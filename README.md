@@ -108,3 +108,20 @@ print(factorial)
 
 * As well as standard desktop integrated development environments, there are Web browser-based IDEs; SageMath (intended for developing science and math-related Python programs); PythonAnywhere, a browser-based IDE and hosting environment; and Canopy IDE, a commercial Python IDE emphasizing scientific computing.
 
+
+## Languages influenced by Python
+
+Python's design and philosophy have influenced many other programming language
+* Boo uses indentation, a similar syntax, and a similar object model.
+* Cobra uses indentation and a similar syntax, and its Acknowledgements document lists Python first among languages that influenced it.
+* CoffeeScript, a programming language that cross-compiles to JavaScript, has Python-inspired syntax.
+* ECMAScript/JavaScript borrowed iterators and generators from Python.
+* GDScript, a scripting language very similar to Python, built-in to the Godot game engine.
+* Go is designed for the "speed of working in a dynamic language like Python" and shares the same syntax for slicing arrays.
+* Groovy was motivated by the desire to bring the Python design philosophy to Java.
+* Julia was designed to be "as usable for general programming as Python".
+* Nim uses indentation and similar syntax.
+* Ruby's creator, Yukihiro Matsumoto, has said: "I wanted a scripting language that was more powerful than Perl, and more object-oriented than Python. That's why I decided to design my own language."
+* Swift, a programming language developed by Apple, has some Python-inspired syntax.
+
+Python's development practices have also been emulated by other languages. For example, the practice of requiring a document describing the rationale for, and issues surrounding, a change to the language (in Python, a PEP) is also used in Tcl, Erlang, and Swift.
