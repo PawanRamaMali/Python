@@ -78,3 +78,23 @@ The standard type hierarchy in Python 3
 * Python allows programmers to define their own types using classes, which are most often used for object-oriented programming. 
 New instances of classes are constructed by calling the class (for example, SpamClass() or EggsClass()), and the classes are instances of the metaclass type (itself an instance of itself), allowing metaprogramming and reflection.
 
+## Code Examples
+
+Hello world program:
+```py
+print('Hello, world!')
+```
+
+Program to calculate the factorial of a positive integer:
+```py
+n = int(input('Type a number, and its factorial will be printed: '))
+
+if n < 0:
+    raise ValueError('You must enter a non negative integer')
+
+factorial = 1
+for i in range(2, n + 1):
+    factorial *= i
+
+print(factorial)
+```
