@@ -60,7 +60,21 @@ Statements cannot be a part of an expression, so list and other comprehensions o
 
 ## Methods
 
-Methods on objects are functions attached to the object's class; 
-the syntax instance.method(argument) is, for normal methods and functions, syntactic sugar for Class.method(instance, argument). 
-Python methods have an explicit self parameter to access instance data, in contrast to the implicit self (or this) in some other object-oriented programming languages (e.g., C++, Java, Objective-C, or Ruby).
-Apart from this Python also provides methods, sometimes called dunder methods due to their names beginning and ending with double-underscores, to extend the functionality of custom class to support native functions such as print, length, comparison, support for arithmetic operations, type conversion, and many more.
+* Methods on objects are functions attached to the object's class; 
+* the syntax instance.method(argument) is, for normal methods and functions, syntactic sugar for Class.method(instance, argument). 
+* Python methods have an explicit self parameter to access instance data, in contrast to the implicit self (or this) in some other object-oriented programming languages (e.g., C++, Java, Objective-C, or Ruby).
+* Apart from this Python also provides methods, sometimes called dunder methods due to their names beginning and ending with double-underscores, to extend the functionality of custom class to support native functions such as print, length, comparison, support for arithmetic operations, type conversion, and many more.
+
+## Typing
+
+![image](https://user-images.githubusercontent.com/11299574/131167952-10c95d10-762c-4a73-9a55-ba9ca1289708.png)
+
+The standard type hierarchy in Python 3
+
+* Python uses duck typing and has typed objects but untyped variable names. 
+* Type constraints are not checked at compile time; rather, operations on an object may fail, signifying that the given object is not of a suitable type. 
+* Despite being dynamically-typed, Python is strongly-typed, forbidding operations that are not well-defined (for example, adding a number to a string) rather than silently attempting to make sense of them.
+
+* Python allows programmers to define their own types using classes, which are most often used for object-oriented programming. 
+New instances of classes are constructed by calling the class (for example, SpamClass() or EggsClass()), and the classes are instances of the metaclass type (itself an instance of itself), allowing metaprogramming and reflection.
+
