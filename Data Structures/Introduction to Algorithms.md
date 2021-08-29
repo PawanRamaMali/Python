@@ -38,3 +38,8 @@ def sum2(n):
 
 sum2(10)
 ```
+
+You'll notice both functions have the same result, but completely different algorithms. You'll note that the first function iteratively adds the numbers, while the second function makes use of:  ∑(i=0,n)i=(n(n+1))/2
+So how can we objectively compare the algorithms? We could compare the amount of space they take in memory or we could also compare how much time it takes each function to run. We can use the built in %timeit magic function in jupyter to compare the time of the functions. The %timeit magic in Jupyter Notebooks will repeat the loop iteration a certain number of times and take the best result. Check out the link for the documentation.
+
+
