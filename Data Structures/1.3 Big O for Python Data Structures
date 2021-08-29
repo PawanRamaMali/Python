@@ -1,0 +1,29 @@
+# Big O for Python Data Structures
+
+In this lecture we will go over the Big O of built-in data structures in Python: Lists and Dictionaries.
+
+## Lists
+
+In Python lists act as dynamic arrays and support a number of common operations through methods called on them. The two most common operations performed on a list are indexing and assigning to an index position. These operations are both designed to be run in constant time, O(1).
+
+Let's imagine you wanted to test different methods to construct a list that is [0,1,2...10000]. Let go ahead and compare various methods, such as appending to the end of a list, concatenating a list, or using tools such as casting and list comprehension.
+
+For example:
+```py
+
+def method1():
+    l = []
+    for n in xrange(10000):
+        l = l + [n]
+
+def method2():
+    l = []
+    for n in xrange(10000):
+        l.append(n)
+
+def method3():
+    l = [n for n in xrange(10000)]
+
+def method4():
+    l = range(10000) # Python 3: list(range(10000))
+```
