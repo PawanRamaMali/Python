@@ -43,3 +43,15 @@ You'll notice both functions have the same result, but completely different algo
 So how can we objectively compare the algorithms? We could compare the amount of space they take in memory or we could also compare how much time it takes each function to run. We can use the built in %timeit magic function in jupyter to compare the time of the functions. The %timeit magic in Jupyter Notebooks will repeat the loop iteration a certain number of times and take the best result. Check out the link for the documentation.
 
 
+Let's go ahead and compare the time it took to run the functions:
+
+`%timeit sum1(100)`
+The slowest run took 5.15 times longer than the fastest. This could mean that an intermediate result is being cached 
+100000 loops, best of 3: 4.86 µs per loop
+`%timeit sum2(100)`
+The slowest run took 16.54 times longer than the fastest. This could mean that an intermediate result is being cached 
+10000000 loops, best of 3: 173 ns per loop
+
+We can see that the second function is much more efficient! Running at a much faster rate than the first. However, we can not use "time to run" as an objective measurement, because that will depend on the speed of the computer itself and hardware capabilities. So we will need to use another method, Big-O!
+
+In the next lecture we will discuss Big-O notation and why its so important!
