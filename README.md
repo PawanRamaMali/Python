@@ -125,3 +125,11 @@ Python's design and philosophy have influenced many other programming language
 * Swift, a programming language developed by Apple, has some Python-inspired syntax.
 
 Python's development practices have also been emulated by other languages. For example, the practice of requiring a document describing the rationale for, and issues surrounding, a change to the language (in Python, a PEP) is also used in Tcl, Erlang, and Swift.
+
+## Start a Python virtual environment 
+
+```
+> python -m venv env
+> .\env\Scripts\activate
+> (env) C:\drive\cd .\app\ 
+```
