@@ -20,7 +20,26 @@ Install the [Anaconda distribution](https://www.anaconda.com/products/individual
 
 2. Activate the new environment with `conda activate ml`.
 
-3. Navigate to directory containing the *requirements.txt* of this repository ([here](https://github.com/jamescalam/transformers/blob/main/requirements.txt)).
+3. Navigate to directory containing the *requirements.txt* of this repository.
+
+requirements.txt
+```
+elasticsearch==7.10.0
+farm-haystack==0.7.0
+kaggle==1.5.12
+nltk==3.5
+numpy==1.19.2
+pandas==1.1.5
+rouge==1.0.0
+seaborn==0.11.1
+transformers==4.1.1
+sentence-transformers==1.1.0
+spacy==3.0.6
+spacy-transformers==1.0.2
+flair==0.8
+tensorflow==2.5.0
+ipykernel==5.5.5
+```
 
 4. Write `pip install -r requirements.txt`.
 
