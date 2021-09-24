@@ -9,3 +9,7 @@
 [02 Python Flow Control](02%20Python%20Flow%20Control.md)
 
 [03 Python Functions](03%20Python%20Functions.md)
+
+### Sources 
+
+[Automate Boring Stuff with Python](https://automatetheboringstuff.com/)
