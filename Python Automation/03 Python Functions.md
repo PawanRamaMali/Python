@@ -385,17 +385,348 @@ You can view the execution of this program at https://autbor.com/localglobalsame
 Since these three separate variables all have the same name, it can be confusing to keep track of which one is being used at any given time. This is why you should avoid using the same variable name in different scopes.
 
 
+### The global Statement
+
+If you need to modify a global variable from within a function, use the global statement. If you have a line such as global eggs at the top of a function, it tells Python, “In this function, eggs refers to the global variable, so don’t create a local variable with this name.” For example, enter the following code into the file editor and save it as globalStatement.py:
+
+```
+def spam():
+  ➊ global eggs
+  ➋ eggs = 'spam'
+
+eggs = 'global'
+spam()
+print(eggs)
+
+```
+
+When you run this program, the final print() call will output this:
+
+```
+spam
+```
+
+You can view the execution of this program at https://autbor.com/globalstatement/. Because eggs is declared global at the top of spam() ➊, when eggs is set to 'spam' ➋, this assignment is done to the globally scoped eggs. No local eggs variable is created.
+
+There are four rules to tell whether a variable is in a local scope or global scope:
+
+If a variable is being used in the global scope (that is, outside of all functions), then it is always a global variable.
+If there is a global statement for that variable in a function, it is a global variable.
+Otherwise, if the variable is used in an assignment statement in the function, it is a local variable.
+But if the variable is not used in an assignment statement, it is a global variable.
+To get a better feel for these rules, here’s an example program. Enter the following code into the file editor and save it as sameNameLocalGlobal.py:
 
 
+```
+def spam():
+  ➊ global eggs
+     eggs = 'spam' # this is the global
+
+def bacon():
+  ➋ eggs = 'bacon' # this is a local
+
+def ham():
+  ➌ print(eggs) # this is the global
+
+eggs = 42 # this is the global
+spam()
+print(eggs)
+```
+
+In the spam() function, eggs is the global eggs variable because there’s a global statement for eggs at the beginning of the function ➊. In bacon(), eggs is a local variable because there’s an assignment statement for it in that function ➋. In ham() ➌, eggs is the global variable because there is no assignment statement or global statement for it in that function. If you run sameNameLocalGlobal.py, the output will look like this:
 
 
+```
+spam
+```
+
+You can view the execution of this program at https://autbor.com/sameNameLocalGlobal/. In a function, a variable will either always be global or always be local. The code in a function can’t use a local variable named eggs and then use the global eggs variable later in that same function.
 
 
+> If you ever want to modify the value stored in a global variable from in a function, you must use a global statement on that variable.
 
 
+If you try to use a local variable in a function before you assign a value to it, as in the following program, Python will give you an error. To see this, enter the following into the file editor and save it as sameNameError.py:
+
+```
+   def spam():
+       print(eggs) # ERROR!
+    ➊ eggs = 'spam local'
+
+➋ eggs = 'global'
+   spam()
+   
+```
+
+If you run the previous program, it produces an error message.
 
 
+```
+Traceback (most recent call last):
+  File "C:/sameNameError.py", line 6, in <module>
+    spam()
+  File "C:/sameNameError.py", line 2, in spam
+    print(eggs) # ERROR!
+UnboundLocalError: local variable 'eggs' referenced before assignment
+```
+
+You can view the execution of this program at https://autbor.com/sameNameError/. This error happens because Python sees that there is an assignment statement for eggs in the spam() function ➊ and, therefore, considers eggs to be local. But because print(eggs) is executed before eggs is assigned anything, the local variable eggs doesn’t exist. Python will not fall back to using the global eggs variable ➋.
+
+### FUNCTIONS AS “BLACK BOXES”
+
+Often, all you need to know about a function are its inputs (the parameters) and output value; you don’t always have to burden yourself with how the function’s code actually works. When you think about functions in this high-level way, it’s common to say that you’re treating a function as a “black box.”
+
+This idea is fundamental to modern programming. Later chapters in this book will show you several modules with functions that were written by other people. While you can take a peek at the source code if you’re curious, you don’t need to know how these functions work in order to use them. And because writing functions without global variables is encouraged, you usually don’t have to worry about the function’s code interacting with the rest of your program.
+
+### Exception Handling
+
+Right now, getting an error, or exception, in your Python program means the entire program will crash. You don’t want this to happen in real-world programs. Instead, you want the program to detect errors, handle them, and then continue to run.
+
+For example, consider the following program, which has a divide-by-zero error. Open a file editor window and enter the following code, saving it as zeroDivide.py:
+
+```
+def spam(divideBy):
+    return 42 / divideBy
+
+print(spam(2))
+print(spam(12))
+print(spam(0))
+print(spam(1))
+```
+
+We’ve defined a function called spam, given it a parameter, and then printed the value of that function with various parameters to see what happens. This is the output you get when you run the previous code:
+
+```
+21.0
+3.5
+Traceback (most recent call last):
+  File "C:/zeroDivide.py", line 6, in <module>
+    print(spam(0))
+  File "C:/zeroDivide.py", line 2, in spam
+    return 42 / divideBy
+ZeroDivisionError: division by zero
+```
+
+You can view the execution of this program at https://autbor.com/zerodivide/. A ZeroDivisionError happens whenever you try to divide a number by zero. From the line number given in the error message, you know that the return statement in spam() is causing an error.
+
+Errors can be handled with try and except statements. The code that could potentially have an error is put in a try clause. The program execution moves to the start of a following except clause if an error happens.
+
+You can put the previous divide-by-zero code in a try clause and have an except clause contain code to handle what happens when this error occurs.
 
 
+```
+def spam(divideBy):
+    try:
+        return 42 / divideBy
+    except ZeroDivisionError:
+        print('Error: Invalid argument.')
+
+print(spam(2))
+print(spam(12))
+print(spam(0))
+print(spam(1))
+```
+
+When code in a try clause causes an error, the program execution immediately moves to the code in the except clause. After running that code, the execution continues as normal. The output of the previous program is as follows:
 
 
+```
+21.0
+3.5
+Error: Invalid argument.
+None
+42.0
+```
+
+
+You can view the execution of this program at https://autbor.com/tryexceptzerodivide/. Note that any errors that occur in function calls in a try block will also be caught. Consider the following program, which instead has the spam() calls in the try block:
+
+```
+def spam(divideBy):
+    return 42 / divideBy
+
+try:
+    print(spam(2))
+    print(spam(12))
+    print(spam(0))
+    print(spam(1))
+except ZeroDivisionError:
+    print('Error: Invalid argument.')
+```
+
+When this program is run, the output looks like this:
+
+
+```
+21.0
+3.5
+Error: Invalid argument.
+
+```
+
+You can view the execution of this program at https://autbor.com/spamintry/. The reason print(spam(1)) is never executed is because once the execution jumps to the code in the except clause, it does not return to the try clause. Instead, it just continues moving down the program as normal.
+
+### A Short Program: Zigzag
+
+Let’s use the programming concepts you’ve learned so far to create a small animation program. This program will create a back-and-forth, zigzag pattern until the user stops it by pressing the Mu editor’s Stop button or by pressing CTRL-C. When you run this program, the output will look something like this:
+
+```
+    ********
+   ********
+  ********
+ ********
+********
+ ********
+  ********
+   ********
+    ********
+```
+
+Type the following source code into the file editor, and save the file as zigzag.py:
+
+```
+import time, sys
+indent = 0 # How many spaces to indent.
+indentIncreasing = True # Whether the indentation is increasing or not.
+
+try:
+    while True: # The main program loop.
+        print(' ' * indent, end='')
+        print('********')
+        time.sleep(0.1) # Pause for 1/10 of a second.
+
+        if indentIncreasing:
+            # Increase the number of spaces:
+            indent = indent + 1
+            if indent == 20:
+                # Change direction:
+                indentIncreasing = False
+
+        else:
+            # Decrease the number of spaces:
+            indent = indent - 1
+            if indent == 0:
+                # Change direction:
+                indentIncreasing = True
+except KeyboardInterrupt:
+    sys.exit()
+```
+
+Let’s look at this code line by line, starting at the top.
+
+```
+import time, sys
+indent = 0 # How many spaces to indent.
+indentIncreasing = True # Whether the indentation is increasing or not.
+```
+
+First, we’ll import the time and sys modules. Our program uses two variables: the indent variable keeps track of how many spaces of indentation are before the band of eight asterisks and indentIncreasing contains a Boolean value to determine if the amount of indentation is increasing or decreasing.
+
+```
+try:
+    while True: # The main program loop.
+        print(' ' * indent, end='')
+        print('********')
+        time.sleep(0.1) # Pause for 1/10 of a second.
+```
+
+Next, we place the rest of the program inside a try statement. When the user presses CTRL-C while a Python program is running, Python raises the KeyboardInterrupt exception. If there is no try-except statement to catch this exception, the program crashes with an ugly error message. However, for our program, we want it to cleanly handle the KeyboardInterrupt exception by calling sys.exit(). (The code for this is in the except statement at the end of the program.)
+
+The while True: infinite loop will repeat the instructions in our program forever. This involves using ' ' * indent to print the correct amount of spaces of indentation. We don’t want to automatically print a newline after these spaces, so we also pass end='' to the first print() call. A second print() call prints the band of asterisks. The time.sleep() function hasn’t been covered yet, but suffice it to say that it introduces a one-tenth-second pause in our program at this point.
+
+```
+        if indentIncreasing:
+            # Increase the number of spaces:
+            indent = indent + 1
+            if indent == 20:
+                indentIncreasing = False # Change direction.
+```
+
+Next, we want to adjust the amount of indentation for the next time we print asterisks. If indentIncreasing is True, then we want to add one to indent. But once indent reaches 20, we want the indentation to decrease.
+
+```
+        else:
+            # Decrease the number of spaces:
+            indent = indent - 1
+            if indent == 0:
+                indentIncreasing = True # Change direction.
+```
+
+Meanwhile, if indentIncreasing was False, we want to subtract one from indent. Once indent reaches 0, we want the indentation to increase once again. Either way, the program execution will jump back to the start of the main program loop to print the asterisks again.
+
+```
+except KeyboardInterrupt:
+    sys.exit()
+```
+
+If the user presses CTRL-C at any point that the program execution is in the try block, the KeyboardInterrrupt exception is raised and handled by this except statement. The program execution moves inside the except block, which runs sys.exit() and quits the program. This way, even though the main program loop is an infinite loop, the user has a way to shut down the program.
+
+### Summary
+
+Functions are the primary way to compartmentalize your code into logical groups. Since the variables in functions exist in their own local scopes, the code in one function cannot directly affect the values of variables in other functions. This limits what code could be changing the values of your variables, which can be helpful when it comes to debugging your code.
+
+Functions are a great tool to help you organize your code. You can think of them as black boxes: they have inputs in the form of parameters and outputs in the form of return values, and the code in them doesn’t affect variables in other functions.
+
+In previous chapters, a single error could cause your programs to crash. In this chapter, you learned about try and except statements, which can run code when an error has been detected. This can make your programs more resilient to common error cases.
+
+### Practice Questions
+1. Why are functions advantageous to have in your programs?
+
+2. When does the code in a function execute: when the function is defined or when the function is called?
+
+3. What statement creates a function?
+
+4. What is the difference between a function and a function call?
+
+5. How many global scopes are there in a Python program? How many local scopes?
+
+6. What happens to variables in a local scope when the function call returns?
+
+7. What is a return value? Can a return value be part of an expression?
+
+8. If a function does not have a return statement, what is the return value of a call to that function?
+
+9. How can you force a variable in a function to refer to the global variable?
+
+10. What is the data type of None?
+
+11. What does the import areallyourpetsnamederic statement do?
+
+12. If you had a function named bacon() in a module named spam, how would you call it after importing spam?
+
+13. How can you prevent a program from crashing when it gets an error?
+
+14. What goes in the try clause? What goes in the except clause?
+
+
+### Practice Projects
+For practice, write programs to do the following tasks.
+
+### The Collatz Sequence
+
+Write a function named collatz() that has one parameter named number. If number is even, then collatz() should print number // 2 and return this value. If number is odd, then collatz() should print and return 3 * number + 1.
+
+Then write a program that lets the user type in an integer and that keeps calling collatz() on that number until the function returns the value 1. (Amazingly enough, this sequence actually works for any integer—sooner or later, using this sequence, you’ll arrive at 1! Even mathematicians aren’t sure why. Your program is exploring what’s called the Collatz sequence, sometimes called “the simplest impossible math problem.”)
+
+Remember to convert the return value from input() to an integer with the int() function; otherwise, it will be a string value.
+
+Hint: An integer number is even if number % 2 == 0, and it’s odd if number % 2 == 1.
+
+The output of this program could look something like this:
+
+
+```
+Enter number:
+3
+10
+5
+16
+8
+4
+2
+1
+```
+
+### Input Validation
+
+Add try and except statements to the previous project to detect whether the user types in a noninteger string. Normally, the int() function will raise a ValueError error if it is passed a noninteger string, as in int('puppy'). In the except clause, print a message to the user saying they must enter an integer.
