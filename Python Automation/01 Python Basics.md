@@ -369,16 +369,164 @@ TypeError: can only concatenate str (not "int") to str
 Python gives an error because the + operator can only be used to add two integers together or concatenate two strings. You can’t add an integer to a string, because this is ungrammatical in Python. You can fix this by using a string version of the integer instead, as explained in the next section.
 
 
+### The str(), int(), and float() Functions
+
+If you want to concatenate an integer such as 29 with a string to pass to print(), you’ll need to get the value '29', which is the string form of 29. The str() function can be passed an integer value and will evaluate to a string value version of the integer, as follows:
+
+```
+>>> str(29)
+'29'
+>>> print('I am ' + str(29) + ' years old.')
+I am 29 years old.
+```
+
+Because str(29) evaluates to '29', the expression 'I am ' + str(29) + ' years old.' evaluates to 'I am ' + '29' + ' years old.', which in turn evaluates to 'I am 29 years old.'. This is the value that is passed to the print() function.
+
+The str(), int(), and float() functions will evaluate to the string, integer, and floating-point forms of the value you pass, respectively. Try converting some values in the interactive shell with these functions and watch what happens.
+
+```
+>>> str(0)
+'0'
+>>> str(-3.14)
+'-3.14'
+>>> int('42')
+42
+>>> int('-99')
+-99
+>>> int(1.25)
+1
+>>> int(1.99)
+1
+>>> float('3.14')
+3.14
+>>> float(10)
+10.0
+```
+
+The previous examples call the str(), int(), and float() functions and pass them values of the other data types to obtain a string, integer, or floating-point form of those values.
+
+The str() function is handy when you have an integer or float that you want to concatenate to a string. The int() function is also helpful if you have a number as a string value that you want to use in some mathematics. For example, the input() function always returns a string, even if the user enters a number. Enter spam = input() into the interactive shell and enter 101 when it waits for your text.
+
+```
+>>> spam = input()
+101
+>>> spam
+'101'
+```
 
 
+The value stored inside spam isn’t the integer 101 but the string '101'. If you want to do math using the value in spam, use the int() function to get the integer form of spam and then store this as the new value in spam.
+```
+>>> spam = int(spam)
+>>> spam
+101
+```
+Now you should be able to treat the spam variable as an integer instead of a string.
+```
+>>> spam * 10 / 5
+202.0
+```
+Note that if you pass a value to int() that it cannot evaluate as an integer, Python will display an error message.
+```
+>>> int('99.99')
+Traceback (most recent call last):
+  File "<pyshell#18>", line 1, in <module>
+    int('99.99')
+ValueError: invalid literal for int() with base 10: '99.99'
+>>> int('twelve')
+Traceback (most recent call last):
+  File "<pyshell#19>", line 1, in <module>
+    int('twelve')
+ValueError: invalid literal for int() with base 10: 'twelve'
+
+The int() function is also useful if you need to round a floating-point number down.
+
+>>> int(7.7)
+7
+>>> int(7.7) + 1
+8
+```
+You used the int() and str() functions in the last three lines of your program to get a value of the appropriate data type for the code.
+```
+➏ print('What is your age?') # ask for their age
+   myAge = input()
+   print('You will be ' + str(int(myAge) + 1) + ' in a year.')
+```
+
+### TEXT AND NUMBER EQUIVALENCE
+
+Although the string value of a number is considered a completely different value from the integer or floating-point version, an integer can be equal to a floating point.
+```
+>>> 42 == '42'
+False
+>>> 42 == 42.0
+True
+>>> 42.0 == 0042.000
+True
+```
+Python makes this distinction because strings are text, while integers and floats are both numbers.
 
 
+The myAge variable contains the value returned from input(). Because the input() function always returns a string (even if the user typed in a number), you can use the int(myAge) code to return an integer value of the string in myAge. This integer value is then added to 1 in the expression int(myAge) + 1.
+
+The result of this addition is passed to the str() function: str(int(myAge) + 1). The string value returned is then concatenated with the strings 'You will be ' and ' in a year.' to evaluate to one large string value. This large string is finally passed to print() to be displayed on the screen.
+
+Let’s say the user enters the string '4' for myAge. The string '4' is converted to an integer, so you can add one to it. The result is 5. The str() function converts the result back to a string, so you can concatenate it with the second string, 'in a year.', to create the final message. These evaluation steps would look something like the following:
+
+![image](https://user-images.githubusercontent.com/11299574/134638778-8148cdb5-18c7-4680-ab0e-41589fd76b8b.png)
+
+### Summary
+
+You can compute expressions with a calculator or enter string concatenations with a word processor. You can even do string replication easily by copying and pasting text. But expressions, and their component values—operators, variables, and function calls—are the basic building blocks that make programs. Once you know how to handle these elements, you will be able to instruct Python to operate on large amounts of data for you.
+
+It is good to remember the different types of operators (+, -, *, /, //, %, and ** for math operations, and + and * for string operations) and the three data types (integers, floating-point numbers, and strings) introduced in this chapter.
+
+I introduced a few different functions as well. The print() and input() functions handle simple text output (to the screen) and input (from the keyboard). The len() function takes a string and evaluates to an int of the number of characters in the string. The str(), int(), and float() functions will evaluate to the string, integer, or floating-point number form of the value they are passed.
+
+In the next chapter, you’ll learn how to tell Python to make intelligent decisions about what code to run, what code to skip, and what code to repeat based on the values it has. This is known as flow control, and it allows you to write programs that make intelligent decisions.
 
 
+Practice Questions
+1. Which of the following are operators, and which are values?
 
+*
+'hello'
+-88.8
+-
+/
++
+5
 
+2. Which of the following is a variable, and which is a string?
 
+spam
+'spam'
 
+3. Name three data types.
+
+4. What is an expression made up of? What do all expressions do?
+
+5. This chapter introduced assignment statements, like spam = 10. What is the difference between an expression and a statement?
+
+6. What does the variable bacon contain after the following code runs?
+
+bacon = 20
+bacon + 1
+
+7. What should the following two expressions evaluate to?
+
+'spam' + 'spamspam'
+'spam' * 3
+
+8. Why is eggs a valid variable name while 100 is invalid?
+
+9. What three functions can be used to get the integer, floating-point number, or string version of a value?
+
+10. Why does this expression cause an error? How can you fix it?
+
+'I have eaten ' + 99 + ' burritos.'
+
+Extra credit: Search online for the Python documentation for the len() function. It will be on a web page titled “Built-in Functions.” Skim the list of other functions Python has, look up what the round() function does, and experiment with it in the interactive shell.
 
 
 
