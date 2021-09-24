@@ -4,7 +4,7 @@
 
 [00 Introduction](000%20Introduction.md)
 
-[01 Python Basics](01%20Python%20Basics.md")
+[01 Python Basics](01%20Python%20Basics.md)
 
 [02 Python Flow Control](02%20Python%20Flow%20Control.md)
 
