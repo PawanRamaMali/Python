@@ -1,0 +1,1176 @@
+# Exceptions: Handling Errors Gracefully {#sec-exceptions}
+
+Errors happen - files don't exist, users enter invalid data, network connections fail. Exception handling lets your program respond to errors gracefully instead of crashing. It's like having a safety net that catches problems and lets you handle them appropriately!
+
+## What Are Exceptions?
+
+An **exception** is an event that disrupts the normal flow of a program. When Python encounters an error, it "raises" an exception.
+
+### Basic Exception Example
+
+```{python}
+# Without exception handling: program crashes
+try:
+    result = 10 / 0  # This will cause an error
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+    result = None
+
+print(f"Result: {result}")
+print("Program continues!")
+```
+
+### What Happens Without try-except?
+
+```{python}
+# This would crash the program:
+def unsafe_divide(a, b):
+    return a / b  # Crashes if b is 0
+
+# This is safer:
+def safe_divide(a, b):
+    try:
+        return a / b
+    except ZeroDivisionError:
+        return None
+
+# Test
+print(f"Unsafe would crash with 0")
+print(f"Safe: {safe_divide(10, 0)}")
+print("Program still running!")
+```
+
+::: {.callout-note}
+## Exception Concepts
+- **Exception**: An error that occurs during execution
+- **Raise**: Generate an exception
+- **Catch**: Handle an exception with try-except
+- **Finally**: Code that always runs (cleanup)
+- **Exception Hierarchy**: Exceptions inherit from each other
+:::
+
+## Try-Except Basics
+
+### Simple try-except
+
+```{python}
+# Basic exception handling
+try:
+    number = int("abc")  # This will fail
+    print(f"Number: {number}")
+except ValueError:
+    print("Invalid number format!")
+
+print("Continuing after exception...")
+```
+
+### Catching Multiple Exceptions
+
+```{python}
+def process_data(value, divisor):
+    try:
+        result = int(value) / int(divisor)
+        return result
+    except ValueError:
+        print("Invalid number format")
+        return None
+    except ZeroDivisionError:
+        print("Cannot divide by zero")
+        return None
+
+# Test different errors
+print(f"Result: {process_data('10', '2')}")
+print(f"Result: {process_data('abc', '2')}")
+print(f"Result: {process_data('10', '0')}")
+```
+
+### Catching Multiple Exceptions Together
+
+```{python}
+def safe_calculation(a, b, operation):
+    try:
+        if operation == "divide":
+            return int(a) / int(b)
+        elif operation == "multiply":
+            return int(a) * int(b)
+    except (ValueError, TypeError) as e:
+        print(f"Invalid input: {e}")
+        return None
+    except ZeroDivisionError:
+        print("Division by zero")
+        return None
+
+# Test
+print(safe_calculation("10", "2", "divide"))
+print(safe_calculation("abc", "2", "divide"))
+print(safe_calculation("10", "0", "divide"))
+```
+
+### Catching All Exceptions
+
+```{python}
+def risky_operation(value):
+    try:
+        result = eval(value)  # Dangerous! Just for demo
+        return result
+    except Exception as e:
+        print(f"Error occurred: {type(e).__name__}: {e}")
+        return None
+
+# Test
+print(risky_operation("2 + 2"))
+print(risky_operation("10 / 0"))
+print(risky_operation("invalid"))
+```
+
+::: {.callout-warning}
+## Catching All Exceptions
+Using bare `except:` or `except Exception:` catches all exceptions, which can hide bugs!
+
+**Better practice**:
+```python
+# Good: Catch specific exceptions
+try:
+    risky_code()
+except ValueError:
+    handle_value_error()
+except TypeError:
+    handle_type_error()
+
+# Acceptable: Catch broad but log
+try:
+    risky_code()
+except Exception as e:
+    logging.error(f"Unexpected error: {e}")
+    raise  # Re-raise to see the error
+
+# Bad: Silently catch everything
+try:
+    risky_code()
+except:
+    pass  # Never do this!
+```
+:::
+
+## The else Clause
+
+Code in `else` runs if no exception occurred.
+
+### Using else
+
+```{python}
+def divide_numbers(a, b):
+    try:
+        result = a / b
+    except ZeroDivisionError:
+        print("Error: Cannot divide by zero")
+    else:
+        # Runs only if no exception
+        print(f"Division successful: {result}")
+        return result
+
+# Test
+print("Test 1:")
+divide_numbers(10, 2)
+
+print("\nTest 2:")
+divide_numbers(10, 0)
+```
+
+### When to Use else
+
+```{python}
+def read_file_safely(filename):
+    try:
+        file = open(filename, "r")
+    except FileNotFoundError:
+        print(f"File not found: {filename}")
+        return None
+    else:
+        # File opened successfully
+        content = file.read()
+        file.close()
+        print(f"File read successfully: {len(content)} characters")
+        return content
+
+# Create test file
+with open("test.txt", "w") as f:
+    f.write("Hello, World!")
+
+# Test
+content = read_file_safely("test.txt")
+content = read_file_safely("nonexistent.txt")
+```
+
+::: {.callout-tip}
+## When to Use else
+- **Runs only if no exception** occurred
+- **Clearer code**: Separates success from error handling
+- **Avoid confusion**: Only exception-prone code in try block
+
+```python
+# Good: Only risky code in try
+try:
+    data = read_data()
+except IOError:
+    handle_error()
+else:
+    process_data(data)  # Only if read succeeded
+
+# Less clear: Everything in try
+try:
+    data = read_data()
+    process_data(data)
+except IOError:
+    handle_error()
+```
+:::
+
+## The finally Clause
+
+Code in `finally` **always runs**, whether exception occurred or not.
+
+### Basic finally
+
+```{python}
+def open_file(filename):
+    file = None
+    try:
+        file = open(filename, "r")
+        content = file.read()
+        print(f"Read {len(content)} characters")
+        return content
+    except FileNotFoundError:
+        print("File not found")
+        return None
+    finally:
+        # Always runs - cleanup!
+        if file:
+            file.close()
+            print("File closed")
+
+# Test
+print("Test 1:")
+open_file("test.txt")
+
+print("\nTest 2:")
+open_file("missing.txt")
+```
+
+### try-except-else-finally Together
+
+```{python}
+def complete_example(filename):
+    """Demonstrate all clauses"""
+    file = None
+
+    try:
+        print("1. Trying to open file...")
+        file = open(filename, "r")
+
+    except FileNotFoundError:
+        print("2. Exception: File not found")
+        return None
+
+    else:
+        print("3. Else: File opened successfully")
+        content = file.read()
+        return content
+
+    finally:
+        print("4. Finally: Cleanup")
+        if file:
+            file.close()
+
+# Test both scenarios
+print("=== File exists ===")
+result = complete_example("test.txt")
+print(f"Result: {result is not None}\n")
+
+print("=== File missing ===")
+result = complete_example("missing.txt")
+print(f"Result: {result is not None}")
+```
+
+### finally for Resource Cleanup
+
+```{python}
+class DatabaseConnection:
+    """Simulated database connection"""
+
+    def __init__(self, name):
+        self.name = name
+        self.connected = False
+
+    def connect(self):
+        print(f"Connecting to {self.name}...")
+        self.connected = True
+
+    def disconnect(self):
+        print(f"Disconnecting from {self.name}...")
+        self.connected = False
+
+    def query(self, sql):
+        if not self.connected:
+            raise RuntimeError("Not connected!")
+        return f"Results from: {sql}"
+
+# Use finally to ensure cleanup
+def perform_query(sql):
+    db = DatabaseConnection("MyDB")
+
+    try:
+        db.connect()
+        result = db.query(sql)
+        print(f"Query result: {result}")
+        return result
+    except RuntimeError as e:
+        print(f"Error: {e}")
+        return None
+    finally:
+        # Always disconnect
+        if db.connected:
+            db.disconnect()
+
+# Test
+perform_query("SELECT * FROM users")
+```
+
+::: {.callout-important}
+## Exception Handling Flow
+```python
+try:
+    # Code that might raise exception
+
+except SomeException:
+    # Runs if SomeException occurs
+
+else:
+    # Runs if NO exception occurs
+
+finally:
+    # ALWAYS runs (cleanup)
+```
+
+**Order matters**:
+1. `try` block executes
+2. If exception: `except` runs, then `finally`
+3. If no exception: `else` runs, then `finally`
+4. `finally` **always** runs
+:::
+
+## Raising Exceptions
+
+You can raise exceptions manually using `raise`.
+
+### Basic raise
+
+```{python}
+def validate_age(age):
+    """Validate age input"""
+    if age < 0:
+        raise ValueError("Age cannot be negative")
+    if age > 150:
+        raise ValueError("Age seems invalid")
+    return True
+
+# Test
+try:
+    validate_age(30)
+    print("Age is valid")
+except ValueError as e:
+    print(f"Error: {e}")
+
+try:
+    validate_age(-5)
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+### Raising with Custom Messages
+
+```{python}
+def divide(a, b):
+    """Division with validation"""
+    if not isinstance(a, (int, float)):
+        raise TypeError(f"Expected number, got {type(a).__name__}")
+
+    if not isinstance(b, (int, float)):
+        raise TypeError(f"Expected number, got {type(b).__name__}")
+
+    if b == 0:
+        raise ZeroDivisionError("Cannot divide by zero")
+
+    return a / b
+
+# Test
+try:
+    print(divide(10, 2))
+    print(divide("10", 2))
+except (TypeError, ZeroDivisionError) as e:
+    print(f"Error: {e}")
+```
+
+### Re-raising Exceptions
+
+```{python}
+def process_data(data):
+    try:
+        result = int(data) * 2
+        return result
+    except ValueError:
+        print("Warning: Invalid data detected")
+        raise  # Re-raise the same exception
+
+# Test
+try:
+    process_data("abc")
+except ValueError as e:
+    print(f"Caught re-raised exception: {e}")
+```
+
+### Raising from Another Exception
+
+```{python}
+def load_config(filename):
+    try:
+        with open(filename, "r") as f:
+            return f.read()
+    except FileNotFoundError as e:
+        # Raise different exception, preserving original
+        raise RuntimeError(f"Configuration error: {filename} not found") from e
+
+# Test
+try:
+    load_config("config.ini")
+except RuntimeError as e:
+    print(f"Error: {e}")
+    print(f"Caused by: {e.__cause__}")
+```
+
+## Custom Exceptions
+
+Create your own exception classes for specific errors.
+
+### Basic Custom Exception
+
+```{python}
+class InvalidPasswordError(Exception):
+    """Raised when password is invalid"""
+    pass
+
+def validate_password(password):
+    """Validate password strength"""
+    if len(password) < 8:
+        raise InvalidPasswordError("Password must be at least 8 characters")
+
+    if not any(c.isupper() for c in password):
+        raise InvalidPasswordError("Password must contain uppercase letter")
+
+    if not any(c.isdigit() for c in password):
+        raise InvalidPasswordError("Password must contain digit")
+
+    return True
+
+# Test
+passwords = ["short", "nouppercase1", "NODIGITS", "ValidPass123"]
+
+for pwd in passwords:
+    try:
+        validate_password(pwd)
+        print(f"✓ '{pwd}' is valid")
+    except InvalidPasswordError as e:
+        print(f"✗ '{pwd}': {e}")
+```
+
+### Custom Exception with Attributes
+
+```{python}
+class ValidationError(Exception):
+    """Custom validation error with details"""
+
+    def __init__(self, field, value, message):
+        self.field = field
+        self.value = value
+        self.message = message
+        super().__init__(f"{field}: {message} (got: {value})")
+
+def validate_user(name, age, email):
+    """Validate user data"""
+    if not name:
+        raise ValidationError("name", name, "Name cannot be empty")
+
+    if age < 18:
+        raise ValidationError("age", age, "Must be at least 18")
+
+    if "@" not in email:
+        raise ValidationError("email", email, "Invalid email format")
+
+    return True
+
+# Test
+try:
+    validate_user("Alice", 25, "alice@example.com")
+    print("User valid")
+except ValidationError as e:
+    print(f"Validation error in '{e.field}': {e.message}")
+
+try:
+    validate_user("Bob", 15, "bob@example.com")
+except ValidationError as e:
+    print(f"Validation error in '{e.field}': {e.message}")
+```
+
+### Exception Hierarchy
+
+```{python}
+class PaymentError(Exception):
+    """Base exception for payment errors"""
+    pass
+
+class InsufficientFundsError(PaymentError):
+    """Not enough money"""
+    pass
+
+class InvalidCardError(PaymentError):
+    """Card is invalid"""
+    pass
+
+class TransactionDeclinedError(PaymentError):
+    """Transaction was declined"""
+    pass
+
+def process_payment(amount, card, balance):
+    """Process payment with specific exceptions"""
+    if not card:
+        raise InvalidCardError("No card provided")
+
+    if balance < amount:
+        raise InsufficientFundsError(
+            f"Need ${amount}, but only have ${balance}"
+        )
+
+    if amount > 1000:
+        raise TransactionDeclinedError(
+            f"Amount ${amount} exceeds daily limit"
+        )
+
+    return True
+
+# Test with hierarchy
+def make_payment(amount, card, balance):
+    try:
+        process_payment(amount, card, balance)
+        print(f"Payment of ${amount} successful")
+    except InsufficientFundsError as e:
+        print(f"Insufficient funds: {e}")
+    except InvalidCardError as e:
+        print(f"Card error: {e}")
+    except PaymentError as e:
+        # Catches all payment errors
+        print(f"Payment error: {e}")
+
+# Test different scenarios
+make_payment(100, "1234-5678", 200)
+make_payment(300, "1234-5678", 100)
+make_payment(1500, "1234-5678", 2000)
+make_payment(100, None, 200)
+```
+
+::: {.callout-note}
+## Custom Exception Best Practices
+1. **Inherit from Exception** or specific exception type
+2. **Name clearly**: End with "Error" or "Exception"
+3. **Create hierarchy**: Base exceptions for categories
+4. **Add attributes**: Store relevant data
+5. **Document**: Explain when raised
+
+```python
+class MyCustomError(Exception):
+    """Clear docstring explaining the error"""
+
+    def __init__(self, message, code=None):
+        self.code = code
+        super().__init__(message)
+```
+:::
+
+## Common Python Exceptions
+
+### Built-in Exception Examples
+
+```{python}
+# ValueError: Invalid value
+try:
+    int("abc")
+except ValueError as e:
+    print(f"ValueError: {e}")
+
+# TypeError: Wrong type
+try:
+    "string" + 5
+except TypeError as e:
+    print(f"TypeError: {e}")
+
+# KeyError: Missing dictionary key
+try:
+    d = {"a": 1}
+    value = d["b"]
+except KeyError as e:
+    print(f"KeyError: {e}")
+
+# IndexError: Invalid index
+try:
+    lst = [1, 2, 3]
+    value = lst[10]
+except IndexError as e:
+    print(f"IndexError: {e}")
+
+# AttributeError: No such attribute
+try:
+    x = 5
+    x.nonexistent()
+except AttributeError as e:
+    print(f"AttributeError: {e}")
+
+# FileNotFoundError: File doesn't exist
+try:
+    open("nonexistent.txt", "r")
+except FileNotFoundError as e:
+    print(f"FileNotFoundError: {e}")
+```
+
+### Exception Hierarchy
+
+```{python}
+# Python exception hierarchy
+print("Common Exception Hierarchy:")
+print("BaseException")
+print("  ├─ SystemExit")
+print("  ├─ KeyboardInterrupt")
+print("  └─ Exception")
+print("      ├─ ArithmeticError")
+print("      │   ├─ ZeroDivisionError")
+print("      │   └─ OverflowError")
+print("      ├─ LookupError")
+print("      │   ├─ IndexError")
+print("      │   └─ KeyError")
+print("      ├─ ValueError")
+print("      ├─ TypeError")
+print("      ├─ IOError / OSError")
+print("      │   └─ FileNotFoundError")
+print("      └─ RuntimeError")
+```
+
+## Real-World Exception Handling
+
+### File Processing with Error Handling
+
+```{python}
+def safe_file_read(filename):
+    """Read file with comprehensive error handling"""
+    try:
+        with open(filename, "r") as f:
+            content = f.read()
+
+        if not content:
+            raise ValueError("File is empty")
+
+        return content
+
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found")
+        return None
+
+    except PermissionError:
+        print(f"Error: No permission to read '{filename}'")
+        return None
+
+    except ValueError as e:
+        print(f"Warning: {e}")
+        return ""
+
+    except Exception as e:
+        print(f"Unexpected error: {type(e).__name__}: {e}")
+        return None
+
+# Test
+content = safe_file_read("test.txt")
+if content is not None:
+    print(f"Success: Read {len(content)} characters")
+```
+
+### User Input Validation
+
+```{python}
+def get_integer_input(prompt, min_val=None, max_val=None):
+    """Get validated integer from user (simulated)"""
+    def simulate_input(value):
+        """Simulate user input for demonstration"""
+        return value
+
+    # Simulate different inputs
+    test_values = ["42", "abc", "100", "-5"]
+
+    for value in test_values:
+        print(f"\nTrying input: '{value}'")
+        try:
+            number = int(value)
+
+            if min_val is not None and number < min_val:
+                raise ValueError(f"Must be at least {min_val}")
+
+            if max_val is not None and number > max_val:
+                raise ValueError(f"Must be at most {max_val}")
+
+            print(f"Valid input: {number}")
+            return number
+
+        except ValueError as e:
+            if "invalid literal" in str(e):
+                print("Error: Please enter a valid number")
+            else:
+                print(f"Error: {e}")
+
+    return None
+
+# Test
+result = get_integer_input("Enter age: ", min_val=0, max_val=150)
+```
+
+### API Error Handling
+
+```{python}
+class APIError(Exception):
+    """Base API error"""
+    pass
+
+class NetworkError(APIError):
+    """Network-related error"""
+    pass
+
+class AuthenticationError(APIError):
+    """Authentication failed"""
+    pass
+
+class RateLimitError(APIError):
+    """Too many requests"""
+    pass
+
+def make_api_request(endpoint, auth_token):
+    """Simulate API request with error handling"""
+    # Simulate different error scenarios
+    if not auth_token:
+        raise AuthenticationError("No authentication token provided")
+
+    if endpoint == "/unlimited":
+        raise RateLimitError("Rate limit exceeded. Try again later.")
+
+    if endpoint == "/network_error":
+        raise NetworkError("Could not connect to server")
+
+    # Successful request
+    return {"status": "success", "data": "API response"}
+
+def call_api_safely(endpoint, auth_token=None):
+    """Make API call with comprehensive error handling"""
+    try:
+        response = make_api_request(endpoint, auth_token)
+        print(f"✓ Success: {response}")
+        return response
+
+    except AuthenticationError as e:
+        print(f"✗ Authentication failed: {e}")
+        print("  → Please log in again")
+        return None
+
+    except RateLimitError as e:
+        print(f"✗ Rate limit: {e}")
+        print("  → Waiting before retry...")
+        return None
+
+    except NetworkError as e:
+        print(f"✗ Network error: {e}")
+        print("  → Check your connection")
+        return None
+
+    except APIError as e:
+        print(f"✗ API error: {e}")
+        return None
+
+# Test different scenarios
+call_api_safely("/data", "valid_token")
+call_api_safely("/data", None)
+call_api_safely("/unlimited", "valid_token")
+call_api_safely("/network_error", "valid_token")
+```
+
+### Database Operations
+
+```{python}
+class DatabaseError(Exception):
+    """Base database error"""
+    pass
+
+class ConnectionError(DatabaseError):
+    """Connection failed"""
+    pass
+
+class QueryError(DatabaseError):
+    """Query execution failed"""
+    pass
+
+class Database:
+    """Simulated database with error handling"""
+
+    def __init__(self, name):
+        self.name = name
+        self.connected = False
+
+    def connect(self):
+        """Connect to database"""
+        try:
+            # Simulate connection
+            if self.name == "invalid":
+                raise ConnectionError("Cannot connect to database")
+            self.connected = True
+            print(f"Connected to {self.name}")
+        except ConnectionError:
+            print(f"Failed to connect to {self.name}")
+            raise
+
+    def execute(self, query):
+        """Execute query"""
+        if not self.connected:
+            raise ConnectionError("Not connected to database")
+
+        if "ERROR" in query:
+            raise QueryError(f"Invalid query: {query}")
+
+        return f"Query executed: {query}"
+
+    def disconnect(self):
+        """Disconnect from database"""
+        self.connected = False
+        print(f"Disconnected from {self.name}")
+
+def perform_db_operation(db_name, query):
+    """Perform database operation with error handling"""
+    db = Database(db_name)
+
+    try:
+        db.connect()
+        result = db.execute(query)
+        print(f"Result: {result}")
+        return result
+
+    except ConnectionError as e:
+        print(f"Connection error: {e}")
+        return None
+
+    except QueryError as e:
+        print(f"Query error: {e}")
+        return None
+
+    finally:
+        if db.connected:
+            db.disconnect()
+
+# Test
+print("=== Valid operation ===")
+perform_db_operation("mydb", "SELECT * FROM users")
+
+print("\n=== Invalid connection ===")
+perform_db_operation("invalid", "SELECT * FROM users")
+
+print("\n=== Invalid query ===")
+perform_db_operation("mydb", "SELECT ERROR FROM users")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Exception basics**:
+  - What exceptions are
+  - try-except blocks
+  - Catching specific exceptions
+
+- **Exception flow control**:
+  - `try` - code that might raise
+  - `except` - handle exceptions
+  - `else` - runs if no exception
+  - `finally` - always runs (cleanup)
+
+- **Raising exceptions**:
+  - `raise` statement
+  - Custom messages
+  - Re-raising exceptions
+  - Exception chaining
+
+- **Custom exceptions**:
+  - Creating exception classes
+  - Exception hierarchies
+  - Adding attributes
+  - Best practices
+
+- **Common exceptions**:
+  - ValueError, TypeError, KeyError
+  - IndexError, AttributeError
+  - FileNotFoundError, PermissionError
+  - Exception hierarchy
+
+- **Real-world examples**:
+  - File operations
+  - User input validation
+  - API error handling
+  - Database operations
+
+::: {.callout-important}
+## Key Takeaways
+1. **Exceptions** handle errors gracefully
+2. **try-except** catches and handles exceptions
+3. **Catch specific** exceptions when possible
+4. **else** runs only if no exception
+5. **finally** always runs (cleanup)
+6. **raise** to generate exceptions
+7. **Custom exceptions** for specific errors
+8. **Exception hierarchy** enables grouped handling
+9. **Always clean up** resources (use finally or with)
+10. **Don't hide errors** - log and handle appropriately
+:::
+
+## Practice Exercises
+
+### Exercise 1: Safe Calculator
+
+Create a calculator with comprehensive error handling.
+
+```{python}
+class CalculatorError(Exception):
+    """Solution: Base calculator error"""
+    pass
+
+class InvalidOperationError(CalculatorError):
+    """Invalid operation"""
+    pass
+
+class InvalidOperandError(CalculatorError):
+    """Invalid operand"""
+    pass
+
+class Calculator:
+    """Solution: Safe calculator"""
+
+    @staticmethod
+    def calculate(operation, a, b):
+        """Perform calculation with error handling"""
+        try:
+            # Validate operands
+            a = float(a)
+            b = float(b)
+        except (ValueError, TypeError):
+            raise InvalidOperandError(f"Invalid operands: {a}, {b}")
+
+        # Perform operation
+        operations = {
+            "+": lambda x, y: x + y,
+            "-": lambda x, y: x - y,
+            "*": lambda x, y: x * y,
+            "/": lambda x, y: x / y,
+            "**": lambda x, y: x ** y
+        }
+
+        if operation not in operations:
+            raise InvalidOperationError(f"Unknown operation: {operation}")
+
+        try:
+            result = operations[operation](a, b)
+            return result
+        except ZeroDivisionError:
+            raise CalculatorError("Division by zero")
+        except OverflowError:
+            raise CalculatorError("Result too large")
+
+# Test
+test_cases = [
+    ("+", 10, 5),
+    ("/", 10, 0),
+    ("*", 10, "abc"),
+    ("unknown", 10, 5),
+    ("**", 10, 1000)
+]
+
+for op, a, b in test_cases:
+    try:
+        result = Calculator.calculate(op, a, b)
+        print(f"✓ {a} {op} {b} = {result}")
+    except CalculatorError as e:
+        print(f"✗ {a} {op} {b}: {type(e).__name__}: {e}")
+```
+
+### Exercise 2: File Manager
+
+Create a file manager with error handling.
+
+```{python}
+class FileManagerError(Exception):
+    """Solution: Base file manager error"""
+    pass
+
+class FileManager:
+    """Solution: Safe file operations"""
+
+    @staticmethod
+    def read_file(filename):
+        """Read file with error handling"""
+        try:
+            with open(filename, "r") as f:
+                return f.read()
+        except FileNotFoundError:
+            raise FileManagerError(f"File not found: {filename}")
+        except PermissionError:
+            raise FileManagerError(f"Permission denied: {filename}")
+        except Exception as e:
+            raise FileManagerError(f"Error reading file: {e}")
+
+    @staticmethod
+    def write_file(filename, content):
+        """Write file with error handling"""
+        try:
+            with open(filename, "w") as f:
+                f.write(content)
+            return True
+        except PermissionError:
+            raise FileManagerError(f"Permission denied: {filename}")
+        except Exception as e:
+            raise FileManagerError(f"Error writing file: {e}")
+
+    @staticmethod
+    def safe_operation(operation, *args):
+        """Perform operation with error handling"""
+        try:
+            result = operation(*args)
+            print(f"✓ Operation successful")
+            return result
+        except FileManagerError as e:
+            print(f"✗ File error: {e}")
+            return None
+        except Exception as e:
+            print(f"✗ Unexpected error: {e}")
+            return None
+
+# Test
+fm = FileManager()
+
+# Write file
+fm.safe_operation(fm.write_file, "test.txt", "Hello, World!")
+
+# Read file
+content = fm.safe_operation(fm.read_file, "test.txt")
+print(f"Content: {content}")
+
+# Try to read nonexistent file
+fm.safe_operation(fm.read_file, "missing.txt")
+```
+
+### Exercise 3: Validation Framework
+
+Create a reusable validation framework.
+
+```{python}
+class ValidationError(Exception):
+    """Solution: Validation error"""
+
+    def __init__(self, field, message, value=None):
+        self.field = field
+        self.message = message
+        self.value = value
+        super().__init__(f"{field}: {message}")
+
+class Validator:
+    """Solution: Validation framework"""
+
+    @staticmethod
+    def validate_required(value, field_name):
+        """Validate required field"""
+        if value is None or value == "":
+            raise ValidationError(field_name, "Field is required", value)
+
+    @staticmethod
+    def validate_range(value, min_val, max_val, field_name):
+        """Validate numeric range"""
+        try:
+            num = float(value)
+            if num < min_val or num > max_val:
+                raise ValidationError(
+                    field_name,
+                    f"Must be between {min_val} and {max_val}",
+                    value
+                )
+        except (ValueError, TypeError):
+            raise ValidationError(field_name, "Must be a number", value)
+
+    @staticmethod
+    def validate_email(value, field_name):
+        """Validate email format"""
+        if "@" not in value or "." not in value.split("@")[-1]:
+            raise ValidationError(field_name, "Invalid email format", value)
+
+    @staticmethod
+    def validate_all(validations):
+        """Run multiple validations"""
+        errors = []
+
+        for validation in validations:
+            try:
+                validation()
+            except ValidationError as e:
+                errors.append(e)
+
+        return errors
+
+# Test
+def validate_user_data(name, age, email):
+    """Validate user registration data"""
+    validations = [
+        lambda: Validator.validate_required(name, "name"),
+        lambda: Validator.validate_range(age, 18, 120, "age"),
+        lambda: Validator.validate_email(email, "email")
+    ]
+
+    errors = Validator.validate_all(validations)
+
+    if errors:
+        print("Validation failed:")
+        for error in errors:
+            print(f"  - {error.field}: {error.message}")
+        return False
+
+    print("✓ All validations passed")
+    return True
+
+# Test cases
+print("=== Valid data ===")
+validate_user_data("Alice", 30, "alice@example.com")
+
+print("\n=== Invalid data ===")
+validate_user_data("", 15, "invalid-email")
+```
+
+::: {.callout-tip}
+## Exception Handling Mastery!
+Exceptions are crucial for robust software:
+- **Anticipate errors**: Think about what can go wrong
+- **Handle specifically**: Catch specific exceptions
+- **Clean up resources**: Use finally or with
+- **Log errors**: Keep track of what went wrong
+- **User-friendly**: Show helpful error messages
+- **Fail gracefully**: Don't crash, handle it
+
+Practice handling errors in file I/O, network operations, user input, and data processing!
+:::
+
+---
+
+Congratulations! You've completed all 10 comprehensive chapters on Python programming. You've learned about variable scope, lambda functions, modules and packages, object-oriented programming (classes, inheritance, polymorphism, encapsulation), file I/O, and exception handling. You now have the tools to build robust, maintainable Python applications!

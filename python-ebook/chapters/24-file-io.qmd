@@ -1,0 +1,909 @@
+# File I/O: Reading and Writing Files {#sec-file-io}
+
+Files are how programs persist data beyond their execution. Whether you're saving user data, reading configuration files, or processing log files, file operations are essential. Python makes file I/O straightforward and safe with its powerful built-in functions and context managers!
+
+## What is File I/O?
+
+**File I/O** (Input/Output) refers to reading data from files and writing data to files on disk.
+
+### Why File I/O Matters
+
+```{python}
+# Without files: data disappears when program ends
+# With files: data persists across program runs
+
+print("File I/O allows programs to:")
+print("  - Save user data")
+print("  - Read configuration")
+print("  - Process documents")
+print("  - Store logs")
+print("  - Exchange data between programs")
+```
+
+::: {.callout-note}
+## File I/O Concepts
+- **File Handle**: Object representing an open file
+- **File Modes**: Read, write, append, binary
+- **File Position**: Current read/write location
+- **Context Manager**: Automatic file closing with `with`
+- **Encoding**: How text is converted to bytes
+:::
+
+## Opening and Closing Files
+
+### Basic File Operations
+
+```{python}
+# Create a sample file first
+with open("sample.txt", "w") as f:
+    f.write("Hello, World!")
+
+# Open and read a file
+file = open("sample.txt", "r")
+content = file.read()
+print(content)
+file.close()  # Must close manually!
+
+print("File read successfully")
+```
+
+### The with Statement (Recommended)
+
+```{python}
+# Better: with statement automatically closes file
+with open("sample.txt", "r") as file:
+    content = file.read()
+    print(content)
+
+# File is automatically closed here, even if error occurs!
+print("with statement ensures file is closed")
+```
+
+### Why Use with?
+
+```{python}
+# Without with: Risk of not closing file
+try:
+    file = open("sample.txt", "r")
+    content = file.read()
+    # If error occurs here, file never closes!
+    result = process_content(content)  # Might raise exception
+except:
+    pass
+finally:
+    file.close()  # Must remember to close
+
+# With with: Automatic cleanup
+with open("sample.txt", "r") as file:
+    content = file.read()
+    # File automatically closes even if error occurs
+    result = process_content(content)
+```
+
+::: {.callout-important}
+## File Handling Best Practices
+1. **Always use `with`** for automatic cleanup
+2. **Handle exceptions** when opening files
+3. **Close files** if not using `with`
+4. **Check file exists** before reading
+5. **Use appropriate mode** for your task
+6. **Specify encoding** for text files
+7. **Use pathlib** for path operations
+:::
+
+## File Modes
+
+Different modes for different operations.
+
+### Common File Modes
+
+```{python}
+# Write mode: 'w' - Creates new or overwrites existing
+with open("output.txt", "w") as f:
+    f.write("This is line 1\n")
+    f.write("This is line 2\n")
+
+# Read mode: 'r' - Read existing file
+with open("output.txt", "r") as f:
+    content = f.read()
+    print("Read content:")
+    print(content)
+
+# Append mode: 'a' - Add to end of file
+with open("output.txt", "a") as f:
+    f.write("This is line 3\n")
+
+# Read the appended content
+with open("output.txt", "r") as f:
+    print("\nAfter append:")
+    print(f.read())
+```
+
+### All File Modes
+
+```{python}
+modes = {
+    "r": "Read (default) - file must exist",
+    "w": "Write - creates new or truncates existing",
+    "a": "Append - adds to end of file",
+    "x": "Exclusive create - fails if file exists",
+    "r+": "Read and write - file must exist",
+    "w+": "Write and read - creates new or truncates",
+    "a+": "Append and read - creates if not exists",
+    "rb": "Read binary",
+    "wb": "Write binary",
+    "ab": "Append binary"
+}
+
+print("File Modes:")
+for mode, description in modes.items():
+    print(f"  '{mode}': {description}")
+```
+
+### Mode Examples
+
+```{python}
+# Exclusive create: 'x' - Error if file exists
+try:
+    with open("new_file.txt", "x") as f:
+        f.write("Created exclusively")
+    print("File created")
+except FileExistsError:
+    print("File already exists!")
+
+# Read and write: 'r+'
+with open("output.txt", "r+") as f:
+    content = f.read()  # Read
+    f.write("Added line\n")  # Write at current position
+```
+
+::: {.callout-tip}
+## Choosing the Right Mode
+- **Read existing**: `'r'`
+- **Create/overwrite**: `'w'`
+- **Add to end**: `'a'`
+- **Must not exist**: `'x'`
+- **Read and write**: `'r+'`, `'w+'`, `'a+'`
+- **Binary data**: Add `'b'` (e.g., `'rb'`, `'wb'`)
+:::
+
+## Reading Files
+
+Different methods for reading file content.
+
+### Reading Entire File
+
+```{python}
+# Create sample file
+with open("book.txt", "w") as f:
+    f.write("Chapter 1: Introduction\n")
+    f.write("Python is awesome.\n")
+    f.write("Chapter 2: Basics\n")
+    f.write("Let's learn Python!\n")
+
+# Read entire file as string
+with open("book.txt", "r") as f:
+    content = f.read()
+    print("Full content:")
+    print(content)
+    print(f"\nTotal characters: {len(content)}")
+```
+
+### Reading Lines
+
+```{python}
+# Read all lines as list
+with open("book.txt", "r") as f:
+    lines = f.readlines()
+    print("All lines:")
+    for i, line in enumerate(lines, 1):
+        print(f"  {i}: {line.strip()}")
+```
+
+### Reading Line by Line
+
+```{python}
+# Read one line at a time (memory efficient)
+with open("book.txt", "r") as f:
+    print("Reading line by line:")
+    for line_num, line in enumerate(f, 1):
+        print(f"  Line {line_num}: {line.strip()}")
+```
+
+### Reading Specific Amount
+
+```{python}
+# Read specific number of characters
+with open("book.txt", "r") as f:
+    chunk = f.read(20)  # Read first 20 characters
+    print(f"First 20 chars: {chunk}")
+
+    chunk = f.read(20)  # Read next 20
+    print(f"Next 20 chars: {chunk}")
+```
+
+### Reading Methods Comparison
+
+```{python}
+with open("book.txt", "r") as f:
+    # read() - entire file as string
+    f.seek(0)  # Reset to beginning
+    content = f.read()
+    print(f"read(): {type(content)}, length: {len(content)}")
+
+    # readlines() - list of lines
+    f.seek(0)
+    lines = f.readlines()
+    print(f"readlines(): {type(lines)}, items: {len(lines)}")
+
+    # readline() - one line at a time
+    f.seek(0)
+    first_line = f.readline()
+    print(f"readline(): {first_line.strip()}")
+
+    # iteration - memory efficient
+    f.seek(0)
+    print("iteration: for line in file:")
+    for i, line in enumerate(f, 1):
+        if i > 2:
+            break
+        print(f"  {line.strip()}")
+```
+
+::: {.callout-note}
+## Reading Methods
+**`read()`**: Entire file as string
+- Good for small files
+- Simple to use
+- Loads everything into memory
+
+**`readlines()`**: List of lines
+- Good for processing all lines
+- Convenient for small files
+- All lines in memory at once
+
+**`readline()`**: One line at a time
+- Good for large files
+- Memory efficient
+- Manual iteration needed
+
+**Iteration** (`for line in file`):
+- Best for large files
+- Memory efficient
+- Most Pythonic
+:::
+
+## Writing to Files
+
+Different ways to write data to files.
+
+### Basic Writing
+
+```{python}
+# Write strings to file
+with open("output.txt", "w") as f:
+    f.write("First line\n")
+    f.write("Second line\n")
+    f.write("Third line\n")
+
+# Read back
+with open("output.txt", "r") as f:
+    print(f.read())
+```
+
+### Writing Multiple Lines
+
+```{python}
+# Write list of lines
+lines = [
+    "Python is powerful\n",
+    "Python is easy\n",
+    "Python is fun\n"
+]
+
+with open("output.txt", "w") as f:
+    f.writelines(lines)
+
+# Or use loop
+with open("output.txt", "w") as f:
+    for line in lines:
+        f.write(line)
+
+# Read back
+with open("output.txt", "r") as f:
+    print(f.read())
+```
+
+### Appending to Files
+
+```{python}
+# Append adds to end without erasing
+with open("output.txt", "a") as f:
+    f.write("Appended line 1\n")
+    f.write("Appended line 2\n")
+
+# Read result
+with open("output.txt", "r") as f:
+    print("After appending:")
+    print(f.read())
+```
+
+### Writing Different Data Types
+
+```{python}
+# Must convert to string
+data = {
+    "name": "Alice",
+    "age": 30,
+    "scores": [95, 87, 92]
+}
+
+with open("data.txt", "w") as f:
+    f.write(f"Name: {data['name']}\n")
+    f.write(f"Age: {data['age']}\n")
+    f.write(f"Scores: {', '.join(map(str, data['scores']))}\n")
+
+# Read back
+with open("data.txt", "r") as f:
+    print(f.read())
+```
+
+### Formatting Output
+
+```{python}
+# Write formatted data
+students = [
+    ("Alice", 95),
+    ("Bob", 87),
+    ("Charlie", 92)
+]
+
+with open("grades.txt", "w") as f:
+    f.write("Student Grades\n")
+    f.write("=" * 30 + "\n")
+
+    for name, grade in students:
+        f.write(f"{name:15} {grade:3}\n")
+
+# Display result
+with open("grades.txt", "r") as f:
+    print(f.read())
+```
+
+## Text vs Binary Files
+
+### Text Files (Default)
+
+```{python}
+# Text mode: strings, with encoding
+with open("text.txt", "w") as f:
+    f.write("Hello, World! 🐍")
+
+with open("text.txt", "r") as f:
+    content = f.read()
+    print(f"Text: {content}")
+    print(f"Type: {type(content)}")
+```
+
+### Binary Files
+
+```{python}
+# Binary mode: bytes, no encoding
+data = b"Hello, World!"  # bytes literal
+
+with open("binary.dat", "wb") as f:
+    f.write(data)
+
+with open("binary.dat", "rb") as f:
+    content = f.read()
+    print(f"Binary: {content}")
+    print(f"Type: {type(content)}")
+    print(f"Decoded: {content.decode()}")
+```
+
+### When to Use Binary Mode
+
+```{python}
+# Binary mode for non-text files
+print("Use binary mode for:")
+print("  - Images (PNG, JPG, GIF)")
+print("  - Videos (MP4, AVI)")
+print("  - Audio (MP3, WAV)")
+print("  - Compressed files (ZIP, GZ)")
+print("  - Executables")
+print("  - Any non-text data")
+
+print("\nUse text mode for:")
+print("  - Text files (.txt)")
+print("  - Source code (.py, .java)")
+print("  - Configuration (.ini, .cfg)")
+print("  - Data files (CSV, JSON, XML)")
+print("  - Logs")
+```
+
+### Encoding
+
+```{python}
+# Specify encoding explicitly
+text = "Hello, Python! 🐍 日本語"
+
+# Write with UTF-8 (default)
+with open("encoded.txt", "w", encoding="utf-8") as f:
+    f.write(text)
+
+# Read with UTF-8
+with open("encoded.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+    print(f"Read: {content}")
+
+# Common encodings
+print("\nCommon encodings:")
+print("  utf-8: Universal, supports all languages")
+print("  ascii: Basic English only")
+print("  latin-1: Western European languages")
+print("  utf-16: Alternative Unicode encoding")
+```
+
+::: {.callout-warning}
+## Encoding Issues
+- **Always specify encoding** for text files
+- **UTF-8 is recommended** for most cases
+- **Binary mode** doesn't use encoding
+- **Match encoding** when reading and writing
+- **UnicodeDecodeError** means wrong encoding
+
+```python
+# Specify encoding
+with open("file.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+```
+:::
+
+## File Position and Seeking
+
+### File Position
+
+```{python}
+# Create sample file
+with open("positions.txt", "w") as f:
+    f.write("0123456789ABCDEF")
+
+# Check position
+with open("positions.txt", "r") as f:
+    print(f"Initial position: {f.tell()}")
+
+    chunk = f.read(5)
+    print(f"Read: {chunk}")
+    print(f"Position after read: {f.tell()}")
+
+    chunk = f.read(5)
+    print(f"Read: {chunk}")
+    print(f"Position: {f.tell()}")
+```
+
+### Seeking
+
+```{python}
+# Seek to specific position
+with open("positions.txt", "r") as f:
+    # Seek to position 10
+    f.seek(10)
+    print(f"Position: {f.tell()}")
+    print(f"Read from 10: {f.read(6)}")
+
+    # Seek to beginning
+    f.seek(0)
+    print(f"\nReset to beginning")
+    print(f"Position: {f.tell()}")
+    print(f"Read: {f.read(5)}")
+```
+
+### Relative Seeking
+
+```{python}
+# Seek relative to current position (binary mode only)
+with open("positions.txt", "rb") as f:
+    f.seek(5)  # Go to position 5
+    print(f"Position: {f.tell()}")
+
+    # Seek relative to current position
+    f.seek(3, 1)  # Move 3 bytes forward
+    print(f"After relative seek: {f.tell()}")
+
+    # Seek from end
+    f.seek(-5, 2)  # 5 bytes before end
+    print(f"From end: {f.tell()}")
+    print(f"Read: {f.read()}")
+```
+
+## Working with File Paths
+
+### Using pathlib (Recommended)
+
+```{python}
+from pathlib import Path
+
+# Create Path object
+file_path = Path("example.txt")
+
+# Write using Path
+file_path.write_text("Hello from pathlib!")
+
+# Read using Path
+content = file_path.read_text()
+print(f"Content: {content}")
+
+# Check if exists
+print(f"Exists: {file_path.exists()}")
+
+# Get file info
+if file_path.exists():
+    print(f"Size: {file_path.stat().st_size} bytes")
+    print(f"Is file: {file_path.is_file()}")
+    print(f"Is directory: {file_path.is_dir()}")
+```
+
+### Path Operations
+
+```{python}
+from pathlib import Path
+
+# Create directory paths
+base_dir = Path("data")
+file_path = base_dir / "subdir" / "file.txt"
+
+print(f"Full path: {file_path}")
+print(f"Parent: {file_path.parent}")
+print(f"Name: {file_path.name}")
+print(f"Suffix: {file_path.suffix}")
+print(f"Stem: {file_path.stem}")
+
+# Create directories
+base_dir.mkdir(exist_ok=True)
+
+# List files
+print("\nFiles in current directory:")
+for file in Path(".").glob("*.txt"):
+    print(f"  {file}")
+```
+
+### Using os.path
+
+```{python}
+import os
+
+# Path operations
+path = "data/subdir/file.txt"
+
+print(f"Directory: {os.path.dirname(path)}")
+print(f"Filename: {os.path.basename(path)}")
+print(f"Extension: {os.path.splitext(path)[1]}")
+
+# Join paths
+new_path = os.path.join("data", "output", "result.txt")
+print(f"Joined path: {new_path}")
+
+# Check existence
+print(f"Exists: {os.path.exists(path)}")
+```
+
+::: {.callout-tip}
+## Path Handling Best Practices
+1. **Use pathlib** for modern Python (3.4+)
+2. **Platform independent**: Works on Windows, Linux, Mac
+3. **Use `/` operator**: `Path("dir") / "file.txt"`
+4. **Check existence**: Before reading/writing
+5. **Create directories**: `mkdir(parents=True, exist_ok=True)`
+6. **Glob for patterns**: Find files by pattern
+:::
+
+## Real-World File I/O Examples
+
+### Configuration File
+
+```{python}
+# Write configuration
+config = {
+    "database": {
+        "host": "localhost",
+        "port": 5432,
+        "name": "myapp"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "app.log"
+    }
+}
+
+with open("config.txt", "w") as f:
+    f.write("[Database]\n")
+    for key, value in config["database"].items():
+        f.write(f"{key} = {value}\n")
+
+    f.write("\n[Logging]\n")
+    for key, value in config["logging"].items():
+        f.write(f"{key} = {value}\n")
+
+# Read configuration
+print("Configuration:")
+with open("config.txt", "r") as f:
+    print(f.read())
+```
+
+### CSV-Like Data
+
+```{python}
+# Write CSV-style data
+employees = [
+    ["Name", "Age", "Department"],
+    ["Alice", "30", "Engineering"],
+    ["Bob", "25", "Marketing"],
+    ["Charlie", "35", "Sales"]
+]
+
+with open("employees.csv", "w") as f:
+    for row in employees:
+        f.write(",".join(row) + "\n")
+
+# Read CSV data
+print("Employee data:")
+with open("employees.csv", "r") as f:
+    for line in f:
+        fields = line.strip().split(",")
+        print(f"  {fields}")
+```
+
+### Log File
+
+```{python}
+from datetime import datetime
+
+def log_message(filename, message, level="INFO"):
+    """Append log message to file"""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(filename, "a") as f:
+        f.write(f"[{timestamp}] {level}: {message}\n")
+
+# Create log entries
+log_message("app.log", "Application started")
+log_message("app.log", "User logged in", "INFO")
+log_message("app.log", "Connection failed", "ERROR")
+log_message("app.log", "Application stopped")
+
+# Read log
+print("Application log:")
+with open("app.log", "r") as f:
+    print(f.read())
+```
+
+### Data Processing
+
+```{python}
+# Read file, process, write result
+with open("book.txt", "r") as input_file:
+    lines = input_file.readlines()
+
+# Process lines
+processed = []
+for line in lines:
+    # Convert to uppercase and add line numbers
+    processed.append(line.upper())
+
+# Write processed data
+with open("book_uppercase.txt", "w") as output_file:
+    output_file.writelines(processed)
+
+print("Processed file:")
+with open("book_uppercase.txt", "r") as f:
+    print(f.read())
+```
+
+### Copy File
+
+```{python}
+def copy_file(source, destination):
+    """Copy file from source to destination"""
+    with open(source, "rb") as src:
+        with open(destination, "wb") as dst:
+            dst.write(src.read())
+
+# Copy a file
+copy_file("book.txt", "book_copy.txt")
+
+# Verify
+with open("book_copy.txt", "r") as f:
+    print("Copied content:")
+    print(f.read())
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Opening files**:
+  - `open()` function
+  - File modes (r, w, a, x, +, b)
+  - `with` statement for automatic cleanup
+
+- **Reading files**:
+  - `read()` - entire file
+  - `readlines()` - list of lines
+  - `readline()` - one line
+  - Iteration - line by line
+
+- **Writing files**:
+  - `write()` - write string
+  - `writelines()` - write multiple lines
+  - Appending data
+  - Formatting output
+
+- **Binary vs Text**:
+  - Text mode for strings
+  - Binary mode for bytes
+  - Encoding (UTF-8, ASCII, etc.)
+
+- **File position**:
+  - `tell()` - current position
+  - `seek()` - move position
+  - Relative seeking
+
+- **Path handling**:
+  - pathlib module (modern)
+  - os.path module (traditional)
+  - Creating directories
+  - Listing files
+
+- **Real-world examples**:
+  - Configuration files
+  - CSV data
+  - Log files
+  - Data processing
+  - File copying
+
+::: {.callout-important}
+## Key Takeaways
+1. **Always use `with`** for automatic file closing
+2. **Handle exceptions** when working with files
+3. **Choose correct mode** (r, w, a, b)
+4. **Specify encoding** for text files
+5. **Use pathlib** for path operations
+6. **Read line by line** for large files
+7. **Binary mode** for non-text data
+8. **Check file exists** before reading
+9. **Close files** if not using `with`
+10. **Use appropriate methods** for your task
+:::
+
+## Practice Exercises
+
+### Exercise 1: Word Counter
+
+Count words in a text file.
+
+```{python}
+def count_words(filename):
+    """
+    Solution: Count words in file
+    """
+    try:
+        with open(filename, "r") as f:
+            content = f.read()
+
+        words = content.split()
+
+        return {
+            "total_words": len(words),
+            "total_characters": len(content),
+            "total_lines": content.count("\n") + 1,
+            "unique_words": len(set(words))
+        }
+    except FileNotFoundError:
+        return {"error": "File not found"}
+
+# Test
+with open("test.txt", "w") as f:
+    f.write("Python is awesome\n")
+    f.write("Python is powerful\n")
+    f.write("Python is fun\n")
+
+stats = count_words("test.txt")
+print("File statistics:")
+for key, value in stats.items():
+    print(f"  {key}: {value}")
+```
+
+### Exercise 2: CSV Writer/Reader
+
+Work with CSV-like data.
+
+```{python}
+def write_csv(filename, headers, rows):
+    """Solution: Write CSV file"""
+    with open(filename, "w") as f:
+        f.write(",".join(headers) + "\n")
+        for row in rows:
+            f.write(",".join(map(str, row)) + "\n")
+
+def read_csv(filename):
+    """Solution: Read CSV file"""
+    with open(filename, "r") as f:
+        lines = f.readlines()
+
+    headers = lines[0].strip().split(",")
+    data = []
+
+    for line in lines[1:]:
+        values = line.strip().split(",")
+        row_dict = dict(zip(headers, values))
+        data.append(row_dict)
+
+    return headers, data
+
+# Test
+headers = ["Name", "Age", "City"]
+rows = [
+    ["Alice", 30, "New York"],
+    ["Bob", 25, "London"],
+    ["Charlie", 35, "Paris"]
+]
+
+write_csv("people.csv", headers, rows)
+
+headers, data = read_csv("people.csv")
+print(f"Headers: {headers}")
+print("Data:")
+for row in data:
+    print(f"  {row}")
+```
+
+### Exercise 3: File Merge
+
+Merge multiple files into one.
+
+```{python}
+def merge_files(input_files, output_file):
+    """
+    Solution: Merge multiple files
+    """
+    with open(output_file, "w") as out:
+        for i, filename in enumerate(input_files):
+            if i > 0:
+                out.write("\n" + "=" * 50 + "\n\n")
+
+            try:
+                with open(filename, "r") as f:
+                    out.write(f"=== {filename} ===\n")
+                    out.write(f.read())
+            except FileNotFoundError:
+                out.write(f"File not found: {filename}\n")
+
+# Create test files
+with open("file1.txt", "w") as f:
+    f.write("Content of file 1\n")
+
+with open("file2.txt", "w") as f:
+    f.write("Content of file 2\n")
+
+# Merge
+merge_files(["file1.txt", "file2.txt"], "merged.txt")
+
+# Read result
+with open("merged.txt", "r") as f:
+    print(f.read())
+```
+
+::: {.callout-tip}
+## Keep Practicing!
+File I/O is essential for real-world programs. Practice with:
+- Reading configuration files
+- Processing log files
+- Analyzing CSV data
+- Creating reports
+- Data backup and recovery
+
+Remember: Always close files and handle errors!
+:::
+
+---
+
+Congratulations! You've mastered file I/O in Python. You can now read and write files, handle different file formats, and work with file paths confidently. This is crucial for building practical applications!

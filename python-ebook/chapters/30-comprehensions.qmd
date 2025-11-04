@@ -1,0 +1,657 @@
+# Comprehensions {#sec-comprehensions}
+
+## Introduction
+
+Want to create lists, dictionaries, and sets in a single elegant line? Comprehensions are Python's syntactic sugar for creating collections concisely and readably. They combine the power of loops and conditionals into a beautiful, Pythonic expression.
+
+In this chapter, we'll master list, dictionary, and set comprehensions, learning when to use them and when traditional loops are better.
+
+::: {.callout-note}
+## What You'll Learn
+
+- List comprehensions
+- Dictionary comprehensions
+- Set comprehensions
+- Nested comprehensions
+- Conditional logic in comprehensions
+- When to use (and not use) comprehensions
+:::
+
+## List Comprehensions
+
+### Basic Syntax
+
+```python
+# Traditional loop
+squares = []
+for x in range(10):
+    squares.append(x ** 2)
+
+# List comprehension
+squares = [x ** 2 for x in range(10)]
+
+print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+General syntax:
+```python
+[expression for item in iterable]
+```
+
+### Simple Examples
+
+```python
+# Double each number
+numbers = [1, 2, 3, 4, 5]
+doubled = [x * 2 for x in numbers]
+print(doubled)  # [2, 4, 6, 8, 10]
+
+# Convert to uppercase
+words = ['hello', 'world', 'python']
+upper = [word.upper() for word in words]
+print(upper)  # ['HELLO', 'WORLD', 'PYTHON']
+
+# Get lengths
+lengths = [len(word) for word in words]
+print(lengths)  # [5, 5, 6]
+
+# Create tuples
+pairs = [(x, x ** 2) for x in range(5)]
+print(pairs)  # [(0, 0), (1, 1), (2, 4), (3, 9), (4, 16)]
+```
+
+## Comprehensions with Conditions
+
+### Filtering with `if`
+
+```python
+# Traditional loop with condition
+evens = []
+for x in range(10):
+    if x % 2 == 0:
+        evens.append(x)
+
+# List comprehension with filter
+evens = [x for x in range(10) if x % 2 == 0]
+print(evens)  # [0, 2, 4, 6, 8]
+```
+
+### More Filtering Examples
+
+```python
+# Positive numbers only
+numbers = [-5, -2, 0, 3, 7, -1, 8]
+positives = [x for x in numbers if x > 0]
+print(positives)  # [3, 7, 8]
+
+# Long words
+words = ['a', 'hi', 'hello', 'world', 'python']
+long_words = [word for word in words if len(word) > 3]
+print(long_words)  # ['hello', 'world', 'python']
+
+# Filter and transform
+numbers = range(10)
+squared_evens = [x ** 2 for x in numbers if x % 2 == 0]
+print(squared_evens)  # [0, 4, 16, 36, 64]
+```
+
+### Conditional Expression (`if-else`)
+
+```python
+# Different transformation based on condition
+numbers = range(10)
+result = ['even' if x % 2 == 0 else 'odd' for x in numbers]
+print(result)  # ['even', 'odd', 'even', 'odd', ...]
+
+# Double evens, triple odds
+numbers = [1, 2, 3, 4, 5]
+result = [x * 2 if x % 2 == 0 else x * 3 for x in numbers]
+print(result)  # [3, 4, 9, 8, 15]
+
+# Clamp values
+numbers = [-5, 3, 10, 15, -2, 7]
+clamped = [x if 0 <= x <= 10 else (0 if x < 0 else 10) for x in numbers]
+print(clamped)  # [0, 3, 10, 10, 0, 7]
+```
+
+::: {.callout-note}
+## Filter vs Transform
+
+- **Filter**: `[x for x in iterable if condition]` (no `else`)
+- **Transform**: `[value1 if condition else value2 for x in iterable]` (requires `else`)
+:::
+
+## Nested List Comprehensions
+
+### Flattening Lists
+
+```python
+# Nested list
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+# Traditional approach
+flat = []
+for row in matrix:
+    for item in row:
+        flat.append(item)
+
+# List comprehension
+flat = [item for row in matrix for item in row]
+print(flat)  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+### Creating Matrices
+
+```python
+# 3x3 matrix of zeros
+matrix = [[0 for _ in range(3)] for _ in range(3)]
+print(matrix)
+# [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+# Multiplication table
+table = [[i * j for j in range(1, 6)] for i in range(1, 6)]
+for row in table:
+    print(row)
+# [1, 2, 3, 4, 5]
+# [2, 4, 6, 8, 10]
+# [3, 6, 9, 12, 15]
+# [4, 8, 12, 16, 20]
+# [5, 10, 15, 20, 25]
+```
+
+### Coordinate Generation
+
+```python
+# Generate all coordinates
+coords = [(x, y) for x in range(3) for y in range(3)]
+print(coords)
+# [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2), (2,0), (2,1), (2,2)]
+
+# Chess board coordinates
+board = [(chr(ord('a') + x), y) for x in range(8) for y in range(1, 9)]
+print(board[:8])  # First rank
+# [('a',1), ('a',2), ..., ('a',8)]
+```
+
+### Filtering Nested Structures
+
+```python
+# Extract even numbers from matrix
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+evens = [item for row in matrix for item in row if item % 2 == 0]
+print(evens)  # [2, 4, 6, 8]
+
+# Flatten and filter
+nested = [[1, 2], [3, 4, 5], [6]]
+filtered = [x * 2 for sublist in nested for x in sublist if x % 2 == 0]
+print(filtered)  # [4, 8, 12]
+```
+
+## Dictionary Comprehensions
+
+### Basic Syntax
+
+```python
+# Traditional approach
+squares_dict = {}
+for x in range(5):
+    squares_dict[x] = x ** 2
+
+# Dictionary comprehension
+squares_dict = {x: x ** 2 for x in range(5)}
+print(squares_dict)  # {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+```
+
+General syntax:
+```python
+{key_expression: value_expression for item in iterable}
+```
+
+### Creating Dictionaries
+
+```python
+# From lists
+names = ['Alice', 'Bob', 'Charlie']
+ages = [25, 30, 35]
+people = {name: age for name, age in zip(names, ages)}
+print(people)  # {'Alice': 25, 'Bob': 30, 'Charlie': 35}
+
+# Word lengths
+words = ['apple', 'banana', 'cherry']
+lengths = {word: len(word) for word in words}
+print(lengths)  # {'apple': 5, 'banana': 6, 'cherry': 6}
+
+# Enumerate
+items = ['a', 'b', 'c']
+indexed = {i: item for i, item in enumerate(items)}
+print(indexed)  # {0: 'a', 1: 'b', 2: 'c'}
+```
+
+### Filtering Dictionaries
+
+```python
+# Original dictionary
+scores = {'Alice': 85, 'Bob': 92, 'Charlie': 78, 'David': 95}
+
+# Filter by value
+high_scores = {name: score for name, score in scores.items() if score >= 90}
+print(high_scores)  # {'Bob': 92, 'David': 95}
+
+# Filter by key
+short_names = {name: score for name, score in scores.items() if len(name) <= 5}
+print(short_names)  # {'Alice': 85, 'Bob': 92, 'David': 95}
+```
+
+### Transforming Dictionaries
+
+```python
+# Original dictionary
+prices = {'apple': 0.50, 'banana': 0.30, 'cherry': 1.00}
+
+# Apply discount
+discounted = {item: price * 0.9 for item, price in prices.items()}
+print(discounted)  # {'apple': 0.45, 'banana': 0.27, 'cherry': 0.9}
+
+# Swap keys and values
+swapped = {value: key for key, value in prices.items()}
+print(swapped)  # {0.5: 'apple', 0.3: 'banana', 1.0: 'cherry'}
+
+# Convert keys to uppercase
+upper_keys = {key.upper(): value for key, value in prices.items()}
+print(upper_keys)  # {'APPLE': 0.5, 'BANANA': 0.3, 'CHERRY': 1.0}
+```
+
+### Conditional Dictionary Comprehensions
+
+```python
+numbers = range(10)
+
+# Even numbers only
+even_squares = {x: x ** 2 for x in numbers if x % 2 == 0}
+print(even_squares)  # {0: 0, 2: 4, 4: 16, 6: 36, 8: 64}
+
+# Different values based on condition
+categorized = {x: 'even' if x % 2 == 0 else 'odd' for x in range(5)}
+print(categorized)  # {0: 'even', 1: 'odd', 2: 'even', 3: 'odd', 4: 'even'}
+```
+
+## Set Comprehensions
+
+### Basic Syntax
+
+```python
+# Traditional approach
+squares_set = set()
+for x in range(5):
+    squares_set.add(x ** 2)
+
+# Set comprehension
+squares_set = {x ** 2 for x in range(5)}
+print(squares_set)  # {0, 1, 4, 9, 16}
+```
+
+General syntax:
+```python
+{expression for item in iterable}
+```
+
+### Creating Sets
+
+```python
+# Unique letters
+word = "hello"
+letters = {char for char in word}
+print(letters)  # {'h', 'e', 'l', 'o'} (no duplicates)
+
+# Absolute values (removes duplicates)
+numbers = [-2, -1, 0, 1, 2]
+absolutes = {abs(x) for x in numbers}
+print(absolutes)  # {0, 1, 2}
+
+# Unique word lengths
+words = ['a', 'hi', 'hello', 'world', 'python', 'hi']
+lengths = {len(word) for word in words}
+print(lengths)  # {1, 2, 5, 6}
+```
+
+### Filtering Sets
+
+```python
+# Even numbers only
+numbers = range(10)
+evens = {x for x in numbers if x % 2 == 0}
+print(evens)  # {0, 2, 4, 6, 8}
+
+# Vowels from string
+text = "Hello World"
+vowels = {char.lower() for char in text if char.lower() in 'aeiou'}
+print(vowels)  # {'e', 'o'}
+```
+
+### Set Operations with Comprehensions
+
+```python
+# Divisible by 2 or 3
+numbers = range(20)
+div_2_or_3 = {x for x in numbers if x % 2 == 0 or x % 3 == 0}
+print(div_2_or_3)  # {0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18}
+
+# Common elements
+list1 = [1, 2, 3, 4, 5]
+list2 = [4, 5, 6, 7, 8]
+common = {x for x in list1 if x in list2}
+print(common)  # {4, 5}
+```
+
+## Practical Examples
+
+### Data Processing
+
+```python
+# Parse CSV-like data
+data = "name:Alice,age:25,city:NYC"
+parsed = {item.split(':')[0]: item.split(':')[1]
+          for item in data.split(',')}
+print(parsed)  # {'name': 'Alice', 'age': '25', 'city': 'NYC'}
+
+# Extract numbers from strings
+strings = ['abc123', 'def456', 'ghi789']
+numbers = [int(''.join(c for c in s if c.isdigit())) for s in strings]
+print(numbers)  # [123, 456, 789]
+
+# Count words
+text = "hello world hello python world"
+word_count = {word: text.split().count(word) for word in set(text.split())}
+print(word_count)  # {'hello': 2, 'world': 2, 'python': 1}
+```
+
+### File Processing
+
+```python
+# Read and process file lines
+# lines = [line.strip() for line in open('file.txt')]
+
+# Non-empty lines only
+# lines = [line.strip() for line in open('file.txt') if line.strip()]
+
+# Process configuration
+config_text = """
+key1=value1
+key2=value2
+key3=value3
+"""
+config = {line.split('=')[0]: line.split('=')[1]
+          for line in config_text.strip().split('\n')}
+print(config)  # {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+```
+
+### String Manipulation
+
+```python
+# Remove vowels
+text = "Hello World"
+no_vowels = ''.join([c for c in text if c.lower() not in 'aeiou'])
+print(no_vowels)  # Hll Wrld
+
+# Capitalize each word
+sentence = "hello world python"
+capitalized = ' '.join([word.capitalize() for word in sentence.split()])
+print(capitalized)  # Hello World Python
+
+# Extract digits
+text = "Phone: 123-456-7890"
+digits = ''.join([c for c in text if c.isdigit()])
+print(digits)  # 1234567890
+```
+
+### Mathematical Operations
+
+```python
+# Prime numbers (simple check)
+def is_prime(n):
+    if n < 2:
+        return False
+    return all(n % i != 0 for i in range(2, int(n ** 0.5) + 1))
+
+primes = [x for x in range(50) if is_prime(x)]
+print(primes)  # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+# Pythagorean triples
+triples = [(a, b, c) for a in range(1, 20)
+           for b in range(a, 20)
+           for c in range(b, 20)
+           if a**2 + b**2 == c**2]
+print(triples)  # [(3,4,5), (5,12,13), (6,8,10), ...]
+```
+
+### Matrix Operations
+
+```python
+# Transpose matrix
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+transposed = [[row[i] for row in matrix] for i in range(len(matrix[0]))]
+print(transposed)
+# [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+
+# Diagonal elements
+diagonal = [matrix[i][i] for i in range(len(matrix))]
+print(diagonal)  # [1, 5, 9]
+
+# Filter matrix
+filtered = [[x for x in row if x % 2 == 0] for row in matrix]
+print(filtered)  # [[2], [4, 6], [8]]
+```
+
+## When to Use Comprehensions
+
+### Good Use Cases
+
+```python
+# Simple transformations
+squares = [x ** 2 for x in range(10)]
+
+# Simple filtering
+evens = [x for x in numbers if x % 2 == 0]
+
+# Creating mappings
+name_lengths = {name: len(name) for name in names}
+
+# Set operations
+unique_chars = {char for char in text}
+```
+
+### When NOT to Use Comprehensions
+
+```python
+# Too complex - use regular loop instead!
+# BAD: Hard to read
+result = [x * 2 if x % 2 == 0 else x * 3 if x % 3 == 0 else x
+          for x in range(100) if x % 5 != 0]
+
+# GOOD: Use regular loop
+result = []
+for x in range(100):
+    if x % 5 != 0:
+        if x % 2 == 0:
+            result.append(x * 2)
+        elif x % 3 == 0:
+            result.append(x * 3)
+        else:
+            result.append(x)
+
+# Multiple operations - use regular loop!
+# BAD: Side effects in comprehension
+[print(x) for x in range(10)]  # Don't do this!
+
+# GOOD: Use regular loop
+for x in range(10):
+    print(x)
+```
+
+::: {.callout-important}
+## Comprehension Guidelines
+
+Use comprehensions when:
+- The operation is simple and clear
+- It fits on one line (or max two)
+- You're creating a new collection
+
+Avoid comprehensions when:
+- The logic is complex or nested
+- You need side effects (printing, modifying external state)
+- It hurts readability
+:::
+
+## Performance Considerations
+
+```python
+import time
+
+# Performance test
+def time_it(func):
+    start = time.time()
+    func()
+    return time.time() - start
+
+# List comprehension vs loop
+def with_comprehension():
+    return [x ** 2 for x in range(1000000)]
+
+def with_loop():
+    result = []
+    for x in range(1000000):
+        result.append(x ** 2)
+    return result
+
+comp_time = time_it(with_comprehension)
+loop_time = time_it(with_loop)
+
+print(f"Comprehension: {comp_time:.4f}s")
+print(f"Loop: {loop_time:.4f}s")
+print(f"Comprehension is {loop_time / comp_time:.2f}x faster")
+```
+
+::: {.callout-tip}
+## Performance
+
+Comprehensions are generally faster than equivalent loops because they're optimized at the C level. However, readability should usually take priority over minor performance gains.
+:::
+
+## Common Patterns
+
+### Enumerate Pattern
+
+```python
+# Add index to items
+items = ['a', 'b', 'c']
+indexed = {i: item for i, item in enumerate(items)}
+print(indexed)  # {0: 'a', 1: 'b', 2: 'c'}
+```
+
+### Zip Pattern
+
+```python
+# Combine lists
+keys = ['name', 'age', 'city']
+values = ['Alice', 25, 'NYC']
+person = {k: v for k, v in zip(keys, values)}
+print(person)  # {'name': 'Alice', 'age': 25, 'city': 'NYC'}
+```
+
+### Conditional Filtering
+
+```python
+# Multiple conditions
+numbers = range(20)
+result = [x for x in numbers if x % 2 == 0 if x % 3 == 0]
+print(result)  # [0, 6, 12, 18]
+
+# Equivalent to:
+result = [x for x in numbers if x % 2 == 0 and x % 3 == 0]
+```
+
+### Nested Iteration
+
+```python
+# Cartesian product
+colors = ['red', 'green', 'blue']
+sizes = ['S', 'M', 'L']
+products = [(color, size) for color in colors for size in sizes]
+print(products)
+# [('red','S'), ('red','M'), ('red','L'),
+#  ('green','S'), ('green','M'), ('green','L'),
+#  ('blue','S'), ('blue','M'), ('blue','L')]
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **List comprehensions** create lists concisely
+- **Dictionary comprehensions** build dictionaries elegantly
+- **Set comprehensions** generate sets with unique values
+- **Conditional logic** enables filtering and transformation
+- **Nested comprehensions** handle complex structures
+- **Best practices** prioritize readability over cleverness
+
+Comprehensions are a powerful Python feature that, when used appropriately, make code more readable and Pythonic!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Comprehensions are faster and more Pythonic than loops
+- Use `if` for filtering, `if-else` for transformation
+- Keep comprehensions simple and readable
+- Use regular loops for complex logic
+- Dictionary and set comprehensions work like list comprehensions
+:::
+
+## Practice Exercises
+
+### Exercise 1: Filter and Square
+Create a list of squared even numbers from 1 to 20:
+
+```python
+# Your code here
+result = [...]
+print(result)  # [4, 16, 36, 64, 100, ...]
+```
+
+### Exercise 2: Grade Mapping
+Create a dictionary mapping student names to "Pass"/"Fail" based on scores:
+
+```python
+students = {'Alice': 85, 'Bob': 55, 'Charlie': 90, 'David': 45}
+# Your code here
+# {'Alice': 'Pass', 'Bob': 'Fail', 'Charlie': 'Pass', 'David': 'Fail'}
+```
+
+### Exercise 3: Unique Word Lengths
+Get unique word lengths from a sentence:
+
+```python
+sentence = "the quick brown fox jumps over the lazy dog"
+# Your code here
+# {3, 5, 4} (unique lengths)
+```
+
+### Exercise 4: Flatten and Filter
+Flatten nested list and keep only positive numbers:
+
+```python
+nested = [[1, -2, 3], [-4, 5, 6], [7, -8, 9]]
+# Your code here
+# [1, 3, 5, 6, 7, 9]
+```
+
+### Exercise 5: Create Lookup Table
+Create a dictionary mapping lowercase to uppercase letters:
+
+```python
+# Your code here
+# {'a': 'A', 'b': 'B', ..., 'z': 'Z'}
+```
+
+## Next Steps
+
+In the next chapter, we'll explore the **datetime module**, learning how to work with dates, times, and time zones. Time to master time!

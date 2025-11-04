@@ -1,0 +1,82 @@
+# Welcome to Python Programming! {.unnumbered}
+
+![](https://raw.githubusercontent.com/python/cpython/main/Misc/python-logo.svg){width=50% fig-align="center"}
+
+## About This Book
+
+Welcome to **Python Programming: From Zero to Hero**! This book is your comprehensive guide to mastering Python, one of the most popular and versatile programming languages in the world.
+
+Whether you're a complete beginner who's never written a line of code, or an experienced programmer looking to add Python to your toolkit, this book has something for you. We've designed it to be:
+
+- **Comprehensive**: Covering everything from basic syntax to advanced concepts
+- **Progressive**: Each chapter builds on previous knowledge
+- **Practical**: Filled with real-world examples and exercises
+- **Fun**: Learning should be enjoyable, not a chore!
+- **Interactive**: Run code examples right in your browser or on your machine
+
+## What You'll Learn
+
+:::{.callout-tip}
+## Your Python Journey
+
+By the end of this book, you'll be able to:
+
+- Write clean, efficient Python code
+- Understand and apply object-oriented programming principles
+- Handle files and exceptions like a pro
+- Use Python's powerful standard library
+- Apply best practices and write professional-grade code
+- Build real-world applications
+:::
+
+## Who This Book Is For
+
+- **Complete Beginners**: No programming experience required! We start from scratch.
+- **Experienced Programmers**: Coming from another language? Learn Python idioms and best practices.
+- **Students**: Perfect for academic courses or self-study.
+- **Professionals**: Enhance your skills for data science, web development, automation, and more.
+
+## How to Use This Book
+
+1. **Read Sequentially**: Chapters build on each other, so start from the beginning if you're new to programming.
+2. **Try the Examples**: Don't just read—type out and run the code examples.
+3. **Do the Exercises**: Practice is essential for mastery.
+4. **Experiment**: Modify examples to see what happens. Breaking things is learning!
+5. **Take Your Time**: There's no rush. Understanding beats speed every time.
+
+:::{.callout-note}
+## Code Examples
+
+All code examples in this book are designed to be:
+
+- Copy-paste friendly
+- Tested and verified
+- Progressively more complex
+- Annotated with explanations
+:::
+
+## Prerequisites
+
+All you need is:
+
+- A computer (Windows, Mac, or Linux)
+- Internet connection (for installation and resources)
+- Curiosity and willingness to learn
+- No prior programming experience required!
+
+## Get Started
+
+Ready to begin your Python journey? Let's dive in! Start with [Chapter 1: Introduction to Python](chapters/01-introduction.qmd).
+
+---
+
+:::{.callout-important}
+## Stay Connected
+
+- **Practice Daily**: Even 15 minutes a day makes a huge difference
+- **Build Projects**: Apply what you learn to real problems
+- **Join Communities**: Python has an amazing, welcoming community
+- **Have Fun**: Enjoy the journey of learning!
+:::
+
+Happy coding! 🐍

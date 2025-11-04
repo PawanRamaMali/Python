@@ -1,0 +1,620 @@
+# Variables and Data Types
+
+## What is a Variable?
+
+A variable is like a labeled box where you can store data. Think of it as giving a name to a value so you can use it later.
+
+```{python}
+# Creating variables
+name = "Alice"
+age = 25
+height = 5.6
+is_student = True
+
+print(name)
+print(age)
+```
+
+:::{.callout-note}
+## Variable Analogy
+
+Think of variables like labels on containers:
+- The label is the **variable name**
+- The container holds the **value**
+- You can change what's in the container anytime
+:::
+
+## Creating and Using Variables
+
+### Assignment
+
+Use the `=` operator to assign values:
+
+```{python}
+x = 10          # Assign 10 to x
+message = "Hi"  # Assign "Hi" to message
+pi = 3.14159    # Assign 3.14159 to pi
+
+print(x, message, pi)
+```
+
+### Multiple Assignments
+
+```{python}
+# Assign multiple variables at once
+x, y, z = 1, 2, 3
+print(f"x={x}, y={y}, z={z}")
+
+# Assign same value to multiple variables
+a = b = c = 0
+print(f"a={a}, b={b}, c={c}")
+
+# Swap values
+a, b = 10, 20
+print(f"Before swap: a={a}, b={b}")
+a, b = b, a
+print(f"After swap: a={a}, b={b}")
+```
+
+## Variable Naming Rules
+
+### Must Follow These Rules:
+
+1. **Start with letter or underscore**: `name`, `_private`
+2. **Can contain letters, numbers, underscores**: `user1`, `first_name`
+3. **Case-sensitive**: `age` and `Age` are different
+4. **No spaces**: Use `first_name`, not `first name`
+5. **No reserved keywords**: Can't use `if`, `for`, `while`, etc.
+
+### Good Practice:
+
+```{python}
+# Good variable names (descriptive, readable)
+user_name = "Alice"
+total_price = 99.99
+is_active = True
+MAX_CONNECTIONS = 100
+
+# Avoid (too short, unclear)
+n = "Alice"  # What is n?
+tp = 99.99   # What is tp?
+x = True     # What does x represent?
+```
+
+:::{.callout-tip}
+## Naming Conventions
+
+- **Variables/functions**: `lower_case_with_underscores`
+- **Constants**: `UPPER_CASE_WITH_UNDERSCORES`
+- **Classes**: `CapitalizedWords` (we'll learn later)
+- **Private variables**: `_leading_underscore`
+:::
+
+### Reserved Keywords
+
+These words are reserved by Python:
+
+```{python}
+import keyword
+print(keyword.kwlist)
+```
+
+## Python Data Types
+
+Python has several built-in data types. Let's explore the main ones:
+
+### 1. Numeric Types
+
+#### Integers (int)
+
+Whole numbers, positive or negative:
+
+```{python}
+age = 25
+temperature = -5
+population = 1_000_000  # Underscores for readability
+
+print(age, temperature, population)
+print(type(age))  # Check type
+```
+
+Python integers can be arbitrarily large:
+
+```{python}
+huge_number = 99999999999999999999999999999
+print(huge_number)
+print(huge_number * 2)
+```
+
+#### Floating-Point Numbers (float)
+
+Numbers with decimal points:
+
+```{python}
+price = 19.99
+temperature = 98.6
+pi = 3.14159
+
+print(price, temperature, pi)
+print(type(price))
+```
+
+Scientific notation:
+
+```{python}
+small = 1.5e-10  # 1.5 × 10⁻¹⁰
+large = 2.5e6    # 2.5 × 10⁶ = 2,500,000
+
+print(small)
+print(large)
+```
+
+#### Complex Numbers (complex)
+
+Numbers with real and imaginary parts:
+
+```{python}
+z = 3 + 4j
+print(z)
+print(type(z))
+print(z.real)
+print(z.imag)
+```
+
+### 2. Boolean Type (bool)
+
+True or False values:
+
+```{python}
+is_python_fun = True
+is_sky_green = False
+
+print(is_python_fun)
+print(type(is_python_fun))
+
+# Boolean operations
+print(True and False)
+print(True or False)
+print(not True)
+```
+
+### 3. String Type (str)
+
+Text data enclosed in quotes:
+
+```{python}
+name = "Alice"
+message = 'Hello, World!'
+multiline = """This is
+a multiline
+string"""
+
+print(name)
+print(type(name))
+```
+
+### 4. NoneType
+
+Represents absence of value:
+
+```{python}
+nothing = None
+print(nothing)
+print(type(nothing))
+```
+
+`None` is useful for initializing variables or representing "no value."
+
+## Type Checking
+
+Use `type()` to check a variable's type:
+
+```{python}
+x = 10
+print(f"x = {x}, type = {type(x)}")
+
+x = 10.5
+print(f"x = {x}, type = {type(x)}")
+
+x = "Hello"
+print(f"x = {x}, type = {type(x)}")
+
+x = True
+print(f"x = {x}, type = {type(x)}")
+```
+
+Use `isinstance()` to check if variable is of specific type:
+
+```{python}
+x = 10
+print(isinstance(x, int))    # True
+print(isinstance(x, float))  # False
+print(isinstance(x, (int, float)))  # True (checks multiple types)
+```
+
+## Type Conversion (Casting)
+
+Convert between types:
+
+### To Integer
+
+```{python}
+# From float
+x = int(3.14)      # 3 (truncates decimal)
+print(x)
+
+# From string
+y = int("100")     # 100
+print(y)
+
+# From boolean
+z = int(True)      # 1
+print(z)
+```
+
+### To Float
+
+```{python}
+# From integer
+x = float(10)      # 10.0
+print(x)
+
+# From string
+y = float("3.14")  # 3.14
+print(y)
+
+# From boolean
+z = float(True)    # 1.0
+print(z)
+```
+
+### To String
+
+```{python}
+# From integer
+x = str(100)       # "100"
+print(x)
+
+# From float
+y = str(3.14)      # "3.14"
+print(y)
+
+# From boolean
+z = str(True)      # "True"
+print(z)
+```
+
+### To Boolean
+
+```{python}
+# Zero and empty values are False
+print(bool(0))          # False
+print(bool(0.0))        # False
+print(bool(""))         # False
+print(bool([]))         # False
+print(bool(None))       # False
+
+# Non-zero and non-empty values are True
+print(bool(1))          # True
+print(bool(-5))         # True
+print(bool("Hello"))    # True
+print(bool([1, 2]))     # True
+```
+
+## Dynamic Typing
+
+Python is dynamically typed—variables can change type:
+
+```{python}
+x = 10              # x is int
+print(f"x = {x}, type = {type(x)}")
+
+x = "Hello"         # now x is str
+print(f"x = {x}, type = {type(x)}")
+
+x = [1, 2, 3]       # now x is list
+print(f"x = {x}, type = {type(x)}")
+```
+
+:::{.callout-important}
+## Dynamic vs. Static Typing
+
+**Dynamic (Python)**: Variable types can change
+```python
+x = 10
+x = "hello"  # OK!
+```
+
+**Static (Java, C++)**: Variable types are fixed
+```java
+int x = 10;
+x = "hello";  // ERROR!
+```
+:::
+
+## Type Hints (Python 3.5+)
+
+You can add type hints for better code documentation:
+
+```{python}
+# Type hints (optional, not enforced)
+name: str = "Alice"
+age: int = 25
+height: float = 5.6
+is_student: bool = True
+
+print(f"{name} is {age} years old")
+```
+
+Type hints don't enforce types but help with:
+- Code documentation
+- IDE autocompletion
+- Type checking tools (mypy)
+
+## Working with Numbers
+
+### Basic Operations
+
+```{python}
+x = 10
+y = 3
+
+print(f"Addition: {x + y}")
+print(f"Subtraction: {x - y}")
+print(f"Multiplication: {x * y}")
+print(f"Division: {x / y}")
+print(f"Floor Division: {x // y}")
+print(f"Modulo: {x % y}")
+print(f"Exponentiation: {x ** y}")
+```
+
+### Built-in Math Functions
+
+```{python}
+x = -7.5
+
+print(f"Absolute value: {abs(x)}")
+print(f"Round: {round(x)}")
+print(f"Round to 1 decimal: {round(x, 1)}")
+print(f"Power: {pow(2, 3)}")  # 2³
+print(f"Max: {max(1, 5, 3)}")
+print(f"Min: {min(1, 5, 3)}")
+```
+
+### Math Module
+
+```{python}
+import math
+
+x = 16
+y = 3.7
+
+print(f"Square root: {math.sqrt(x)}")
+print(f"Ceiling: {math.ceil(y)}")
+print(f"Floor: {math.floor(y)}")
+print(f"Pi: {math.pi}")
+print(f"e: {math.e}")
+print(f"Sin(π/2): {math.sin(math.pi/2)}")
+print(f"Log: {math.log(10)}")
+print(f"Log10: {math.log10(100)}")
+```
+
+## Working with Strings (Preview)
+
+We'll dive deep into strings later, but here are basics:
+
+```{python}
+# String operations
+name = "Alice"
+greeting = "Hello"
+
+# Concatenation
+message = greeting + ", " + name + "!"
+print(message)
+
+# Repetition
+print("Ha" * 5)
+
+# Length
+print(f"Length of '{name}': {len(name)}")
+
+# Indexing
+print(f"First character: {name[0]}")
+print(f"Last character: {name[-1]}")
+
+# Slicing
+print(f"First 3 characters: {name[:3]}")
+```
+
+## Variable Scope (Preview)
+
+Variables have scope—where they can be accessed:
+
+```{python}
+# Global variable
+x = 10
+
+def my_function():
+    # Local variable
+    y = 20
+    print(f"Inside function: x={x}, y={y}")
+
+my_function()
+print(f"Outside function: x={x}")
+# print(y)  # This would cause an error - y is local to the function
+```
+
+We'll learn more about scope in the Functions chapter.
+
+## Best Practices
+
+1. **Use descriptive names**
+```{python}
+# Good
+user_age = 25
+total_price = 99.99
+
+# Bad
+x = 25
+tp = 99.99
+```
+
+2. **Use consistent naming conventions**
+```{python}
+# Good (snake_case for variables)
+first_name = "Alice"
+last_name = "Smith"
+
+# Inconsistent
+firstName = "Alice"  # camelCase (use for JavaScript, not Python)
+LastName = "Smith"   # PascalCase (use for classes)
+```
+
+3. **Don't use built-in names**
+```{python}
+# Bad - shadows built-in functions
+# list = [1, 2, 3]  # Don't do this!
+# str = "hello"     # Don't do this!
+
+# Good
+my_list = [1, 2, 3]
+my_string = "hello"
+```
+
+4. **Initialize variables appropriately**
+```{python}
+# Good - clear initialization
+count = 0
+total = 0.0
+name = ""
+items = []
+
+# Use None when value is unknown
+result = None
+```
+
+## Common Pitfalls
+
+### 1. Type Errors
+
+```{python}
+#| error: true
+# Can't add string and int directly
+"Age: " + 25  # TypeError
+```
+
+```{python}
+# Solution: Convert to same type
+print("Age: " + str(25))
+print(f"Age: {25}")  # Better: use f-string
+```
+
+### 2. Division Differences
+
+```{python}
+# Division always returns float
+print(10 / 2)      # 5.0, not 5
+
+# Use floor division for integer result
+print(10 // 2)     # 5
+```
+
+### 3. Floating Point Precision
+
+```{python}
+# Floating point arithmetic can be imprecise
+print(0.1 + 0.2)           # 0.30000000000000004
+print(0.1 + 0.2 == 0.3)    # False!
+
+# Solution: Use round() or decimal module for precision
+print(round(0.1 + 0.2, 1) == 0.3)  # True
+```
+
+## Summary
+
+In this chapter, you learned:
+
+- ✅ Variables store and label data
+- ✅ Python has dynamic typing
+- ✅ Main types: int, float, complex, bool, str, None
+- ✅ Use `type()` and `isinstance()` to check types
+- ✅ Convert types with `int()`, `float()`, `str()`, `bool()`
+- ✅ Variable naming rules and conventions
+- ✅ Basic operations on numbers and strings
+
+:::{.callout-tip}
+## Next Steps
+
+Now that you understand variables and types, let's explore operators in detail in the next chapter!
+:::
+
+## Practice Exercises
+
+1. Create variables for your name, age, height, and whether you like Python. Print them all.
+
+2. Perform these conversions and print results:
+   - Convert 3.14 to int
+   - Convert "100" to int
+   - Convert 0 to bool
+   - Convert 42 to str
+
+3. Calculate and print:
+   - Your age in days (age × 365)
+   - Your age in hours
+   - Your age in seconds
+
+4. What's wrong with this code? Fix it:
+```python
+Name = "alice"
+AGE = 25
+print(name + " is " + AGE)
+```
+
+5. Create variables for temperature in Fahrenheit, convert to Celsius using formula: C = (F - 32) × 5/9
+
+:::{.callout-note collapse="true"}
+## Exercise Solutions
+
+**Exercise 1:**
+```python
+name = "Alice"
+age = 25
+height = 5.6
+likes_python = True
+print(f"Name: {name}, Age: {age}, Height: {height}, Likes Python: {likes_python}")
+```
+
+**Exercise 2:**
+```python
+print(int(3.14))      # 3
+print(int("100"))     # 100
+print(bool(0))        # False
+print(str(42))        # "42"
+```
+
+**Exercise 3:**
+```python
+age = 25
+print(f"Age in days: {age * 365}")
+print(f"Age in hours: {age * 365 * 24}")
+print(f"Age in seconds: {age * 365 * 24 * 60 * 60}")
+```
+
+**Exercise 4:**
+```python
+# Problems: inconsistent naming, mixing str and int
+# Fixed:
+name = "Alice"
+age = 25
+print(name + " is " + str(age))
+# Or better:
+print(f"{name} is {age}")
+```
+
+**Exercise 5:**
+```python
+fahrenheit = 98.6
+celsius = (fahrenheit - 32) * 5 / 9
+print(f"{fahrenheit}°F = {celsius:.2f}°C")
+```
+:::

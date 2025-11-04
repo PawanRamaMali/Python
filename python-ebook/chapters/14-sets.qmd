@@ -1,0 +1,921 @@
+# Sets: Unique Collections {#sec-sets}
+
+Sets are Python's way of storing unique items. Think of them as a bag of distinct objects - no duplicates allowed! They're perfect for membership testing, removing duplicates, and performing mathematical set operations like union, intersection, and difference.
+
+## What Are Sets?
+
+A **set** is an unordered collection of unique, immutable items. Sets automatically remove duplicates and don't maintain any particular order.
+
+### Creating Sets
+
+```{python}
+# Empty set (must use set(), not {})
+empty = set()
+print(f"Empty set: {empty}, Type: {type(empty)}")
+
+# Set with items
+numbers = {1, 2, 3, 4, 5}
+print(f"Numbers: {numbers}")
+
+# Sets automatically remove duplicates
+duplicates = {1, 2, 2, 3, 3, 3, 4, 5}
+print(f"With duplicates: {duplicates}")
+
+# From a list
+fruits_list = ["apple", "banana", "apple", "orange", "banana"]
+fruits = set(fruits_list)
+print(f"From list: {fruits}")
+
+# From a string
+letters = set("hello")
+print(f"From string: {letters}")
+
+# Mixed types (all immutable)
+mixed = {1, "hello", 3.14, True, (1, 2)}
+print(f"Mixed: {mixed}")
+```
+
+::: {.callout-warning}
+## Empty Set Syntax
+Use `set()` for an empty set, not `{}`.
+
+```python
+empty_set = set()    # Correct
+empty_dict = {}      # This is a dictionary!
+```
+:::
+
+### Why Use Sets?
+
+```{python}
+# Fast membership testing
+large_list = list(range(100000))
+large_set = set(range(100000))
+
+import time
+
+# List lookup
+start = time.time()
+99999 in large_list
+list_time = time.time() - start
+
+# Set lookup
+start = time.time()
+99999 in large_set
+set_time = time.time() - start
+
+print(f"List lookup: {list_time:.6f}s")
+print(f"Set lookup: {set_time:.6f}s")
+print(f"Set is {list_time/set_time:.0f}x faster!")
+```
+
+::: {.callout-note}
+## When to Use Sets?
+- Remove duplicates from a collection
+- Fast membership testing
+- Mathematical set operations
+- Finding unique elements
+- Comparing collections
+:::
+
+## Set Elements Must Be Immutable
+
+```{python}
+# Valid set elements (immutable)
+valid = {1, 2, 3, "hello", (1, 2), True, None}
+print(f"Valid: {valid}")
+
+# Invalid - lists are mutable
+try:
+    invalid = {1, 2, [3, 4]}
+except TypeError as e:
+    print(f"Error with list: {e}")
+
+# Invalid - dictionaries are mutable
+try:
+    invalid = {1, 2, {"a": 1}}
+except TypeError as e:
+    print(f"Error with dict: {e}")
+
+# Invalid - sets themselves are mutable
+try:
+    invalid = {1, 2, {3, 4}}
+except TypeError as e:
+    print(f"Error with set: {e}")
+```
+
+## Basic Set Operations
+
+### Adding Elements
+
+```{python}
+# add() - add single element
+fruits = {"apple", "banana"}
+print(f"Original: {fruits}")
+
+fruits.add("orange")
+print(f"After add: {fruits}")
+
+# Adding duplicate (no effect)
+fruits.add("apple")
+print(f"After adding duplicate: {fruits}")
+
+# update() - add multiple elements
+fruits.update(["grape", "mango", "kiwi"])
+print(f"After update: {fruits}")
+
+# update() with multiple iterables
+fruits.update(["lemon"], ("lime",), {"melon"})
+print(f"After multiple updates: {fruits}")
+```
+
+### Removing Elements
+
+```{python}
+fruits = {"apple", "banana", "orange", "grape"}
+
+# remove() - raises error if not found
+fruits_copy = fruits.copy()
+fruits_copy.remove("banana")
+print(f"After remove: {fruits_copy}")
+
+try:
+    fruits_copy.remove("mango")
+except KeyError as e:
+    print(f"KeyError: {e}")
+
+# discard() - no error if not found
+fruits_copy = fruits.copy()
+fruits_copy.discard("banana")
+print(f"After discard: {fruits_copy}")
+
+fruits_copy.discard("mango")  # No error
+print(f"After discarding non-existent: {fruits_copy}")
+
+# pop() - remove and return arbitrary element
+fruits_copy = fruits.copy()
+removed = fruits_copy.pop()
+print(f"Popped: {removed}, Remaining: {fruits_copy}")
+
+# clear() - remove all elements
+fruits_copy = fruits.copy()
+fruits_copy.clear()
+print(f"After clear: {fruits_copy}")
+```
+
+::: {.callout-tip}
+## remove() vs discard()
+- `remove()`: Raises KeyError if element doesn't exist
+- `discard()`: Silently does nothing if element doesn't exist
+- Use `discard()` when you're not sure if element exists
+:::
+
+### Membership Testing
+
+```{python}
+fruits = {"apple", "banana", "orange"}
+
+# in operator
+print(f"'apple' in fruits: {'apple' in fruits}")
+print(f"'grape' in fruits: {'grape' in fruits}")
+
+# not in operator
+print(f"'grape' not in fruits: {'grape' not in fruits}")
+```
+
+### Set Length
+
+```{python}
+numbers = {1, 2, 3, 4, 5}
+print(f"Length: {len(numbers)}")
+
+# Empty set
+empty = set()
+print(f"Empty set length: {len(empty)}")
+```
+
+## Set Operations
+
+Sets support mathematical set operations!
+
+### Union (|)
+
+Combine all elements from both sets:
+
+```{python}
+set1 = {1, 2, 3, 4}
+set2 = {3, 4, 5, 6}
+
+# Using | operator
+union1 = set1 | set2
+print(f"Union with |: {union1}")
+
+# Using union() method
+union2 = set1.union(set2)
+print(f"Union with method: {union2}")
+
+# Multiple sets
+set3 = {5, 6, 7, 8}
+union3 = set1 | set2 | set3
+print(f"Union of three: {union3}")
+```
+
+### Intersection (&)
+
+Elements common to both sets:
+
+```{python}
+set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+
+# Using & operator
+intersection1 = set1 & set2
+print(f"Intersection with &: {intersection1}")
+
+# Using intersection() method
+intersection2 = set1.intersection(set2)
+print(f"Intersection with method: {intersection2}")
+
+# Multiple sets
+set3 = {3, 4, 5, 9}
+intersection3 = set1 & set2 & set3
+print(f"Intersection of three: {intersection3}")
+```
+
+### Difference (-)
+
+Elements in first set but not in second:
+
+```{python}
+set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+
+# Using - operator
+diff1 = set1 - set2
+print(f"set1 - set2: {diff1}")
+
+diff2 = set2 - set1
+print(f"set2 - set1: {diff2}")
+
+# Using difference() method
+diff3 = set1.difference(set2)
+print(f"Difference with method: {diff3}")
+```
+
+### Symmetric Difference (^)
+
+Elements in either set, but not in both:
+
+```{python}
+set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+
+# Using ^ operator
+sym_diff1 = set1 ^ set2
+print(f"Symmetric difference with ^: {sym_diff1}")
+
+# Using symmetric_difference() method
+sym_diff2 = set1.symmetric_difference(set2)
+print(f"Symmetric difference with method: {sym_diff2}")
+
+# Same as (set1 - set2) | (set2 - set1)
+manual = (set1 - set2) | (set2 - set1)
+print(f"Manual calculation: {manual}")
+```
+
+::: {.callout-note}
+## Set Operations Visual
+
+```
+set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+
+Union (|):              {1, 2, 3, 4, 5, 6, 7, 8}
+Intersection (&):       {4, 5}
+Difference (-):         {1, 2, 3}
+Symmetric Diff (^):     {1, 2, 3, 6, 7, 8}
+```
+:::
+
+## Set Comparison Methods
+
+### Subset and Superset
+
+```{python}
+set1 = {1, 2, 3}
+set2 = {1, 2, 3, 4, 5}
+set3 = {1, 2}
+
+# issubset() - is set1 contained in set2?
+print(f"set1.issubset(set2): {set1.issubset(set2)}")
+print(f"set2.issubset(set1): {set2.issubset(set1)}")
+
+# Using <= operator
+print(f"set1 <= set2: {set1 <= set2}")
+
+# Proper subset (< operator)
+print(f"set1 < set2: {set1 < set2}")
+print(f"set1 < set1: {set1 < set1}")  # Not a proper subset of itself
+
+# issuperset() - does set2 contain set1?
+print(f"set2.issuperset(set1): {set2.issuperset(set1)}")
+
+# Using >= operator
+print(f"set2 >= set1: {set2 >= set1}")
+```
+
+### Disjoint Sets
+
+```{python}
+set1 = {1, 2, 3}
+set2 = {4, 5, 6}
+set3 = {3, 4, 5}
+
+# isdisjoint() - no common elements?
+print(f"set1.isdisjoint(set2): {set1.isdisjoint(set2)}")
+print(f"set1.isdisjoint(set3): {set1.isdisjoint(set3)}")
+```
+
+## Modifying Set Operations
+
+Some operations modify the original set:
+
+### Update Operations
+
+```{python}
+# update() or |=
+set1 = {1, 2, 3}
+set1.update({3, 4, 5})
+print(f"After update: {set1}")
+
+set2 = {1, 2, 3}
+set2 |= {3, 4, 5}
+print(f"After |=: {set2}")
+
+# intersection_update() or &=
+set3 = {1, 2, 3, 4, 5}
+set3.intersection_update({3, 4, 5, 6})
+print(f"After intersection_update: {set3}")
+
+# difference_update() or -=
+set4 = {1, 2, 3, 4, 5}
+set4.difference_update({3, 4, 5})
+print(f"After difference_update: {set4}")
+
+# symmetric_difference_update() or ^=
+set5 = {1, 2, 3, 4}
+set5.symmetric_difference_update({3, 4, 5, 6})
+print(f"After symmetric_difference_update: {set5}")
+```
+
+::: {.callout-important}
+## In-Place vs New Set
+- Operators (`|`, `&`, `-`, `^`) create new sets
+- Methods with `_update` modify the original set
+- Choose based on whether you need the original set
+:::
+
+## Set Comprehensions
+
+Create sets concisely using comprehensions:
+
+```{python}
+# Basic set comprehension
+squares = {x**2 for x in range(10)}
+print(f"Squares: {squares}")
+
+# With condition
+even_squares = {x**2 for x in range(10) if x % 2 == 0}
+print(f"Even squares: {even_squares}")
+
+# From strings
+sentence = "the quick brown fox jumps over the lazy dog"
+unique_letters = {char for char in sentence if char.isalpha()}
+print(f"Unique letters: {sorted(unique_letters)}")
+
+# From list (remove duplicates)
+numbers = [1, 2, 2, 3, 3, 3, 4, 5]
+unique = {x for x in numbers}
+print(f"Unique numbers: {unique}")
+
+# Transformation
+words = ["hello", "world", "python"]
+lengths = {len(word) for word in words}
+print(f"Word lengths: {lengths}")
+```
+
+## Frozen Sets
+
+Immutable version of sets:
+
+```{python}
+# Create frozen set
+frozen = frozenset([1, 2, 3, 4, 5])
+print(f"Frozen set: {frozen}")
+
+# Can't be modified
+try:
+    frozen.add(6)
+except AttributeError as e:
+    print(f"Can't modify frozen set: {e}")
+
+# Can be used as dictionary keys
+cache = {
+    frozenset([1, 2, 3]): "result1",
+    frozenset([4, 5, 6]): "result2"
+}
+print(f"Cache: {cache}")
+
+# Can be set elements
+set_of_sets = {frozenset([1, 2]), frozenset([3, 4])}
+print(f"Set of frozen sets: {set_of_sets}")
+
+# Support same operations as regular sets (except modification)
+frozen1 = frozenset([1, 2, 3])
+frozen2 = frozenset([3, 4, 5])
+print(f"Union: {frozen1 | frozen2}")
+print(f"Intersection: {frozen1 & frozen2}")
+```
+
+::: {.callout-tip}
+## When to Use frozenset?
+- When you need an immutable set
+- As dictionary keys
+- As elements in another set
+- When you want to ensure data can't be modified
+:::
+
+## Practical Examples
+
+Let's apply sets to real-world problems:
+
+### Remove Duplicates
+
+```{python}
+def remove_duplicates(items):
+    """Remove duplicates while preserving type"""
+    return list(set(items))
+
+# Test
+numbers = [1, 2, 2, 3, 4, 4, 5, 1, 2]
+unique_numbers = remove_duplicates(numbers)
+print(f"Original: {numbers}")
+print(f"Unique: {unique_numbers}")
+
+# Note: order is not preserved with sets
+# For ordered unique, use dict.fromkeys()
+def remove_duplicates_ordered(items):
+    return list(dict.fromkeys(items))
+
+ordered_unique = remove_duplicates_ordered(numbers)
+print(f"Ordered unique: {ordered_unique}")
+```
+
+### Find Common Elements
+
+```{python}
+def find_common_elements(*lists):
+    """Find elements common to all lists"""
+    if not lists:
+        return set()
+
+    # Convert first list to set
+    common = set(lists[0])
+
+    # Intersect with remaining lists
+    for lst in lists[1:]:
+        common &= set(lst)
+
+    return common
+
+# Test
+list1 = [1, 2, 3, 4, 5]
+list2 = [4, 5, 6, 7, 8]
+list3 = [3, 4, 5, 9, 10]
+
+common = find_common_elements(list1, list2, list3)
+print(f"Common elements: {common}")
+```
+
+### Email Validator System
+
+```{python}
+class EmailValidator:
+    """Validate emails against whitelist/blacklist"""
+    def __init__(self):
+        self.whitelist = set()
+        self.blacklist = set()
+
+    def add_to_whitelist(self, email):
+        """Add email to whitelist"""
+        self.whitelist.add(email.lower())
+
+    def add_to_blacklist(self, email):
+        """Add email to blacklist"""
+        self.blacklist.add(email.lower())
+
+    def is_valid(self, email):
+        """Check if email is valid"""
+        email = email.lower()
+
+        # If in blacklist, reject
+        if email in self.blacklist:
+            return False, "Email is blacklisted"
+
+        # If whitelist exists and email not in it, reject
+        if self.whitelist and email not in self.whitelist:
+            return False, "Email not in whitelist"
+
+        return True, "Email is valid"
+
+    def bulk_validate(self, emails):
+        """Validate multiple emails"""
+        results = {
+            "valid": [],
+            "invalid": []
+        }
+
+        for email in emails:
+            is_valid, message = self.is_valid(email)
+            if is_valid:
+                results["valid"].append(email)
+            else:
+                results["invalid"].append((email, message))
+
+        return results
+
+# Test
+validator = EmailValidator()
+
+# Add to whitelist
+validator.add_to_whitelist("user@example.com")
+validator.add_to_whitelist("admin@example.com")
+
+# Add to blacklist
+validator.add_to_blacklist("spam@example.com")
+
+# Validate
+emails = [
+    "user@example.com",
+    "spam@example.com",
+    "other@example.com"
+]
+
+results = validator.bulk_validate(emails)
+print(f"Valid: {results['valid']}")
+print(f"Invalid: {results['invalid']}")
+```
+
+### Tag System
+
+```{python}
+class Article:
+    """Article with tags using sets"""
+    def __init__(self, title, tags=None):
+        self.title = title
+        self.tags = set(tags) if tags else set()
+
+    def add_tag(self, tag):
+        """Add a tag"""
+        self.tags.add(tag)
+
+    def remove_tag(self, tag):
+        """Remove a tag"""
+        self.tags.discard(tag)
+
+    def has_tag(self, tag):
+        """Check if article has tag"""
+        return tag in self.tags
+
+    def __repr__(self):
+        return f"Article('{self.title}', tags={self.tags})"
+
+def find_articles_by_tags(articles, required_tags):
+    """Find articles that have all required tags"""
+    required = set(required_tags)
+    return [article for article in articles
+            if required.issubset(article.tags)]
+
+def find_articles_by_any_tag(articles, tags):
+    """Find articles that have any of the tags"""
+    search_tags = set(tags)
+    return [article for article in articles
+            if article.tags & search_tags]
+
+# Test
+articles = [
+    Article("Python Basics", ["python", "programming", "tutorial"]),
+    Article("Web Development", ["python", "web", "flask"]),
+    Article("Data Science", ["python", "data", "analysis"]),
+    Article("JavaScript Guide", ["javascript", "web", "programming"])
+]
+
+# Find articles with all tags
+python_tutorials = find_articles_by_tags(articles, ["python", "programming"])
+print("Python programming articles:")
+for article in python_tutorials:
+    print(f"  {article}")
+
+# Find articles with any tag
+web_articles = find_articles_by_any_tag(articles, ["web", "javascript"])
+print("\nWeb-related articles:")
+for article in web_articles:
+    print(f"  {article}")
+```
+
+### Skills Matcher
+
+```{python}
+class Job:
+    """Job posting with required skills"""
+    def __init__(self, title, required_skills):
+        self.title = title
+        self.required_skills = set(required_skills)
+
+class Candidate:
+    """Job candidate with skills"""
+    def __init__(self, name, skills):
+        self.name = name
+        self.skills = set(skills)
+
+def match_candidates(job, candidates):
+    """Find candidates that match job requirements"""
+    matches = []
+
+    for candidate in candidates:
+        # Skills candidate has
+        has_skills = job.required_skills & candidate.skills
+
+        # Skills candidate lacks
+        missing_skills = job.required_skills - candidate.skills
+
+        # Calculate match percentage
+        match_percent = len(has_skills) / len(job.required_skills) * 100
+
+        matches.append({
+            "candidate": candidate.name,
+            "match": match_percent,
+            "has": has_skills,
+            "missing": missing_skills
+        })
+
+    # Sort by match percentage
+    return sorted(matches, key=lambda x: x["match"], reverse=True)
+
+# Test
+job = Job("Python Developer", ["python", "django", "sql", "git"])
+
+candidates = [
+    Candidate("Alice", ["python", "django", "sql", "git", "docker"]),
+    Candidate("Bob", ["python", "flask", "sql"]),
+    Candidate("Charlie", ["javascript", "react", "node"]),
+    Candidate("Diana", ["python", "django", "git"])
+]
+
+print(f"Job: {job.title}")
+print(f"Required skills: {job.required_skills}\n")
+
+matches = match_candidates(job, candidates)
+
+print("Candidate Matches:")
+print("-" * 60)
+for match in matches:
+    print(f"{match['candidate']:10} - {match['match']:.0f}% match")
+    print(f"  Has: {match['has']}")
+    print(f"  Missing: {match['missing']}")
+    print()
+```
+
+### Word Relationships
+
+```{python}
+def analyze_text_similarity(text1, text2):
+    """Analyze similarity between two texts"""
+    # Convert to sets of words
+    words1 = set(text1.lower().split())
+    words2 = set(text2.lower().split())
+
+    # Common words
+    common = words1 & words2
+
+    # Unique to each text
+    unique_to_1 = words1 - words2
+    unique_to_2 = words2 - words1
+
+    # All words
+    all_words = words1 | words2
+
+    # Calculate Jaccard similarity
+    if not all_words:
+        similarity = 0
+    else:
+        similarity = len(common) / len(all_words)
+
+    return {
+        "common_words": common,
+        "unique_to_text1": unique_to_1,
+        "unique_to_text2": unique_to_2,
+        "total_unique": len(all_words),
+        "similarity": similarity
+    }
+
+# Test
+text1 = "Python is a great programming language"
+text2 = "Python is an excellent programming tool"
+
+analysis = analyze_text_similarity(text1, text2)
+
+print("Text Similarity Analysis")
+print("=" * 60)
+print(f"Text 1: {text1}")
+print(f"Text 2: {text2}")
+print()
+print(f"Common words: {analysis['common_words']}")
+print(f"Unique to text 1: {analysis['unique_to_text1']}")
+print(f"Unique to text 2: {analysis['unique_to_text2']}")
+print(f"Total unique words: {analysis['total_unique']}")
+print(f"Similarity: {analysis['similarity']:.2%}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Creating sets**:
+  - Using `{}`or `set()`
+  - Automatically removes duplicates
+  - Unordered collection
+
+- **Set operations**:
+  - Adding: `add()`, `update()`
+  - Removing: `remove()`, `discard()`, `pop()`, `clear()`
+  - Membership testing with `in`
+
+- **Mathematical operations**:
+  - Union (`|`): all elements
+  - Intersection (`&`): common elements
+  - Difference (`-`): elements in first but not second
+  - Symmetric difference (`^`): elements in either but not both
+
+- **Set comparisons**:
+  - Subset (`<=`, `issubset()`)
+  - Superset (`>=`, `issuperset()`)
+  - Disjoint (`isdisjoint()`)
+
+- **Advanced features**:
+  - Set comprehensions
+  - Frozen sets (immutable)
+  - Modifying operations
+
+- **Use cases**:
+  - Remove duplicates
+  - Fast membership testing
+  - Finding common/unique elements
+  - Tag systems
+  - Skill matching
+
+::: {.callout-important}
+## Key Takeaways
+1. Sets store **unique** elements only
+2. Sets are **unordered** - no indexing
+3. Elements must be **immutable**
+4. **Fast membership testing** (O(1) average)
+5. Support **mathematical set operations**
+6. Use **frozenset** for immutable version
+7. Perfect for **removing duplicates** and **comparisons**
+:::
+
+## Practice Exercises
+
+### Exercise 1: Unique Characters
+
+Write a function that finds unique characters in two strings.
+
+```{python}
+def unique_chars(str1, str2):
+    """Solution"""
+    set1 = set(str1.lower())
+    set2 = set(str2.lower())
+
+    return {
+        "common": set1 & set2,
+        "only_in_str1": set1 - set2,
+        "only_in_str2": set2 - set1,
+        "all_unique": set1 | set2
+    }
+
+# Test
+result = unique_chars("Hello World", "Python World")
+print(f"Common: {result['common']}")
+print(f"Only in 'Hello World': {result['only_in_str1']}")
+print(f"Only in 'Python World': {result['only_in_str2']}")
+```
+
+### Exercise 2: Find Duplicates
+
+Write a function that finds duplicates in a list using sets.
+
+```{python}
+def find_duplicates(lst):
+    """Solution"""
+    seen = set()
+    duplicates = set()
+
+    for item in lst:
+        if item in seen:
+            duplicates.add(item)
+        else:
+            seen.add(item)
+
+    return list(duplicates)
+
+# Test
+numbers = [1, 2, 3, 2, 4, 5, 3, 6, 1]
+dupes = find_duplicates(numbers)
+print(f"Duplicates: {dupes}")
+```
+
+### Exercise 3: Set Partitioning
+
+Write a function that partitions a set into two sets based on a condition.
+
+```{python}
+def partition_set(s, condition):
+    """Solution"""
+    true_set = {x for x in s if condition(x)}
+    false_set = s - true_set
+    return true_set, false_set
+
+# Test
+numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+evens, odds = partition_set(numbers, lambda x: x % 2 == 0)
+print(f"Evens: {evens}")
+print(f"Odds: {odds}")
+```
+
+### Exercise 4: Symmetric Pairs
+
+Find all symmetric pairs in a list of tuples (where (a,b) and (b,a) both exist).
+
+```{python}
+def find_symmetric_pairs(pairs):
+    """Solution"""
+    seen = set()
+    symmetric = set()
+
+    for a, b in pairs:
+        if (b, a) in seen:
+            # Add both orderings to result
+            symmetric.add((min(a, b), max(a, b)))
+        seen.add((a, b))
+
+    return symmetric
+
+# Test
+pairs = [(1, 2), (3, 4), (2, 1), (5, 6), (4, 3)]
+result = find_symmetric_pairs(pairs)
+print(f"Symmetric pairs: {result}")
+```
+
+### Exercise 5: Power Set
+
+Write a function that generates the power set (set of all subsets) of a set.
+
+```{python}
+def power_set(s):
+    """Solution"""
+    # Convert to list for indexing
+    elements = list(s)
+    n = len(elements)
+
+    # Generate all subsets using binary representation
+    power = []
+    for i in range(2 ** n):
+        subset = set()
+        for j in range(n):
+            # Check if jth bit is set
+            if i & (1 << j):
+                subset.add(elements[j])
+        power.append(frozenset(subset))
+
+    return set(power)
+
+# Test
+original = {1, 2, 3}
+result = power_set(original)
+
+print(f"Power set of {original}:")
+for subset in sorted(result, key=lambda x: (len(x), sorted(x))):
+    print(f"  {set(subset) if subset else '{}'}")
+
+print(f"\nTotal subsets: {len(result)} (should be 2^{len(original)} = {2**len(original)})")
+```
+
+::: {.callout-tip}
+## Master Sets!
+Sets are powerful for many algorithms and data processing tasks. Practice using set operations to solve problems efficiently!
+:::
+
+---
+
+Excellent! You've mastered sets. Finally, let's explore functions - the building blocks of reusable code!

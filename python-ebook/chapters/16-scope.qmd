@@ -1,0 +1,1115 @@
+# Variable Scope: Understanding Where Variables Live {#sec-scope}
+
+Variable scope determines where in your code a variable can be accessed. Understanding scope is crucial for writing bug-free code and avoiding mysterious errors. Python's scoping rules are elegant and logical once you understand the LEGB rule. Let's dive in!
+
+## What is Scope?
+
+**Scope** is the region of code where a variable is accessible. Think of it like rooms in a house - some items are only in one room, while others are available throughout the entire house.
+
+### Why Scope Matters
+
+```{python}
+# Different scopes, different variables
+x = "global"
+
+def my_function():
+    x = "local"
+    print(f"Inside function: {x}")
+
+my_function()
+print(f"Outside function: {x}")
+```
+
+Notice how the same name `x` refers to different variables depending on where you are in the code!
+
+::: {.callout-note}
+## Key Scope Concepts
+- **Namespace**: A mapping from names to objects
+- **Scope**: The textual region where a namespace is accessible
+- **Lifetime**: How long a variable exists in memory
+- **Visibility**: Where a variable can be accessed
+:::
+
+## The LEGB Rule
+
+Python searches for variables in this order: **L**ocal, **E**nclosing, **G**lobal, **B**uilt-in.
+
+```{python}
+# Built-in scope (B)
+# Functions like print(), len() are here
+
+# Global scope (G)
+global_var = "I'm global"
+
+def outer():
+    # Enclosing scope (E)
+    enclosing_var = "I'm enclosing"
+
+    def inner():
+        # Local scope (L)
+        local_var = "I'm local"
+
+        # Can access all scopes
+        print(f"Local: {local_var}")
+        print(f"Enclosing: {enclosing_var}")
+        print(f"Global: {global_var}")
+        print(f"Built-in: {len([1, 2, 3])}")
+
+    inner()
+
+outer()
+```
+
+::: {.callout-important}
+## LEGB Search Order
+When Python encounters a variable name, it searches in this order:
+1. **Local** - Inside the current function
+2. **Enclosing** - In enclosing function scopes
+3. **Global** - At the module level
+4. **Built-in** - Python built-in names
+
+First match wins!
+:::
+
+## Local Scope
+
+Variables created inside a function have **local scope** - they only exist within that function.
+
+### Basic Local Variables
+
+```{python}
+def greet(name):
+    # 'name' and 'message' are local
+    message = f"Hello, {name}!"
+    print(message)
+    return message
+
+greet("Alice")
+
+# These don't exist outside the function
+try:
+    print(message)
+except NameError as e:
+    print(f"Error: {e}")
+```
+
+### Parameters are Local
+
+```{python}
+def calculate(a, b, operation):
+    # a, b, and operation are local variables
+    if operation == "add":
+        result = a + b
+    elif operation == "multiply":
+        result = a * b
+    else:
+        result = None
+
+    # result is also local
+    return result
+
+answer = calculate(5, 3, "add")
+print(f"Answer: {answer}")
+
+# Parameters don't exist outside
+try:
+    print(a)
+except NameError:
+    print("'a' doesn't exist outside the function")
+```
+
+### Multiple Functions, Separate Scopes
+
+```{python}
+def function_a():
+    x = 10
+    print(f"Function A: x = {x}")
+
+def function_b():
+    x = 20
+    print(f"Function B: x = {x}")
+
+# Each function has its own x
+function_a()
+function_b()
+
+# These are different variables!
+```
+
+::: {.callout-tip}
+## Local Scope Benefits
+- **Isolation**: Functions don't interfere with each other
+- **Reusability**: Same variable names in different functions
+- **Memory**: Local variables are freed when function exits
+- **Testing**: Easier to test isolated functions
+:::
+
+## Global Scope
+
+Variables defined at the module level (outside functions) have **global scope**.
+
+### Accessing Global Variables
+
+```{python}
+# Global variable
+company = "TechCorp"
+employee_count = 0
+
+def show_company_info():
+    # Can read global variables
+    print(f"Company: {company}")
+    print(f"Employees: {employee_count}")
+
+show_company_info()
+```
+
+### The Global Keyword
+
+To **modify** a global variable from inside a function, use the `global` keyword:
+
+```{python}
+counter = 0
+
+def increment():
+    global counter  # Declare we're using global counter
+    counter += 1
+    print(f"Counter: {counter}")
+
+def decrement():
+    global counter
+    counter -= 1
+    print(f"Counter: {counter}")
+
+print(f"Initial: {counter}")
+increment()
+increment()
+increment()
+decrement()
+print(f"Final: {counter}")
+```
+
+### Without global Keyword
+
+```{python}
+count = 0
+
+def wrong_increment():
+    # This creates a NEW local variable
+    # UnboundLocalError if you try count += 1
+    count = 1  # Local variable
+    print(f"Inside function: {count}")
+
+wrong_increment()
+print(f"Outside function: {count}")  # Still 0!
+```
+
+### Multiple Global Variables
+
+```{python}
+x = 10
+y = 20
+z = 30
+
+def modify_globals():
+    global x, y  # Can declare multiple on one line
+    x = 100
+    y = 200
+    # z is not declared global, so can only read it
+    print(f"Inside: x={x}, y={y}, z={z}")
+
+print(f"Before: x={x}, y={y}, z={z}")
+modify_globals()
+print(f"After: x={x}, y={y}, z={z}")
+```
+
+::: {.callout-warning}
+## Avoid Excessive Global Variables!
+While globals are sometimes necessary, they make code harder to:
+- **Understand**: Changes can come from anywhere
+- **Test**: Functions depend on external state
+- **Debug**: Hard to track who modifies what
+- **Maintain**: Unexpected side effects
+
+**Better approach**: Pass values as parameters, return results!
+:::
+
+### Better Alternative to Globals
+
+```{python}
+# Instead of using globals...
+def bad_add_to_total(value):
+    global total
+    total += value
+
+# Do this!
+def good_add_to_total(current_total, value):
+    return current_total + value
+
+# Usage
+total = 0
+total = good_add_to_total(total, 10)
+total = good_add_to_total(total, 20)
+print(f"Total: {total}")
+```
+
+## Enclosing Scope
+
+When you have **nested functions**, the inner function can access variables from the outer function.
+
+### Accessing Enclosing Variables
+
+```{python}
+def outer(x):
+    name = "outer"
+
+    def inner(y):
+        # Can access outer's variables
+        result = x + y
+        print(f"In {name} function: {x} + {y} = {result}")
+        return result
+
+    return inner(10)
+
+outer(5)
+```
+
+### Multiple Levels of Nesting
+
+```{python}
+def level1():
+    var1 = "Level 1"
+
+    def level2():
+        var2 = "Level 2"
+
+        def level3():
+            var3 = "Level 3"
+            # Can access all enclosing scopes
+            print(var1)
+            print(var2)
+            print(var3)
+
+        level3()
+
+    level2()
+
+level1()
+```
+
+### Closures: Functions That Remember
+
+```{python}
+def make_multiplier(factor):
+    """Create a function that multiplies by factor"""
+
+    def multiplier(x):
+        # 'factor' is from enclosing scope
+        return x * factor
+
+    return multiplier
+
+# Create specialized functions
+times_2 = make_multiplier(2)
+times_5 = make_multiplier(5)
+times_10 = make_multiplier(10)
+
+print(f"5 × 2 = {times_2(5)}")
+print(f"5 × 5 = {times_5(5)}")
+print(f"5 × 10 = {times_10(5)}")
+```
+
+::: {.callout-note}
+## What's a Closure?
+A **closure** is a function that:
+1. Is defined inside another function
+2. Accesses variables from the enclosing function
+3. Is returned or passed elsewhere
+
+The inner function "closes over" the enclosing variables, keeping them alive even after the outer function returns!
+:::
+
+### Practical Closure Example
+
+```{python}
+def make_counter(start=0):
+    """Create a counter function"""
+    count = start
+
+    def counter():
+        nonlocal count  # We'll explain this next!
+        count += 1
+        return count
+
+    return counter
+
+# Create independent counters
+counter1 = make_counter(0)
+counter2 = make_counter(100)
+
+print("Counter 1:", counter1(), counter1(), counter1())
+print("Counter 2:", counter2(), counter2())
+```
+
+## The nonlocal Keyword
+
+The `nonlocal` keyword allows you to **modify** variables from an enclosing (but not global) scope.
+
+### Without nonlocal
+
+```{python}
+def outer():
+    count = 0
+
+    def inner():
+        # This creates a NEW local variable
+        count = 1  # Local, doesn't affect outer's count
+        print(f"Inner count: {count}")
+
+    inner()
+    print(f"Outer count: {count}")  # Still 0
+
+outer()
+```
+
+### With nonlocal
+
+```{python}
+def outer():
+    count = 0
+
+    def inner():
+        nonlocal count  # Refer to outer's count
+        count = 1  # Modifies outer's count
+        print(f"Inner count: {count}")
+
+    inner()
+    print(f"Outer count: {count}")  # Now 1!
+
+outer()
+```
+
+### nonlocal vs global
+
+```{python}
+x = "global"
+
+def outer():
+    x = "enclosing"
+
+    def inner_nonlocal():
+        nonlocal x  # Refers to enclosing scope
+        x = "modified enclosing"
+        return x
+
+    def inner_global():
+        global x  # Refers to global scope
+        x = "modified global"
+        return x
+
+    print(f"Before: outer x = '{x}', global x = '{globals()['x']}'")
+
+    # Reset for demo
+    inner_nonlocal()
+    print(f"After nonlocal: outer x = '{x}'")
+
+outer()
+print(f"Global x = '{x}'")
+```
+
+### Building a Bank Account
+
+```{python}
+def create_account(initial_balance):
+    """Create a bank account with encapsulated balance"""
+    balance = initial_balance
+
+    def deposit(amount):
+        nonlocal balance
+        balance += amount
+        return f"Deposited ${amount}. New balance: ${balance}"
+
+    def withdraw(amount):
+        nonlocal balance
+        if amount > balance:
+            return f"Insufficient funds! Balance: ${balance}"
+        balance -= amount
+        return f"Withdrew ${amount}. New balance: ${balance}"
+
+    def get_balance():
+        return f"Current balance: ${balance}"
+
+    # Return a dictionary of operations
+    return {
+        'deposit': deposit,
+        'withdraw': withdraw,
+        'balance': get_balance
+    }
+
+# Create account
+account = create_account(1000)
+
+print(account['balance']())
+print(account['deposit'](500))
+print(account['withdraw'](200))
+print(account['withdraw'](2000))
+print(account['balance']())
+```
+
+::: {.callout-important}
+## nonlocal vs global
+- **nonlocal**: Modifies variable in nearest enclosing function scope
+- **global**: Modifies variable in global (module) scope
+- **Neither**: Creates new local variable
+
+```python
+def outer():
+    x = 1
+    def inner():
+        nonlocal x  # Modifies outer's x
+        # global x  # Would modify global x
+        # x = 2     # Would create new local x
+```
+:::
+
+## Built-in Scope
+
+Python's built-in functions and names are always available.
+
+### Built-in Functions
+
+```{python}
+# These are always available without import
+print("Built-in functions:")
+print(f"len([1, 2, 3]) = {len([1, 2, 3])}")
+print(f"max(1, 5, 3) = {max(1, 5, 3)}")
+print(f"abs(-42) = {abs(-42)}")
+print(f"round(3.14159, 2) = {round(3.14159, 2)}")
+```
+
+### Shadowing Built-ins (Don't Do This!)
+
+```{python}
+# Bad idea: shadowing built-in names
+def bad_example():
+    # This creates a local 'len', shadows built-in
+    len = 5
+    print(f"len = {len}")
+
+    # Now len() function is unavailable!
+    try:
+        length = len([1, 2, 3])
+    except TypeError as e:
+        print(f"Error: {e}")
+
+bad_example()
+
+# Original len still works outside
+print(f"len([1, 2, 3]) = {len([1, 2, 3])}")
+```
+
+### Checking Built-ins
+
+```{python}
+import builtins
+
+# See all built-in names
+print(f"Number of built-ins: {len(dir(builtins))}")
+print("\nSome built-in functions:")
+for name in ['print', 'len', 'max', 'min', 'sum', 'abs']:
+    print(f"  - {name}")
+```
+
+::: {.callout-warning}
+## Never Shadow Built-ins!
+Avoid using names like:
+- `list`, `dict`, `set`, `tuple`
+- `len`, `max`, `min`, `sum`
+- `id`, `type`, `input`, `print`
+- `str`, `int`, `float`, `bool`
+
+Use descriptive names instead:
+- `items` instead of `list`
+- `length` instead of `len`
+- `maximum` instead of `max`
+:::
+
+## Practical Scope Examples
+
+### Configuration System
+
+```{python}
+# Global configuration
+CONFIG = {
+    "debug": False,
+    "max_connections": 10,
+    "timeout": 30
+}
+
+def get_config(key):
+    """Get configuration value"""
+    return CONFIG.get(key)
+
+def update_config(key, value):
+    """Update configuration"""
+    global CONFIG
+    CONFIG[key] = value
+    print(f"Updated {key} = {value}")
+
+def with_debug(func):
+    """Decorator to run function with debug enabled"""
+    def wrapper(*args, **kwargs):
+        global CONFIG
+        old_debug = CONFIG["debug"]
+        CONFIG["debug"] = True
+
+        print(f"Debug mode: ON")
+        result = func(*args, **kwargs)
+
+        CONFIG["debug"] = old_debug
+        print(f"Debug mode: {'ON' if old_debug else 'OFF'}")
+        return result
+
+    return wrapper
+
+@with_debug
+def process_data(data):
+    if CONFIG["debug"]:
+        print(f"Processing: {data}")
+    return data.upper()
+
+# Test
+print(f"Debug: {get_config('debug')}")
+result = process_data("hello")
+print(f"Result: {result}")
+```
+
+### State Management with Closures
+
+```{python}
+def create_game_character(name, health=100):
+    """Create a game character with state"""
+
+    def take_damage(amount):
+        nonlocal health
+        health = max(0, health - amount)
+        status = "defeated" if health == 0 else "alive"
+        return f"{name} took {amount} damage. Health: {health} ({status})"
+
+    def heal(amount):
+        nonlocal health
+        health = min(100, health + amount)
+        return f"{name} healed {amount}. Health: {health}"
+
+    def get_status():
+        return {
+            "name": name,
+            "health": health,
+            "alive": health > 0
+        }
+
+    return {
+        "damage": take_damage,
+        "heal": heal,
+        "status": get_status
+    }
+
+# Create characters
+hero = create_game_character("Hero", 100)
+enemy = create_game_character("Enemy", 80)
+
+print(hero['damage'](30))
+print(hero['heal'](20))
+print(hero['status']())
+
+print(enemy['damage'](50))
+print(enemy['damage'](40))
+print(enemy['status']())
+```
+
+### Function Factory
+
+```{python}
+def create_math_operations(operator):
+    """Create specialized math functions"""
+
+    if operator == "add":
+        def operation(x, y):
+            return x + y
+    elif operator == "subtract":
+        def operation(x, y):
+            return x - y
+    elif operator == "multiply":
+        def operation(x, y):
+            return x * y
+    elif operator == "power":
+        def operation(x, y):
+            return x ** y
+    else:
+        def operation(x, y):
+            return None
+
+    operation.__name__ = operator
+    return operation
+
+# Create operations
+add = create_math_operations("add")
+multiply = create_math_operations("multiply")
+power = create_math_operations("power")
+
+print(f"5 + 3 = {add(5, 3)}")
+print(f"5 × 3 = {multiply(5, 3)}")
+print(f"5³ = {power(5, 3)}")
+```
+
+## Scope Best Practices
+
+### Use Immutable Globals for Constants
+
+```{python}
+# Good: Use UPPERCASE for constants
+MAX_RETRIES = 3
+API_TIMEOUT = 30
+BASE_URL = "https://api.example.com"
+
+def make_request(endpoint):
+    """Make API request with constants"""
+    url = f"{BASE_URL}/{endpoint}"
+    print(f"Requesting: {url}")
+    print(f"Timeout: {API_TIMEOUT}s")
+    print(f"Max retries: {MAX_RETRIES}")
+    return "Response"
+
+make_request("users")
+```
+
+### Pass State as Parameters
+
+```{python}
+# Good: Explicit parameter passing
+def calculate_discount(price, customer_type):
+    """Calculate discount based on customer type"""
+    discounts = {
+        "regular": 0.0,
+        "member": 0.1,
+        "vip": 0.2
+    }
+    discount_rate = discounts.get(customer_type, 0.0)
+    return price * (1 - discount_rate)
+
+# Clear what affects the calculation
+final_price = calculate_discount(100, "vip")
+print(f"Final price: ${final_price}")
+```
+
+### Use Classes for Complex State
+
+```{python}
+class ShoppingCart:
+    """Better than global variables!"""
+
+    def __init__(self):
+        self.items = []
+        self.total = 0
+
+    def add_item(self, name, price):
+        self.items.append({"name": name, "price": price})
+        self.total += price
+
+    def get_summary(self):
+        return {
+            "items": len(self.items),
+            "total": self.total
+        }
+
+# Create cart
+cart = ShoppingCart()
+cart.add_item("Book", 29.99)
+cart.add_item("Pen", 4.99)
+
+print(cart.get_summary())
+```
+
+::: {.callout-tip}
+## Scope Guidelines
+1. **Prefer local** over global
+2. **Pass parameters** instead of using globals
+3. **Return values** instead of modifying globals
+4. **Use classes** for complex state management
+5. **Use closures** for encapsulation
+6. **Document** any necessary global variables
+7. **Avoid** modifying mutable globals
+8. **Never shadow** built-in names
+:::
+
+## Debugging Scope Issues
+
+### Using globals() and locals()
+
+```{python}
+x = "global x"
+
+def show_scopes():
+    y = "local y"
+
+    print("Local variables:")
+    for name, value in locals().items():
+        print(f"  {name} = {value}")
+
+    print("\nGlobal variables (sample):")
+    for name in ['x', '__name__']:
+        if name in globals():
+            print(f"  {name} = {globals()[name]}")
+
+show_scopes()
+```
+
+### Scope Inspection
+
+```{python}
+def outer():
+    outer_var = "outer"
+
+    def inner():
+        inner_var = "inner"
+
+        # Check what's in each scope
+        print("Inner locals:", list(locals().keys()))
+        print(f"Can access outer_var: {outer_var}")
+
+    print("Outer locals:", list(locals().keys()))
+    inner()
+
+outer()
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Scope fundamentals**:
+  - What scope is and why it matters
+  - Namespace and visibility
+  - Variable lifetime
+
+- **The LEGB rule**:
+  - **L**ocal scope (function level)
+  - **E**nclosing scope (nested functions)
+  - **G**lobal scope (module level)
+  - **B**uilt-in scope (Python built-ins)
+
+- **Local scope**:
+  - Variables in functions
+  - Parameters as local variables
+  - Scope isolation between functions
+
+- **Global scope**:
+  - Module-level variables
+  - The `global` keyword
+  - When (and when not) to use globals
+
+- **Enclosing scope**:
+  - Nested functions
+  - Closures
+  - The `nonlocal` keyword
+
+- **Best practices**:
+  - Prefer local scope
+  - Pass parameters, return values
+  - Avoid excessive global state
+  - Use classes for complex state
+  - Never shadow built-ins
+
+::: {.callout-important}
+## Key Takeaways
+1. **LEGB rule** determines where Python looks for variables
+2. **Local variables** are isolated within functions
+3. **global** keyword modifies module-level variables
+4. **nonlocal** keyword modifies enclosing function variables
+5. **Closures** allow functions to remember enclosing state
+6. **Avoid globals** - pass parameters and return values instead
+7. **Never shadow** built-in names
+8. **Use classes** when state management gets complex
+:::
+
+## Practice Exercises
+
+### Exercise 1: Counter Functions
+
+Create a counter system using closures.
+
+```{python}
+def create_counter(name, start=0, step=1):
+    """
+    Solution: Create a named counter with configurable start and step
+    """
+    count = start
+
+    def increment():
+        nonlocal count
+        count += step
+        return count
+
+    def decrement():
+        nonlocal count
+        count -= step
+        return count
+
+    def reset():
+        nonlocal count
+        count = start
+        return count
+
+    def get_value():
+        return count
+
+    def get_info():
+        return f"{name}: {count}"
+
+    return {
+        'inc': increment,
+        'dec': decrement,
+        'reset': reset,
+        'value': get_value,
+        'info': get_info
+    }
+
+# Test
+counter = create_counter("MyCounter", start=10, step=5)
+print(counter['info']())
+print(f"After inc: {counter['inc']()}")
+print(f"After inc: {counter['inc']()}")
+print(f"After dec: {counter['dec']()}")
+print(counter['info']())
+counter['reset']()
+print(f"After reset: {counter['info']()}")
+```
+
+### Exercise 2: Scope Analyzer
+
+Write functions to analyze variable scope.
+
+```{python}
+def analyze_scope():
+    """Solution: Demonstrate scope analysis"""
+    global_var = "I'm global"
+
+    def outer():
+        enclosing_var = "I'm enclosing"
+
+        def inner():
+            local_var = "I'm local"
+
+            # Analyze scopes
+            print("=== Scope Analysis ===")
+            print(f"\nLocal scope has: {list(locals().keys())}")
+            print(f"Can access local: {local_var}")
+            print(f"Can access enclosing: {enclosing_var}")
+            print(f"Can access global: {global_var}")
+
+            # Show variable origins
+            print("\nVariable origins:")
+            print(f"  local_var: Local scope")
+            print(f"  enclosing_var: Enclosing scope")
+            print(f"  global_var: Global scope")
+
+        inner()
+
+    outer()
+
+# Test
+analyze_scope()
+```
+
+### Exercise 3: Function Memoization
+
+Create a memoization decorator using closures.
+
+```{python}
+def memoize(func):
+    """
+    Solution: Memoization decorator using closure
+    """
+    cache = {}  # Enclosing scope variable
+
+    def wrapper(*args):
+        if args not in cache:
+            cache[args] = func(*args)
+            print(f"Computing {func.__name__}{args}...")
+        else:
+            print(f"Using cached result for {func.__name__}{args}")
+        return cache[args]
+
+    def cache_info():
+        return {
+            "size": len(cache),
+            "hits": sum(1 for _ in cache.values())
+        }
+
+    wrapper.cache_info = cache_info
+    wrapper.cache_clear = cache.clear
+
+    return wrapper
+
+@memoize
+def fibonacci(n):
+    """Calculate Fibonacci number"""
+    if n < 2:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+@memoize
+def factorial(n):
+    """Calculate factorial"""
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+# Test
+print(f"fib(5) = {fibonacci(5)}")
+print(f"fib(5) = {fibonacci(5)}")  # Cached
+print(f"\n5! = {factorial(5)}")
+print(f"Cache info: {fibonacci.cache_info()}")
+```
+
+### Exercise 4: Settings Manager
+
+Create a settings manager with global and local scopes.
+
+```{python}
+# Global settings
+SETTINGS = {
+    "theme": "light",
+    "language": "en",
+    "notifications": True
+}
+
+def get_setting(key, default=None):
+    """Solution: Get a setting value"""
+    return SETTINGS.get(key, default)
+
+def update_setting(key, value):
+    """Solution: Update a setting"""
+    global SETTINGS
+    old_value = SETTINGS.get(key)
+    SETTINGS[key] = value
+    return f"Updated {key}: {old_value} → {value}"
+
+def with_temporary_settings(**temp_settings):
+    """Solution: Decorator for temporary settings"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            global SETTINGS
+            # Save original settings
+            original = SETTINGS.copy()
+
+            # Apply temporary settings
+            SETTINGS.update(temp_settings)
+            print(f"Temporary settings: {temp_settings}")
+
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                # Restore original settings
+                SETTINGS = original
+
+            return result
+        return wrapper
+    return decorator
+
+@with_temporary_settings(theme="dark", language="fr")
+def display_ui():
+    """Display UI with current settings"""
+    print(f"Theme: {get_setting('theme')}")
+    print(f"Language: {get_setting('language')}")
+    print(f"Notifications: {get_setting('notifications')}")
+
+# Test
+print("Original settings:", SETTINGS)
+print("\nDuring function:")
+display_ui()
+print("\nAfter function:", SETTINGS)
+```
+
+### Exercise 5: Scope Challenge
+
+Create a complex nested scope example.
+
+```{python}
+def create_calculator():
+    """
+    Solution: Calculator with history using nested scopes
+    """
+    history = []
+    memory = 0
+
+    def calculate(operation, a, b=None):
+        nonlocal memory
+
+        result = None
+        if operation == "add":
+            result = a + b if b is not None else memory + a
+        elif operation == "subtract":
+            result = a - b if b is not None else memory - a
+        elif operation == "multiply":
+            result = a * b if b is not None else memory * a
+        elif operation == "divide":
+            divisor = b if b is not None else a
+            result = (a if b is not None else memory) / divisor if divisor != 0 else "Error"
+
+        if result != "Error":
+            history.append(f"{operation}({a}, {b}) = {result}")
+            memory = result
+
+        return result
+
+    def get_memory():
+        return memory
+
+    def clear_memory():
+        nonlocal memory
+        memory = 0
+
+    def get_history():
+        return history.copy()
+
+    def clear_history():
+        nonlocal history
+        history = []
+
+    return {
+        "calc": calculate,
+        "memory": get_memory,
+        "clear_mem": clear_memory,
+        "history": get_history,
+        "clear_hist": clear_history
+    }
+
+# Test
+calc = create_calculator()
+print(calc["calc"]("add", 10, 5))
+print(calc["calc"]("multiply", 2, 3))
+print(calc["calc"]("subtract", 20, 8))
+
+print(f"\nMemory: {calc['memory']()}")
+print(f"History:")
+for entry in calc["history"]():
+    print(f"  {entry}")
+
+calc["clear_mem"]()
+print(f"\nAfter clear: {calc['memory']()}")
+```
+
+::: {.callout-tip}
+## Master Scope!
+Understanding scope is essential for:
+- Writing bug-free code
+- Building closures and decorators
+- Managing state effectively
+- Debugging variable issues
+
+Practice with nested functions and closures to solidify your understanding!
+:::
+
+---
+
+Congratulations! You now understand Python's scoping rules and the LEGB rule. You can write code that properly manages variable visibility and state. Keep practicing with closures and nested functions!

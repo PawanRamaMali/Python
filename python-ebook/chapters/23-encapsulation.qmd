@@ -1,0 +1,1178 @@
+# Encapsulation: Hiding Implementation Details {#sec-encapsulation}
+
+Encapsulation is about bundling data and methods together while controlling access to them. It's like a capsule that protects its contents - you can interact with it through a specific interface, but the internal details are hidden. This principle helps create more maintainable and secure code!
+
+## What is Encapsulation?
+
+**Encapsulation** means hiding internal details and exposing only what's necessary through a public interface.
+
+### Real-World Analogy
+
+```{python}
+# Think of a car:
+# - Public interface: steering wheel, pedals, gear shift
+# - Private internals: engine, transmission, electronics
+# You don't need to know HOW the engine works to drive!
+
+print("Encapsulation: Hide complexity, expose simplicity")
+print("Like using your phone - you tap buttons, not circuit boards!")
+```
+
+::: {.callout-note}
+## Benefits of Encapsulation
+1. **Data Protection**: Prevent invalid state
+2. **Flexibility**: Change implementation without breaking interface
+3. **Maintainability**: Internal changes don't affect users
+4. **Abstraction**: Hide complexity
+5. **Control**: Validate data on access/modification
+:::
+
+## Public, Private, and Protected
+
+Python uses naming conventions to indicate access levels.
+
+### Public Members
+
+No prefix - accessible from anywhere:
+
+```{python}
+class Person:
+    """Person with public attributes"""
+
+    def __init__(self, name, age):
+        self.name = name  # Public
+        self.age = age    # Public
+
+    def introduce(self):  # Public method
+        return f"Hi, I'm {self.name}"
+
+# All members accessible
+person = Person("Alice", 30)
+print(person.name)  # Direct access
+print(person.age)
+print(person.introduce())
+
+# Can even modify directly
+person.age = 31
+print(f"New age: {person.age}")
+```
+
+### Private Members
+
+Prefix with double underscore `__` - name mangling makes them "private":
+
+```{python}
+class BankAccount:
+    """Account with private balance"""
+
+    def __init__(self, owner, balance):
+        self.owner = owner        # Public
+        self.__balance = balance  # Private
+
+    def deposit(self, amount):
+        """Public method to modify private data"""
+        if amount > 0:
+            self.__balance += amount
+            return f"Deposited ${amount}"
+        return "Invalid amount"
+
+    def get_balance(self):
+        """Public method to access private data"""
+        return self.__balance
+
+# Create account
+account = BankAccount("Alice", 1000)
+
+# Can access public members
+print(account.owner)
+
+# Cannot access private members directly
+try:
+    print(account.__balance)
+except AttributeError as e:
+    print(f"Error: {e}")
+
+# Must use public methods
+print(f"Balance: ${account.get_balance()}")
+print(account.deposit(500))
+print(f"New balance: ${account.get_balance()}")
+```
+
+### Name Mangling
+
+Python "mangles" private names to make them harder to access:
+
+```{python}
+class Example:
+    def __init__(self):
+        self.__private = "I'm private"
+
+obj = Example()
+
+# Direct access fails
+try:
+    print(obj.__private)
+except AttributeError:
+    print("Cannot access __private directly")
+
+# But can access via mangled name (not recommended!)
+print(f"Mangled name: {obj._Example__private}")
+
+# Check all attributes
+print(f"Attributes: {[attr for attr in dir(obj) if not attr.startswith('__')]}")
+```
+
+### Protected Members
+
+Prefix with single underscore `_` - convention for "internal use":
+
+```{python}
+class Vehicle:
+    """Vehicle with protected members"""
+
+    def __init__(self, brand):
+        self.brand = brand          # Public
+        self._mileage = 0          # Protected (internal use)
+        self.__vin = "SECRET123"   # Private
+
+    def drive(self, distance):
+        """Public method"""
+        self._update_mileage(distance)
+
+    def _update_mileage(self, distance):
+        """Protected method (internal use, but accessible)"""
+        self._mileage += distance
+
+    def get_info(self):
+        return f"{self.brand}: {self._mileage} miles"
+
+# Create vehicle
+car = Vehicle("Toyota")
+
+# Public access works
+car.drive(100)
+print(car.get_info())
+
+# Protected members accessible but shouldn't be used
+print(f"Protected mileage: {car._mileage}")  # Works but discouraged
+car._update_mileage(50)  # Works but discouraged
+print(car.get_info())
+
+# Private members not accessible
+try:
+    print(car.__vin)
+except AttributeError:
+    print("Cannot access private __vin")
+```
+
+::: {.callout-important}
+## Access Levels in Python
+**Public** (no prefix):
+- Accessible everywhere
+- Part of public API
+- Example: `self.name`
+
+**Protected** (single `_`):
+- Convention for internal use
+- Still accessible but discouraged
+- Subclasses can use
+- Example: `self._internal`
+
+**Private** (double `__`):
+- Name mangling makes it harder to access
+- Not inherited by subclasses
+- Example: `self.__private`
+
+**Note**: These are conventions! Python doesn't enforce true privacy.
+:::
+
+## Property Decorators
+
+Properties provide controlled access to attributes with getter/setter methods.
+
+### Basic Property
+
+```{python}
+class Temperature:
+    """Temperature with validation"""
+
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def celsius(self):
+        """Getter for celsius"""
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        """Setter with validation"""
+        if value < -273.15:
+            raise ValueError("Temperature below absolute zero!")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):
+        """Computed property"""
+        return self._celsius * 9/5 + 32
+
+    @fahrenheit.setter
+    def fahrenheit(self, value):
+        """Set via fahrenheit"""
+        self.celsius = (value - 32) * 5/9
+
+# Use like attributes, but with validation
+temp = Temperature(25)
+print(f"{temp.celsius}°C = {temp.fahrenheit}°F")
+
+# Setter validates
+temp.celsius = 100
+print(f"{temp.celsius}°C = {temp.fahrenheit}°F")
+
+# Set via fahrenheit
+temp.fahrenheit = 32
+print(f"{temp.celsius}°C = {temp.fahrenheit}°F")
+
+# Validation works
+try:
+    temp.celsius = -300
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+### Read-Only Property
+
+```{python}
+class Circle:
+    """Circle with read-only area"""
+
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, value):
+        if value <= 0:
+            raise ValueError("Radius must be positive")
+        self._radius = value
+
+    @property
+    def area(self):
+        """Read-only computed property"""
+        import math
+        return math.pi * self._radius ** 2
+
+    # No setter for area - it's computed!
+
+# Use properties
+circle = Circle(5)
+print(f"Radius: {circle.radius}")
+print(f"Area: {circle.area:.2f}")
+
+# Can modify radius
+circle.radius = 10
+print(f"New area: {circle.area:.2f}")
+
+# Cannot modify area
+try:
+    circle.area = 100
+except AttributeError as e:
+    print(f"Error: {e}")
+```
+
+### Property with Deleter
+
+```{python}
+class User:
+    """User with deletable password"""
+
+    def __init__(self, username, password):
+        self.username = username
+        self._password = password
+
+    @property
+    def password(self):
+        """Cannot read password"""
+        raise AttributeError("Password is write-only!")
+
+    @password.setter
+    def password(self, value):
+        """Set password with validation"""
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        self._password = value
+        print("Password updated successfully")
+
+    @password.deleter
+    def password(self):
+        """Delete password"""
+        self._password = None
+        print("Password deleted")
+
+# Create user
+user = User("alice", "initial123")
+
+# Cannot read password
+try:
+    print(user.password)
+except AttributeError as e:
+    print(f"Error: {e}")
+
+# Can set password
+user.password = "newpassword123"
+
+# Can delete password
+del user.password
+```
+
+## Getters and Setters
+
+Traditional getter/setter pattern (property decorators are preferred).
+
+### Manual Getters/Setters
+
+```{python}
+class Person:
+    """Person with manual getters/setters"""
+
+    def __init__(self, name, age):
+        self.__name = name
+        self.__age = age
+
+    # Getter methods
+    def get_name(self):
+        return self.__name
+
+    def get_age(self):
+        return self.__age
+
+    # Setter methods
+    def set_name(self, name):
+        if not name:
+            raise ValueError("Name cannot be empty")
+        self.__name = name
+
+    def set_age(self, age):
+        if age < 0 or age > 150:
+            raise ValueError("Invalid age")
+        self.__age = age
+
+# Use getters/setters
+person = Person("Alice", 30)
+print(f"Name: {person.get_name()}")
+print(f"Age: {person.get_age()}")
+
+# Modify via setters
+person.set_age(31)
+print(f"New age: {person.get_age()}")
+
+# Validation works
+try:
+    person.set_age(200)
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+### Properties vs Getters/Setters
+
+```{python}
+# Old style: getters/setters
+class OldStyle:
+    def __init__(self, value):
+        self.__value = value
+
+    def get_value(self):
+        return self.__value
+
+    def set_value(self, value):
+        self.__value = value
+
+# New style: properties
+class NewStyle:
+    def __init__(self, value):
+        self._value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+
+# Compare usage
+old = OldStyle(10)
+print(f"Old style: {old.get_value()}")
+old.set_value(20)
+
+new = NewStyle(10)
+print(f"New style: {new.value}")  # Much cleaner!
+new.value = 20
+```
+
+::: {.callout-tip}
+## Property Best Practices
+1. **Use @property** instead of manual getters/setters
+2. **Validate in setters** to maintain invariants
+3. **Compute expensive values** lazily
+4. **Document behavior** in docstrings
+5. **Keep it simple** - don't overuse
+6. **Read-only for derived** data
+
+```python
+@property
+def area(self):
+    """Area is always computed, never stored"""
+    return self.width * self.height
+```
+:::
+
+## Real-World Encapsulation Examples
+
+### Bank Account System
+
+```{python}
+class BankAccount:
+    """Secure bank account with encapsulation"""
+
+    _account_counter = 1000
+
+    def __init__(self, owner, initial_balance=0):
+        self._account_number = BankAccount._account_counter
+        BankAccount._account_counter += 1
+
+        self._owner = owner
+        self.__balance = initial_balance
+        self.__transactions = []
+        self.__pin = None
+
+    @property
+    def account_number(self):
+        """Read-only account number"""
+        return self._account_number
+
+    @property
+    def owner(self):
+        """Read-only owner"""
+        return self._owner
+
+    @property
+    def balance(self):
+        """Read-only balance"""
+        return self.__balance
+
+    def set_pin(self, pin):
+        """Set 4-digit PIN"""
+        if len(str(pin)) != 4:
+            raise ValueError("PIN must be 4 digits")
+        self.__pin = pin
+        return "PIN set successfully"
+
+    def verify_pin(self, pin):
+        """Verify PIN"""
+        return self.__pin == pin
+
+    def deposit(self, amount, pin):
+        """Deposit with PIN verification"""
+        if not self.verify_pin(pin):
+            return "Invalid PIN"
+
+        if amount <= 0:
+            return "Invalid amount"
+
+        self.__balance += amount
+        self.__transactions.append(f"Deposit: +${amount}")
+        return f"Deposited ${amount}. Balance: ${self.__balance}"
+
+    def withdraw(self, amount, pin):
+        """Withdraw with PIN verification"""
+        if not self.verify_pin(pin):
+            return "Invalid PIN"
+
+        if amount <= 0:
+            return "Invalid amount"
+
+        if amount > self.__balance:
+            return "Insufficient funds"
+
+        self.__balance -= amount
+        self.__transactions.append(f"Withdrawal: -${amount}")
+        return f"Withdrew ${amount}. Balance: ${self.__balance}"
+
+    def get_statement(self, pin):
+        """Get statement with PIN verification"""
+        if not self.verify_pin(pin):
+            return "Invalid PIN"
+
+        statement = [
+            f"\nAccount #{self._account_number}",
+            f"Owner: {self._owner}",
+            f"Balance: ${self.__balance}",
+            "\nTransactions:"
+        ]
+        statement.extend(f"  {t}" for t in self.__transactions)
+        return "\n".join(statement)
+
+# Test secure account
+account = BankAccount("Alice", 1000)
+account.set_pin(1234)
+
+print(f"Account: {account.account_number}")
+print(f"Owner: {account.owner}")
+print(f"Balance: ${account.balance}")
+
+print("\n" + account.deposit(500, 1234))
+print(account.withdraw(200, 1234))
+print(account.withdraw(200, 9999))  # Wrong PIN
+
+print(account.get_statement(1234))
+```
+
+### User Authentication System
+
+```{python}
+import hashlib
+
+class User:
+    """User with encrypted password"""
+
+    def __init__(self, username, email):
+        self._username = username
+        self._email = email
+        self.__password_hash = None
+        self.__is_active = True
+
+    @property
+    def username(self):
+        """Read-only username"""
+        return self._username
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, value):
+        """Validate email format"""
+        if "@" not in value or "." not in value.split("@")[-1]:
+            raise ValueError("Invalid email format")
+        self._email = value
+
+    @property
+    def is_active(self):
+        return self.__is_active
+
+    def set_password(self, password):
+        """Set password (stores hash, not password!)"""
+        if len(password) < 8:
+            raise ValueError("Password must be at least 8 characters")
+
+        # Hash the password
+        self.__password_hash = hashlib.sha256(
+            password.encode()
+        ).hexdigest()
+        return "Password set successfully"
+
+    def verify_password(self, password):
+        """Verify password"""
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        return password_hash == self.__password_hash
+
+    def deactivate(self):
+        """Deactivate account"""
+        self.__is_active = False
+
+    def activate(self):
+        """Activate account"""
+        self.__is_active = True
+
+    def authenticate(self, password):
+        """Authenticate user"""
+        if not self.__is_active:
+            return False, "Account is deactivated"
+
+        if self.verify_password(password):
+            return True, "Authentication successful"
+
+        return False, "Invalid password"
+
+# Test authentication
+user = User("alice", "alice@example.com")
+user.set_password("securepass123")
+
+# Try authentication
+success, message = user.authenticate("securepass123")
+print(f"{message}")
+
+success, message = user.authenticate("wrongpass")
+print(f"{message}")
+
+# Update email
+user.email = "newemail@example.com"
+print(f"New email: {user.email}")
+
+# Deactivate
+user.deactivate()
+success, message = user.authenticate("securepass123")
+print(f"After deactivation: {message}")
+```
+
+### Configuration Manager
+
+```{python}
+class Config:
+    """Configuration with validation and defaults"""
+
+    def __init__(self):
+        self.__settings = {
+            "debug": False,
+            "max_connections": 100,
+            "timeout": 30,
+            "host": "localhost"
+        }
+        self.__validators = {
+            "debug": lambda x: isinstance(x, bool),
+            "max_connections": lambda x: isinstance(x, int) and 1 <= x <= 1000,
+            "timeout": lambda x: isinstance(x, (int, float)) and x > 0,
+            "host": lambda x: isinstance(x, str) and len(x) > 0
+        }
+
+    def get(self, key, default=None):
+        """Get setting"""
+        return self.__settings.get(key, default)
+
+    def set(self, key, value):
+        """Set setting with validation"""
+        if key not in self.__validators:
+            raise KeyError(f"Unknown setting: {key}")
+
+        if not self.__validators[key](value):
+            raise ValueError(f"Invalid value for {key}: {value}")
+
+        old_value = self.__settings.get(key)
+        self.__settings[key] = value
+        return f"Updated {key}: {old_value} → {value}"
+
+    @property
+    def debug(self):
+        return self.__settings["debug"]
+
+    @debug.setter
+    def debug(self, value):
+        self.set("debug", value)
+
+    @property
+    def max_connections(self):
+        return self.__settings["max_connections"]
+
+    @max_connections.setter
+    def max_connections(self, value):
+        self.set("max_connections", value)
+
+    def get_all(self):
+        """Get all settings (copy)"""
+        return self.__settings.copy()
+
+    def reset(self):
+        """Reset to defaults"""
+        self.__settings = {
+            "debug": False,
+            "max_connections": 100,
+            "timeout": 30,
+            "host": "localhost"
+        }
+
+# Test configuration
+config = Config()
+print(f"Debug: {config.debug}")
+print(f"Max connections: {config.max_connections}")
+
+# Modify via property
+config.debug = True
+print(f"Debug enabled: {config.debug}")
+
+# Modify via set
+print(config.set("timeout", 60))
+
+# Validation works
+try:
+    config.max_connections = 5000
+except ValueError as e:
+    print(f"Error: {e}")
+
+print("\nAll settings:")
+for key, value in config.get_all().items():
+    print(f"  {key}: {value}")
+```
+
+### Data Validation Class
+
+```{python}
+class ValidatedData:
+    """Base class for validated data"""
+
+    def __init__(self, **kwargs):
+        self.__data = {}
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def __setattr__(self, name, value):
+        if name.startswith('_'):
+            # Internal attributes
+            super().__setattr__(name, value)
+        else:
+            # Validate public attributes
+            validator_name = f"_validate_{name}"
+            if hasattr(self, validator_name):
+                validator = getattr(self, validator_name)
+                if not validator(value):
+                    raise ValueError(f"Invalid value for {name}: {value}")
+
+            self.__dict__.setdefault('_ValidatedData__data', {})[name] = value
+
+    def __getattr__(self, name):
+        if name in self.__data:
+            return self.__data[name]
+        raise AttributeError(f"No attribute: {name}")
+
+class Person(ValidatedData):
+    """Person with validated attributes"""
+
+    def _validate_name(self, value):
+        return isinstance(value, str) and len(value) > 0
+
+    def _validate_age(self, value):
+        return isinstance(value, int) and 0 <= value <= 150
+
+    def _validate_email(self, value):
+        return isinstance(value, str) and "@" in value
+
+# Test validation
+person = Person(name="Alice", age=30, email="alice@example.com")
+print(f"Name: {person.name}")
+print(f"Age: {person.age}")
+print(f"Email: {person.email}")
+
+# Validation works
+try:
+    person.age = 200
+except ValueError as e:
+    print(f"Error: {e}")
+
+try:
+    person.email = "invalid"
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Access levels**:
+  - Public (no prefix)
+  - Protected (single `_`)
+  - Private (double `__`)
+  - Name mangling
+
+- **Properties**:
+  - `@property` decorator
+  - Getters and setters
+  - Read-only properties
+  - Computed properties
+  - Property deleters
+
+- **Validation**:
+  - Input validation in setters
+  - Maintaining invariants
+  - Preventing invalid state
+
+- **Real-world examples**:
+  - Bank accounts
+  - User authentication
+  - Configuration management
+  - Data validation
+
+- **Best practices**:
+  - Use properties over manual getters/setters
+  - Validate data
+  - Hide implementation details
+  - Expose minimal interface
+
+::: {.callout-important}
+## Key Takeaways
+1. **Encapsulation** hides implementation details
+2. **Public/Protected/Private** are conventions
+3. **Properties** provide controlled access
+4. **Validate** in setters
+5. **Read-only** for derived data
+6. **Name mangling** makes privates harder to access
+7. **Single `_`** means "internal use"
+8. **Double `__`** means "private"
+9. **Properties** are Pythonic
+10. **Expose interface**, hide implementation
+:::
+
+## Practice Exercises
+
+### Exercise 1: Smart Thermostat
+
+Create a thermostat with validation and constraints.
+
+```{python}
+class Thermostat:
+    """
+    Solution: Smart thermostat with encapsulation
+    """
+
+    def __init__(self, min_temp=50, max_temp=90):
+        self.__current_temp = 70
+        self.__target_temp = 70
+        self.__min_temp = min_temp
+        self.__max_temp = max_temp
+        self.__is_on = False
+        self.__mode = "heat"  # heat, cool, auto
+
+    @property
+    def current_temp(self):
+        """Read-only current temperature"""
+        return self.__current_temp
+
+    @property
+    def target_temp(self):
+        return self.__target_temp
+
+    @target_temp.setter
+    def target_temp(self, value):
+        """Set target with validation"""
+        if value < self.__min_temp or value > self.__max_temp:
+            raise ValueError(
+                f"Target must be between {self.__min_temp}°F and {self.__max_temp}°F"
+            )
+        self.__target_temp = value
+
+    @property
+    def mode(self):
+        return self.__mode
+
+    @mode.setter
+    def mode(self, value):
+        """Set mode with validation"""
+        valid_modes = ["heat", "cool", "auto"]
+        if value not in valid_modes:
+            raise ValueError(f"Mode must be one of: {valid_modes}")
+        self.__mode = value
+
+    @property
+    def is_on(self):
+        return self.__is_on
+
+    def turn_on(self):
+        self.__is_on = True
+        return "Thermostat turned on"
+
+    def turn_off(self):
+        self.__is_on = False
+        return "Thermostat turned off"
+
+    def _simulate_temp_change(self):
+        """Internal method to simulate temperature change"""
+        if not self.__is_on:
+            return
+
+        diff = self.__target_temp - self.__current_temp
+
+        if self.__mode == "heat" and diff > 0:
+            self.__current_temp += 1
+        elif self.__mode == "cool" and diff < 0:
+            self.__current_temp -= 1
+        elif self.__mode == "auto":
+            if diff > 0:
+                self.__current_temp += 1
+            elif diff < 0:
+                self.__current_temp -= 1
+
+    def get_status(self):
+        status = "ON" if self.__is_on else "OFF"
+        return {
+            "status": status,
+            "mode": self.__mode,
+            "current": self.__current_temp,
+            "target": self.__target_temp,
+            "range": f"{self.__min_temp}°F - {self.__max_temp}°F"
+        }
+
+# Test thermostat
+thermo = Thermostat()
+print("Initial status:", thermo.get_status())
+
+thermo.turn_on()
+thermo.target_temp = 75
+thermo.mode = "heat"
+
+print("\nAfter setup:", thermo.get_status())
+
+# Simulate temperature changes
+for _ in range(3):
+    thermo._simulate_temp_change()
+    print(f"Current: {thermo.current_temp}°F")
+```
+
+### Exercise 2: Secure Wallet
+
+Create a cryptocurrency wallet with private keys.
+
+```{python}
+import hashlib
+import secrets
+
+class CryptoWallet:
+    """
+    Solution: Secure cryptocurrency wallet
+    """
+
+    def __init__(self, owner):
+        self.__owner = owner
+        self.__balance = 0.0
+        self.__private_key = self.__generate_private_key()
+        self.__public_address = self.__generate_address()
+        self.__transaction_history = []
+
+    @staticmethod
+    def __generate_private_key():
+        """Generate random private key"""
+        return secrets.token_hex(32)
+
+    def __generate_address(self):
+        """Generate public address from private key"""
+        hash_obj = hashlib.sha256(self.__private_key.encode())
+        return "0x" + hash_obj.hexdigest()[:40]
+
+    @property
+    def owner(self):
+        return self.__owner
+
+    @property
+    def balance(self):
+        return self.__balance
+
+    @property
+    def public_address(self):
+        """Public address is safe to share"""
+        return self.__public_address
+
+    def get_private_key(self, confirmation):
+        """Get private key with confirmation"""
+        if confirmation != "I understand the risks":
+            return "Access denied - confirmation required"
+        return self.__private_key
+
+    def deposit(self, amount):
+        """Deposit cryptocurrency"""
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+
+        self.__balance += amount
+        self.__transaction_history.append({
+            "type": "deposit",
+            "amount": amount,
+            "balance": self.__balance
+        })
+        return f"Deposited {amount} BTC"
+
+    def withdraw(self, amount, private_key):
+        """Withdraw with private key verification"""
+        if private_key != self.__private_key:
+            raise ValueError("Invalid private key")
+
+        if amount > self.__balance:
+            raise ValueError("Insufficient funds")
+
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+
+        self.__balance -= amount
+        self.__transaction_history.append({
+            "type": "withdrawal",
+            "amount": -amount,
+            "balance": self.__balance
+        })
+        return f"Withdrew {amount} BTC"
+
+    def get_transaction_history(self):
+        """Get copy of transaction history"""
+        return self.__transaction_history.copy()
+
+# Test wallet
+wallet = CryptoWallet("Alice")
+print(f"Owner: {wallet.owner}")
+print(f"Address: {wallet.public_address}")
+print(f"Balance: {wallet.balance} BTC")
+
+# Deposit
+print("\n" + wallet.deposit(1.5))
+print(f"Balance: {wallet.balance} BTC")
+
+# Try to get private key
+print("\n" + wallet.get_private_key("no"))
+private_key = wallet.get_private_key("I understand the risks")
+print(f"Private key: {private_key[:10]}...")
+
+# Withdraw
+print("\n" + wallet.withdraw(0.5, private_key))
+print(f"Balance: {wallet.balance} BTC")
+```
+
+### Exercise 3: Validated Employee System
+
+```{python}
+from datetime import datetime
+
+class Employee:
+    """
+    Solution: Employee with comprehensive validation
+    """
+
+    MIN_SALARY = 30000
+    MAX_SALARY = 500000
+
+    def __init__(self, name, employee_id, department, salary):
+        self.__name = name
+        self.__employee_id = employee_id
+        self.__department = department
+        self.__salary = salary
+        self.__hire_date = datetime.now()
+        self.__is_active = True
+        self.__performance_reviews = []
+
+        self.__validate_all()
+
+    def __validate_all(self):
+        """Validate all fields"""
+        if not self.__name or len(self.__name) < 2:
+            raise ValueError("Name must be at least 2 characters")
+
+        if not self.__employee_id:
+            raise ValueError("Employee ID required")
+
+        if not self.__department:
+            raise ValueError("Department required")
+
+        if not (self.MIN_SALARY <= self.__salary <= self.MAX_SALARY):
+            raise ValueError(
+                f"Salary must be between ${self.MIN_SALARY} and ${self.MAX_SALARY}"
+            )
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def employee_id(self):
+        return self.__employee_id
+
+    @property
+    def department(self):
+        return self.__department
+
+    @property
+    def salary(self):
+        return self.__salary
+
+    @property
+    def hire_date(self):
+        return self.__hire_date
+
+    @property
+    def is_active(self):
+        return self.__is_active
+
+    @property
+    def years_employed(self):
+        """Computed property"""
+        delta = datetime.now() - self.__hire_date
+        return delta.days / 365.25
+
+    def give_raise(self, percentage):
+        """Give raise with validation"""
+        if not self.__is_active:
+            raise ValueError("Cannot give raise to inactive employee")
+
+        if percentage < 0 or percentage > 20:
+            raise ValueError("Raise must be between 0% and 20%")
+
+        old_salary = self.__salary
+        self.__salary = old_salary * (1 + percentage / 100)
+
+        if self.__salary > self.MAX_SALARY:
+            self.__salary = self.MAX_SALARY
+
+        return f"Salary increased from ${old_salary:,.2f} to ${self.__salary:,.2f}"
+
+    def add_review(self, rating, comments):
+        """Add performance review"""
+        if not 1 <= rating <= 5:
+            raise ValueError("Rating must be 1-5")
+
+        self.__performance_reviews.append({
+            "date": datetime.now(),
+            "rating": rating,
+            "comments": comments
+        })
+
+    @property
+    def average_rating(self):
+        """Computed average rating"""
+        if not self.__performance_reviews:
+            return None
+
+        total = sum(r["rating"] for r in self.__performance_reviews)
+        return total / len(self.__performance_reviews)
+
+    def terminate(self):
+        """Terminate employment"""
+        self.__is_active = False
+
+    def rehire(self):
+        """Rehire employee"""
+        self.__is_active = True
+
+    def __str__(self):
+        status = "Active" if self.__is_active else "Inactive"
+        return (
+            f"Employee: {self.__name} (ID: {self.__employee_id})\n"
+            f"Department: {self.__department}\n"
+            f"Salary: ${self.__salary:,.2f}\n"
+            f"Status: {status}"
+        )
+
+# Test employee
+emp = Employee("Alice Johnson", "E001", "Engineering", 75000)
+print(emp)
+
+print("\n" + emp.give_raise(10))
+
+emp.add_review(4, "Great performance")
+emp.add_review(5, "Excellent work")
+print(f"\nAverage rating: {emp.average_rating:.2f}")
+
+print(f"Years employed: {emp.years_employed:.2f}")
+```
+
+::: {.callout-tip}
+## Master Encapsulation!
+Encapsulation is crucial for:
+- **Data integrity**: Prevent invalid state
+- **Security**: Protect sensitive information
+- **Maintainability**: Change internals without breaking code
+- **API design**: Clear public interface
+
+Practice by adding validation and access control to your classes!
+:::
+
+---
+
+Congratulations! You've mastered encapsulation in Python. You can now create classes with proper data hiding, validation, and controlled access. This is essential for building robust, maintainable applications!

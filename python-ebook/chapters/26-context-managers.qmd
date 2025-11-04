@@ -1,0 +1,721 @@
+# Context Managers {#sec-context-managers}
+
+## Introduction
+
+Have you ever opened a file and forgotten to close it? Or acquired a database connection that remained open after an error occurred? Context managers are Python's elegant solution to resource management, ensuring that resources are properly acquired and released, even when errors occur.
+
+In this chapter, we'll explore the magical world of context managers and the `with` statement, learning how to write cleaner, safer code that automatically handles resource cleanup.
+
+::: {.callout-note}
+## What You'll Learn
+
+- Understanding the `with` statement
+- Using built-in context managers
+- Creating custom context managers with classes
+- Using the `contextlib` module
+- Best practices for resource management
+:::
+
+## The Problem: Resource Management
+
+Before context managers, resource management in Python looked like this:
+
+```python
+# The old way - error prone!
+file = open('data.txt', 'r')
+try:
+    data = file.read()
+    # Process data...
+    print(data)
+finally:
+    file.close()  # Must remember to close!
+```
+
+Problems with this approach:
+1. Easy to forget the `finally` block
+2. Verbose and repetitive
+3. Error-prone when dealing with multiple resources
+4. Clutters the main logic
+
+## The Solution: Context Managers
+
+Context managers provide a cleaner way to manage resources:
+
+```python
+# The modern way - clean and safe!
+with open('data.txt', 'r') as file:
+    data = file.read()
+    print(data)
+# File is automatically closed here!
+```
+
+The `with` statement ensures that resources are properly cleaned up, even if an error occurs within the block.
+
+## The `with` Statement
+
+### Basic Syntax
+
+```python
+with expression as variable:
+    # Code block
+    pass
+# Cleanup happens automatically here
+```
+
+### File Operations
+
+The most common use of context managers:
+
+```python
+# Reading a file
+with open('input.txt', 'r') as f:
+    content = f.read()
+    print(content)
+
+# Writing to a file
+with open('output.txt', 'w') as f:
+    f.write('Hello, Context Managers!')
+
+# Multiple files
+with open('input.txt', 'r') as infile, \
+     open('output.txt', 'w') as outfile:
+    content = infile.read()
+    outfile.write(content.upper())
+```
+
+### Error Handling
+
+Context managers work seamlessly with exceptions:
+
+```python
+try:
+    with open('data.txt', 'r') as f:
+        data = f.read()
+        # Even if an error occurs here...
+        result = 1 / 0  # ZeroDivisionError!
+except ZeroDivisionError:
+    print("Error occurred!")
+# ...the file is still closed properly!
+```
+
+::: {.callout-tip}
+## Context Manager Guarantee
+
+Context managers guarantee that cleanup code runs, even if:
+- An exception is raised
+- A `return` statement is executed
+- A `break` or `continue` is used
+:::
+
+## Built-in Context Managers
+
+Python provides many built-in context managers:
+
+### File Objects
+
+```python
+# Text files
+with open('text.txt', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Binary files
+with open('image.png', 'rb') as f:
+    binary_data = f.read()
+```
+
+### Threading Locks
+
+```python
+import threading
+
+lock = threading.Lock()
+
+def thread_safe_function():
+    with lock:
+        # Only one thread can execute this at a time
+        print("Critical section")
+        # Lock is automatically released
+```
+
+### Decimal Context
+
+```python
+from decimal import Decimal, localcontext
+
+with localcontext() as ctx:
+    ctx.prec = 4  # Set precision to 4
+    result = Decimal('1') / Decimal('3')
+    print(result)  # 0.3333
+```
+
+## Creating Custom Context Managers with Classes
+
+You can create your own context managers by implementing the context manager protocol.
+
+### The Context Manager Protocol
+
+A context manager must implement two special methods:
+- `__enter__()`: Called when entering the `with` block
+- `__exit__()`: Called when exiting the `with` block
+
+```python
+class MyContextManager:
+    def __enter__(self):
+        print("Entering context")
+        return self  # Returned value is assigned to 'as' variable
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting context")
+        # exc_type: Exception type (if any)
+        # exc_value: Exception value (if any)
+        # traceback: Exception traceback (if any)
+        return False  # False = propagate exceptions
+
+# Using it
+with MyContextManager() as cm:
+    print("Inside context")
+```
+
+Output:
+```
+Entering context
+Inside context
+Exiting context
+```
+
+### Practical Example: Database Connection
+
+```python
+class DatabaseConnection:
+    def __init__(self, connection_string):
+        self.connection_string = connection_string
+        self.connection = None
+
+    def __enter__(self):
+        print(f"Connecting to {self.connection_string}")
+        # Simulate connection
+        self.connection = f"Connection to {self.connection_string}"
+        return self.connection
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Closing database connection")
+        self.connection = None
+        if exc_type is not None:
+            print(f"An error occurred: {exc_value}")
+        return False  # Don't suppress exceptions
+
+# Using it
+with DatabaseConnection("postgresql://localhost/mydb") as conn:
+    print(f"Using: {conn}")
+    print("Executing queries...")
+```
+
+### File Manager Example
+
+```python
+class FileManager:
+    def __init__(self, filename, mode):
+        self.filename = filename
+        self.mode = mode
+        self.file = None
+
+    def __enter__(self):
+        print(f"Opening {self.filename}")
+        self.file = open(self.filename, self.mode)
+        return self.file
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print(f"Closing {self.filename}")
+        if self.file:
+            self.file.close()
+        return False
+
+# Using it
+with FileManager('test.txt', 'w') as f:
+    f.write('Hello from custom context manager!')
+```
+
+### Timer Context Manager
+
+```python
+import time
+
+class Timer:
+    def __enter__(self):
+        self.start = time.time()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.end = time.time()
+        self.elapsed = self.end - self.start
+        print(f"Elapsed time: {self.elapsed:.4f} seconds")
+        return False
+
+# Using it
+with Timer():
+    # Code to time
+    total = sum(range(1000000))
+    print(f"Sum: {total}")
+```
+
+### Suppressing Exceptions
+
+```python
+class SuppressErrors:
+    def __init__(self, *exceptions):
+        self.exceptions = exceptions
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        # Return True to suppress the exception
+        return exc_type is not None and issubclass(exc_type, self.exceptions)
+
+# Using it
+with SuppressErrors(ZeroDivisionError, ValueError):
+    result = 10 / 0  # This error is suppressed!
+    print("This won't print")
+
+print("Program continues!")  # This prints
+```
+
+## The `contextlib` Module
+
+The `contextlib` module provides utilities for creating context managers more easily.
+
+### The `@contextmanager` Decorator
+
+Create context managers using a generator function:
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def file_manager(filename, mode):
+    print(f"Opening {filename}")
+    f = open(filename, mode)
+    try:
+        yield f  # This value is assigned to 'as' variable
+    finally:
+        print(f"Closing {filename}")
+        f.close()
+
+# Using it
+with file_manager('test.txt', 'w') as f:
+    f.write('Hello from contextmanager!')
+```
+
+### Timer with `@contextmanager`
+
+```python
+import time
+from contextlib import contextmanager
+
+@contextmanager
+def timer(name):
+    start = time.time()
+    print(f"Starting {name}...")
+    yield
+    end = time.time()
+    print(f"{name} took {end - start:.4f} seconds")
+
+# Using it
+with timer("Database query"):
+    time.sleep(0.5)  # Simulate work
+    print("Executing query...")
+```
+
+### `contextlib.closing`
+
+Automatically call `close()` on an object:
+
+```python
+from contextlib import closing
+from urllib.request import urlopen
+
+with closing(urlopen('http://www.python.org')) as page:
+    content = page.read()
+```
+
+### `contextlib.suppress`
+
+Suppress specified exceptions:
+
+```python
+from contextlib import suppress
+
+# Instead of try/except
+with suppress(FileNotFoundError):
+    with open('nonexistent.txt') as f:
+        print(f.read())
+
+print("Program continues even if file doesn't exist")
+
+# Suppress multiple exceptions
+with suppress(ZeroDivisionError, ValueError, TypeError):
+    result = 10 / 0
+    number = int("invalid")
+```
+
+### `contextlib.redirect_stdout` and `redirect_stderr`
+
+Redirect output streams:
+
+```python
+from contextlib import redirect_stdout, redirect_stderr
+import io
+
+# Capture stdout
+f = io.StringIO()
+with redirect_stdout(f):
+    print("This goes to the StringIO object")
+    print("Not to the console!")
+
+output = f.getvalue()
+print("Captured:", output)
+
+# Redirect to a file
+with open('output.log', 'w') as f:
+    with redirect_stdout(f):
+        print("This goes to the file")
+```
+
+### `contextlib.ExitStack`
+
+Manage multiple context managers dynamically:
+
+```python
+from contextlib import ExitStack
+
+def process_files(filenames):
+    with ExitStack() as stack:
+        files = [stack.enter_context(open(fname)) for fname in filenames]
+        # All files are now open
+        for f in files:
+            print(f.read())
+        # All files are automatically closed here
+
+# Using it
+process_files(['file1.txt', 'file2.txt', 'file3.txt'])
+```
+
+## Advanced Context Manager Patterns
+
+### Nested Context Managers
+
+```python
+with open('input.txt', 'r') as infile:
+    with open('output.txt', 'w') as outfile:
+        content = infile.read()
+        outfile.write(content.upper())
+
+# Or use a single with statement (Python 3.1+)
+with open('input.txt', 'r') as infile, open('output.txt', 'w') as outfile:
+    content = infile.read()
+    outfile.write(content.upper())
+```
+
+### Reusable Context Managers
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def temporary_attribute(obj, attr, value):
+    """Temporarily change an object's attribute."""
+    original = getattr(obj, attr)
+    setattr(obj, attr, value)
+    try:
+        yield obj
+    finally:
+        setattr(obj, attr, original)
+
+# Using it
+class Config:
+    debug = False
+
+config = Config()
+print(f"Debug: {config.debug}")  # False
+
+with temporary_attribute(config, 'debug', True):
+    print(f"Debug: {config.debug}")  # True
+
+print(f"Debug: {config.debug}")  # False again
+```
+
+### Transaction Context Manager
+
+```python
+from contextlib import contextmanager
+
+class Database:
+    def __init__(self):
+        self.in_transaction = False
+
+    def begin_transaction(self):
+        print("BEGIN TRANSACTION")
+        self.in_transaction = True
+
+    def commit(self):
+        print("COMMIT")
+        self.in_transaction = False
+
+    def rollback(self):
+        print("ROLLBACK")
+        self.in_transaction = False
+
+@contextmanager
+def transaction(db):
+    db.begin_transaction()
+    try:
+        yield db
+    except Exception:
+        db.rollback()
+        raise
+    else:
+        db.commit()
+
+# Using it
+db = Database()
+
+# Successful transaction
+with transaction(db):
+    print("Executing query 1")
+    print("Executing query 2")
+
+print()
+
+# Failed transaction
+try:
+    with transaction(db):
+        print("Executing query 1")
+        raise ValueError("Something went wrong!")
+        print("This won't execute")
+except ValueError as e:
+    print(f"Caught: {e}")
+```
+
+## Real-World Examples
+
+### Working Directory Context Manager
+
+```python
+import os
+from contextlib import contextmanager
+
+@contextmanager
+def change_directory(path):
+    """Temporarily change working directory."""
+    original_dir = os.getcwd()
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(original_dir)
+
+# Using it
+print(f"Current dir: {os.getcwd()}")
+
+with change_directory('/tmp'):
+    print(f"Inside context: {os.getcwd()}")
+    # Do work in /tmp
+
+print(f"After context: {os.getcwd()}")
+```
+
+### Environment Variable Manager
+
+```python
+import os
+from contextlib import contextmanager
+
+@contextmanager
+def environment_variable(key, value):
+    """Temporarily set an environment variable."""
+    original_value = os.environ.get(key)
+    os.environ[key] = value
+    try:
+        yield
+    finally:
+        if original_value is None:
+            del os.environ[key]
+        else:
+            os.environ[key] = original_value
+
+# Using it
+with environment_variable('DEBUG', 'True'):
+    print(f"DEBUG = {os.environ.get('DEBUG')}")
+```
+
+### Resource Pool Manager
+
+```python
+from contextlib import contextmanager
+from queue import Queue
+
+class ConnectionPool:
+    def __init__(self, size):
+        self.pool = Queue()
+        for i in range(size):
+            self.pool.put(f"Connection-{i}")
+
+    @contextmanager
+    def connection(self):
+        conn = self.pool.get()
+        try:
+            yield conn
+        finally:
+            self.pool.put(conn)
+
+# Using it
+pool = ConnectionPool(3)
+
+with pool.connection() as conn:
+    print(f"Using {conn}")
+    # Do work with connection
+```
+
+::: {.callout-important}
+## Best Practices
+
+1. **Always use context managers for resources** (files, connections, locks)
+2. **Keep context manager code simple** - complex logic should be outside
+3. **Don't suppress exceptions** unless you have a good reason
+4. **Use `@contextmanager` for simple cases** - it's cleaner than classes
+5. **Document what your context manager does** - especially cleanup behavior
+:::
+
+## Common Pitfalls
+
+### Don't Store the Context Manager
+
+```python
+# Wrong - defeats the purpose!
+cm = open('file.txt', 'r')
+with cm as f:
+    data = f.read()
+
+# Right - let with manage it
+with open('file.txt', 'r') as f:
+    data = f.read()
+```
+
+### Don't Use Resources After Context
+
+```python
+with open('file.txt', 'r') as f:
+    data = f.read()
+
+# Wrong - file is closed!
+# print(f.read())  # ValueError: I/O operation on closed file
+```
+
+### Handle Exceptions Properly
+
+```python
+class BadContextManager:
+    def __exit__(self, exc_type, exc_value, traceback):
+        return True  # Suppresses ALL exceptions - dangerous!
+
+class GoodContextManager:
+    def __exit__(self, exc_type, exc_value, traceback):
+        # Do cleanup
+        # Return False or None to propagate exceptions
+        return False
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **Context managers** provide automatic resource management
+- **The `with` statement** ensures cleanup code runs
+- **Custom context managers** can be created with classes or decorators
+- **The `contextlib` module** provides utilities for easier context manager creation
+- **Best practices** include using context managers for all resources
+
+Context managers are one of Python's most elegant features, making code cleaner, safer, and more maintainable. Master them, and your code will be more robust!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Use `with` for automatic resource management
+- Context managers guarantee cleanup, even on errors
+- Use `@contextmanager` decorator for simple cases
+- Built-in context managers exist for common tasks
+- Always prefer context managers over manual cleanup
+:::
+
+## Practice Exercises
+
+### Exercise 1: Custom File Logger
+Create a context manager that logs when a file is opened and closed:
+
+```python
+@contextmanager
+def logged_file(filename, mode):
+    # Your code here
+    pass
+
+# Should print when file is opened and closed
+with logged_file('test.txt', 'w') as f:
+    f.write('Hello!')
+```
+
+### Exercise 2: Timing Context Manager
+Create a context manager that measures and prints execution time:
+
+```python
+# Your code here
+
+with Timer("My operation"):
+    sum(range(1000000))
+# Should print: "My operation took X.XXXX seconds"
+```
+
+### Exercise 3: Temporary File
+Create a context manager that creates a temporary file and deletes it after use:
+
+```python
+# Your code here
+
+with TemporaryFile('temp.txt') as filename:
+    with open(filename, 'w') as f:
+        f.write('Temporary data')
+    # File exists here
+# File is deleted here
+```
+
+### Exercise 4: List Modifier
+Create a context manager that temporarily appends items to a list:
+
+```python
+# Your code here
+
+my_list = [1, 2, 3]
+with ListAppender(my_list, [4, 5, 6]):
+    print(my_list)  # [1, 2, 3, 4, 5, 6]
+print(my_list)  # [1, 2, 3]
+```
+
+### Exercise 5: Error Handler
+Create a context manager that catches and logs exceptions:
+
+```python
+# Your code here
+
+with ErrorHandler('operation.log'):
+    result = 10 / 0  # Error is caught and logged
+print("Program continues")
+```
+
+## Additional Resources
+
+- [PEP 343 - The "with" Statement](https://www.python.org/dev/peps/pep-0343/)
+- [contextlib documentation](https://docs.python.org/3/library/contextlib.html)
+- [Context Manager Types](https://docs.python.org/3/reference/datamodel.html#context-managers)
+
+## Next Steps
+
+In the next chapter, we'll dive into **decorators**, another powerful Python feature that allows you to modify function behavior elegantly. Get ready to wrap your head around function wrapping!

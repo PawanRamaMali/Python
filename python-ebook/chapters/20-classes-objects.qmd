@@ -1,0 +1,1118 @@
+# Classes and Objects: Object-Oriented Programming {#sec-classes-objects}
+
+Welcome to Object-Oriented Programming (OOP)! Classes and objects let you model real-world things in code. Think of a class as a blueprint (like architectural plans) and objects as the actual buildings created from those plans. This powerful paradigm will transform how you structure your programs!
+
+## What Are Classes and Objects?
+
+A **class** is a blueprint for creating objects. An **object** is an instance of a class - a specific realization of that blueprint.
+
+### Real-World Analogy
+
+```{python}
+# Class = Cookie cutter (blueprint)
+# Object = Cookie (actual thing)
+
+# Class = Car blueprint
+# Objects = Your specific car, my specific car
+
+class Dog:
+    """A blueprint for dogs"""
+    pass
+
+# Create objects (instances)
+buddy = Dog()  # One dog object
+max_dog = Dog()     # Another dog object
+
+print(f"buddy is a {type(buddy)}")
+print(f"max is a {type(max_dog)}")
+print(f"Are they different? {buddy is not max_dog}")
+```
+
+::: {.callout-note}
+## Key OOP Concepts
+- **Class**: Blueprint/template for objects
+- **Object**: Instance of a class
+- **Attribute**: Data stored in object
+- **Method**: Function that belongs to class
+- **Instance**: A specific object created from class
+:::
+
+## Creating Your First Class
+
+### Basic Class Definition
+
+```{python}
+# Define a class
+class Person:
+    """A simple Person class"""
+    pass  # Empty class for now
+
+# Create an object
+alice = Person()
+print(f"Alice is a {type(alice)}")
+print(f"Object: {alice}")
+```
+
+### Class with Attributes
+
+```{python}
+class Dog:
+    """A class representing a dog"""
+
+    # Class attribute (shared by all instances)
+    species = "Canis familiaris"
+
+    def __init__(self, name, age):
+        """Initialize a dog"""
+        # Instance attributes (unique to each instance)
+        self.name = name
+        self.age = age
+
+# Create dog objects
+buddy = Dog("Buddy", 3)
+max_dog = Dog("Max", 5)
+
+print(f"{buddy.name} is {buddy.age} years old")
+print(f"{max_dog.name} is {max_dog.age} years old")
+print(f"Both are {Dog.species}")
+```
+
+### The __init__ Method
+
+The `__init__` method is the constructor - it's called when creating a new object.
+
+```{python}
+class Car:
+    """A class representing a car"""
+
+    def __init__(self, make, model, year):
+        """Initialize car attributes"""
+        print(f"Creating a {year} {make} {model}")
+        self.make = make
+        self.model = model
+        self.year = year
+        self.odometer = 0  # Default value
+
+# Create car
+my_car = Car("Toyota", "Camry", 2022)
+print(f"Make: {my_car.make}")
+print(f"Model: {my_car.model}")
+print(f"Year: {my_car.year}")
+print(f"Odometer: {my_car.odometer}")
+```
+
+::: {.callout-important}
+## Understanding self
+- **self** represents the instance itself
+- **First parameter** of instance methods
+- **Automatically passed** when calling methods
+- **Access attributes** with `self.attribute_name`
+- **Call methods** with `self.method_name()`
+
+```python
+class Example:
+    def __init__(self, value):
+        self.value = value  # self refers to this specific instance
+
+obj = Example(42)  # Python automatically passes obj as self
+```
+:::
+
+## Instance Attributes vs Class Attributes
+
+### Instance Attributes
+
+Unique to each object, defined in `__init__`:
+
+```{python}
+class BankAccount:
+    """Bank account class"""
+
+    def __init__(self, owner, balance):
+        # Instance attributes - different for each account
+        self.owner = owner
+        self.balance = balance
+
+# Each account has its own owner and balance
+account1 = BankAccount("Alice", 1000)
+account2 = BankAccount("Bob", 2000)
+
+print(f"{account1.owner}: ${account1.balance}")
+print(f"{account2.owner}: ${account2.balance}")
+```
+
+### Class Attributes
+
+Shared by all instances, defined in class body:
+
+```{python}
+class BankAccount:
+    """Bank account with interest rate"""
+
+    # Class attribute - shared by all accounts
+    interest_rate = 0.02
+
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+# All accounts share the same interest rate
+account1 = BankAccount("Alice", 1000)
+account2 = BankAccount("Bob", 2000)
+
+print(f"Alice's interest: {account1.balance * BankAccount.interest_rate}")
+print(f"Bob's interest: {account2.balance * BankAccount.interest_rate}")
+
+# Change class attribute affects all instances
+BankAccount.interest_rate = 0.03
+print(f"New interest rate: {BankAccount.interest_rate}")
+print(f"Alice's new interest: {account1.balance * BankAccount.interest_rate}")
+```
+
+### Combining Both
+
+```{python}
+class Employee:
+    """Employee class with instance and class attributes"""
+
+    # Class attribute - shared
+    company = "TechCorp"
+    employee_count = 0
+
+    def __init__(self, name, salary):
+        # Instance attributes - unique
+        self.name = name
+        self.salary = salary
+
+        # Increment class attribute
+        Employee.employee_count += 1
+
+# Create employees
+emp1 = Employee("Alice", 70000)
+emp2 = Employee("Bob", 80000)
+emp3 = Employee("Charlie", 75000)
+
+print(f"Company: {Employee.company}")
+print(f"Total employees: {Employee.employee_count}")
+print(f"{emp1.name} works at {emp1.company}")
+```
+
+::: {.callout-tip}
+## Instance vs Class Attributes
+**Instance attributes** (`self.attribute`):
+- Unique to each object
+- Different values for different instances
+- Defined in `__init__`
+
+**Class attributes**:
+- Shared by all instances
+- Same value for all instances (unless overridden)
+- Defined in class body
+- Access via `ClassName.attribute` or `self.attribute`
+:::
+
+## Instance Methods
+
+Methods are functions that belong to a class.
+
+### Basic Methods
+
+```{python}
+class Dog:
+    """Dog class with methods"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def bark(self):
+        """Make the dog bark"""
+        return f"{self.name} says Woof!"
+
+    def get_info(self):
+        """Get dog information"""
+        return f"{self.name} is {self.age} years old"
+
+    def have_birthday(self):
+        """Celebrate birthday (increase age)"""
+        self.age += 1
+        return f"Happy birthday {self.name}! Now {self.age} years old"
+
+# Create and use
+buddy = Dog("Buddy", 3)
+print(buddy.bark())
+print(buddy.get_info())
+print(buddy.have_birthday())
+print(buddy.get_info())
+```
+
+### Methods with Parameters
+
+```{python}
+class BankAccount:
+    """Bank account with methods"""
+
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        """Deposit money"""
+        if amount > 0:
+            self.balance += amount
+            return f"Deposited ${amount}. New balance: ${self.balance}"
+        return "Invalid amount"
+
+    def withdraw(self, amount):
+        """Withdraw money"""
+        if amount > self.balance:
+            return "Insufficient funds"
+        if amount > 0:
+            self.balance -= amount
+            return f"Withdrew ${amount}. New balance: ${self.balance}"
+        return "Invalid amount"
+
+    def get_balance(self):
+        """Get current balance"""
+        return f"{self.owner}'s balance: ${self.balance}"
+
+# Use the account
+account = BankAccount("Alice", 1000)
+print(account.get_balance())
+print(account.deposit(500))
+print(account.withdraw(200))
+print(account.withdraw(2000))
+print(account.get_balance())
+```
+
+### Methods Calling Other Methods
+
+```{python}
+class Circle:
+    """Circle class"""
+
+    def __init__(self, radius):
+        self.radius = radius
+
+    def get_diameter(self):
+        """Calculate diameter"""
+        return self.radius * 2
+
+    def get_circumference(self):
+        """Calculate circumference"""
+        import math
+        return 2 * math.pi * self.radius
+
+    def get_area(self):
+        """Calculate area"""
+        import math
+        return math.pi * self.radius ** 2
+
+    def get_summary(self):
+        """Get complete summary"""
+        return {
+            "radius": self.radius,
+            "diameter": self.get_diameter(),
+            "circumference": round(self.get_circumference(), 2),
+            "area": round(self.get_area(), 2)
+        }
+
+# Create and use
+circle = Circle(5)
+summary = circle.get_summary()
+print("Circle summary:")
+for key, value in summary.items():
+    print(f"  {key}: {value}")
+```
+
+## String Representation: __str__ and __repr__
+
+### Default Representation
+
+```{python}
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+person = Person("Alice", 30)
+print(person)  # Not very useful!
+```
+
+### Custom __str__ Method
+
+```{python}
+class Person:
+    """Person with string representation"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __str__(self):
+        """String representation for users"""
+        return f"{self.name}, {self.age} years old"
+
+person = Person("Alice", 30)
+print(person)  # Much better!
+print(f"Person: {person}")
+```
+
+### The __repr__ Method
+
+```{python}
+class Person:
+    """Person with both __str__ and __repr__"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __str__(self):
+        """User-friendly string"""
+        return f"{self.name}, {self.age} years old"
+
+    def __repr__(self):
+        """Developer-friendly representation"""
+        return f"Person(name='{self.name}', age={self.age})"
+
+person = Person("Alice", 30)
+print(str(person))   # Uses __str__
+print(repr(person))  # Uses __repr__
+print(person)        # Uses __str__ (falls back to __repr__ if no __str__)
+
+# __repr__ is what you see in lists
+people = [Person("Alice", 30), Person("Bob", 25)]
+print(people)
+```
+
+::: {.callout-note}
+## __str__ vs __repr__
+- **__str__**: Human-readable, for end users
+- **__repr__**: Unambiguous, for developers/debugging
+- **Goal of __repr__**: Should be valid Python code when possible
+- **Fallback**: If no `__str__`, Python uses `__repr__`
+
+```python
+__str__:  "Alice, 30 years old"
+__repr__: "Person(name='Alice', age=30)"
+```
+:::
+
+## Class Methods and Static Methods
+
+### Regular Instance Methods
+
+```{python}
+class Example:
+    def instance_method(self):
+        """Needs an instance to call"""
+        return f"Called on {self}"
+
+obj = Example()
+print(obj.instance_method())
+```
+
+### Class Methods
+
+Use `@classmethod` decorator. First parameter is `cls` (the class itself):
+
+```{python}
+class Pizza:
+    """Pizza class with class methods"""
+
+    def __init__(self, ingredients):
+        self.ingredients = ingredients
+
+    def __str__(self):
+        return f"Pizza with {', '.join(self.ingredients)}"
+
+    @classmethod
+    def margherita(cls):
+        """Create margherita pizza"""
+        return cls(["mozzarella", "tomatoes", "basil"])
+
+    @classmethod
+    def pepperoni(cls):
+        """Create pepperoni pizza"""
+        return cls(["mozzarella", "tomatoes", "pepperoni"])
+
+# Create using class methods
+pizza1 = Pizza.margherita()
+pizza2 = Pizza.pepperoni()
+pizza3 = Pizza(["cheese", "olives", "mushrooms"])
+
+print(pizza1)
+print(pizza2)
+print(pizza3)
+```
+
+### Static Methods
+
+Use `@staticmethod` decorator. No automatic first parameter:
+
+```{python}
+class MathUtils:
+    """Utility class with static methods"""
+
+    @staticmethod
+    def add(x, y):
+        """Add two numbers"""
+        return x + y
+
+    @staticmethod
+    def is_even(n):
+        """Check if number is even"""
+        return n % 2 == 0
+
+    @staticmethod
+    def factorial(n):
+        """Calculate factorial"""
+        if n <= 1:
+            return 1
+        return n * MathUtils.factorial(n - 1)
+
+# Call without creating instance
+print(MathUtils.add(5, 3))
+print(MathUtils.is_even(7))
+print(MathUtils.factorial(5))
+```
+
+### Comparing Method Types
+
+```{python}
+class Demo:
+    """Demonstrate all three method types"""
+
+    class_variable = "I'm shared"
+
+    def __init__(self, value):
+        self.instance_variable = value
+
+    def instance_method(self):
+        """Access instance and class data"""
+        return f"Instance: {self.instance_variable}, Class: {self.class_variable}"
+
+    @classmethod
+    def class_method(cls):
+        """Access class data, can't access instance data"""
+        return f"Class: {cls.class_variable}"
+
+    @staticmethod
+    def static_method(x):
+        """Can't access instance or class data"""
+        return f"Just a function: {x}"
+
+# Instance method needs an object
+obj = Demo("instance value")
+print(obj.instance_method())
+
+# Class method can be called on class or instance
+print(Demo.class_method())
+print(obj.class_method())
+
+# Static method is just a regular function in the class namespace
+print(Demo.static_method("hello"))
+print(obj.static_method("hello"))
+```
+
+::: {.callout-important}
+## Method Types
+**Instance method**:
+- First parameter: `self`
+- Access: instance and class attributes
+- Call on: instance
+
+**Class method** (`@classmethod`):
+- First parameter: `cls`
+- Access: class attributes only
+- Call on: class or instance
+- Use for: alternative constructors
+
+**Static method** (`@staticmethod`):
+- No automatic first parameter
+- Access: neither instance nor class attributes
+- Call on: class or instance
+- Use for: utility functions related to class
+:::
+
+## Properties and Computed Attributes
+
+### Basic Property
+
+```{python}
+class Circle:
+    """Circle with computed properties"""
+
+    def __init__(self, radius):
+        self.radius = radius
+
+    @property
+    def diameter(self):
+        """Diameter is computed from radius"""
+        return self.radius * 2
+
+    @property
+    def area(self):
+        """Area is computed from radius"""
+        import math
+        return math.pi * self.radius ** 2
+
+# Use properties like attributes
+circle = Circle(5)
+print(f"Radius: {circle.radius}")
+print(f"Diameter: {circle.diameter}")  # Computed!
+print(f"Area: {circle.area:.2f}")  # Computed!
+
+# Can still modify radius
+circle.radius = 10
+print(f"New diameter: {circle.diameter}")  # Automatically updated!
+```
+
+### Property with Setter
+
+```{python}
+class Temperature:
+    """Temperature with Celsius/Fahrenheit conversion"""
+
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def celsius(self):
+        """Get temperature in Celsius"""
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        """Set temperature in Celsius"""
+        if value < -273.15:
+            raise ValueError("Temperature below absolute zero!")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):
+        """Get temperature in Fahrenheit"""
+        return self._celsius * 9/5 + 32
+
+    @fahrenheit.setter
+    def fahrenheit(self, value):
+        """Set temperature in Fahrenheit"""
+        self.celsius = (value - 32) * 5/9
+
+# Use properties
+temp = Temperature(0)
+print(f"{temp.celsius}°C = {temp.fahrenheit}°F")
+
+temp.celsius = 100
+print(f"{temp.celsius}°C = {temp.fahrenheit}°F")
+
+temp.fahrenheit = 32
+print(f"{temp.celsius}°C = {temp.fahrenheit}°F")
+
+# Validation works
+try:
+    temp.celsius = -300
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+## Real-World Class Examples
+
+### Student Class
+
+```{python}
+class Student:
+    """Student with grades"""
+
+    def __init__(self, name, student_id):
+        self.name = name
+        self.student_id = student_id
+        self.grades = []
+
+    def add_grade(self, grade):
+        """Add a grade"""
+        if 0 <= grade <= 100:
+            self.grades.append(grade)
+            return f"Added grade: {grade}"
+        return "Invalid grade (must be 0-100)"
+
+    def get_average(self):
+        """Calculate average grade"""
+        if not self.grades:
+            return 0
+        return sum(self.grades) / len(self.grades)
+
+    def get_letter_grade(self):
+        """Get letter grade based on average"""
+        avg = self.get_average()
+        if avg >= 90:
+            return "A"
+        elif avg >= 80:
+            return "B"
+        elif avg >= 70:
+            return "C"
+        elif avg >= 60:
+            return "D"
+        return "F"
+
+    def __str__(self):
+        return f"Student: {self.name} (ID: {self.student_id})"
+
+# Create and use
+student = Student("Alice Johnson", "S12345")
+print(student)
+
+student.add_grade(95)
+student.add_grade(87)
+student.add_grade(92)
+
+print(f"Grades: {student.grades}")
+print(f"Average: {student.get_average():.2f}")
+print(f"Letter grade: {student.get_letter_grade()}")
+```
+
+### Shopping Cart Class
+
+```{python}
+class ShoppingCart:
+    """Shopping cart for e-commerce"""
+
+    def __init__(self, customer_name):
+        self.customer_name = customer_name
+        self.items = []
+
+    def add_item(self, name, price, quantity=1):
+        """Add item to cart"""
+        self.items.append({
+            "name": name,
+            "price": price,
+            "quantity": quantity
+        })
+        return f"Added {quantity}x {name}"
+
+    def remove_item(self, name):
+        """Remove item from cart"""
+        for item in self.items:
+            if item["name"] == name:
+                self.items.remove(item)
+                return f"Removed {name}"
+        return f"{name} not in cart"
+
+    def get_total(self):
+        """Calculate total cost"""
+        return sum(item["price"] * item["quantity"] for item in self.items)
+
+    def get_item_count(self):
+        """Get total number of items"""
+        return sum(item["quantity"] for item in self.items)
+
+    def display_cart(self):
+        """Display cart contents"""
+        if not self.items:
+            return "Cart is empty"
+
+        result = [f"\n{self.customer_name}'s Cart:"]
+        result.append("-" * 40)
+
+        for item in self.items:
+            subtotal = item["price"] * item["quantity"]
+            result.append(
+                f"{item['name']:20} ${item['price']:6.2f} x{item['quantity']} = ${subtotal:7.2f}"
+            )
+
+        result.append("-" * 40)
+        result.append(f"{'Total:':29} ${self.get_total():7.2f}")
+        result.append(f"Items: {self.get_item_count()}")
+
+        return "\n".join(result)
+
+    def __str__(self):
+        return f"ShoppingCart({self.customer_name}, {self.get_item_count()} items)"
+
+# Create and use
+cart = ShoppingCart("Alice")
+cart.add_item("Book", 29.99, 2)
+cart.add_item("Pen", 4.99, 5)
+cart.add_item("Notebook", 12.50, 3)
+
+print(cart.display_cart())
+```
+
+### Book Class
+
+```{python}
+class Book:
+    """Book class for library"""
+
+    # Class attribute - keep track of all books
+    total_books = 0
+
+    def __init__(self, title, author, isbn, pages):
+        self.title = title
+        self.author = author
+        self.isbn = isbn
+        self.pages = pages
+        self.is_borrowed = False
+        self.borrower = None
+
+        Book.total_books += 1
+
+    def borrow(self, borrower_name):
+        """Borrow the book"""
+        if self.is_borrowed:
+            return f"Sorry, {self.title} is already borrowed by {self.borrower}"
+
+        self.is_borrowed = True
+        self.borrower = borrower_name
+        return f"{borrower_name} borrowed {self.title}"
+
+    def return_book(self):
+        """Return the book"""
+        if not self.is_borrowed:
+            return f"{self.title} is not currently borrowed"
+
+        borrower = self.borrower
+        self.is_borrowed = False
+        self.borrower = None
+        return f"{borrower} returned {self.title}"
+
+    @property
+    def status(self):
+        """Get book status"""
+        if self.is_borrowed:
+            return f"Borrowed by {self.borrower}"
+        return "Available"
+
+    @classmethod
+    def get_total_books(cls):
+        """Get total number of books"""
+        return cls.total_books
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
+
+    def __repr__(self):
+        return f"Book('{self.title}', '{self.author}', '{self.isbn}')"
+
+# Create books
+book1 = Book("Python Crash Course", "Eric Matthes", "978-1593279288", 560)
+book2 = Book("Clean Code", "Robert Martin", "978-0132350884", 464)
+
+print(f"Total books: {Book.get_total_books()}")
+print(f"\n{book1}")
+print(f"Status: {book1.status}")
+
+print(book1.borrow("Alice"))
+print(f"Status: {book1.status}")
+
+print(book1.borrow("Bob"))  # Already borrowed
+print(book1.return_book())
+print(f"Status: {book1.status}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Classes and objects**:
+  - Class definition
+  - Creating objects (instances)
+  - Class as blueprint
+
+- **Attributes**:
+  - Instance attributes (unique to each object)
+  - Class attributes (shared by all objects)
+  - Accessing and modifying attributes
+
+- **Methods**:
+  - `__init__` constructor
+  - Instance methods
+  - `self` parameter
+  - Methods with parameters
+
+- **Special methods**:
+  - `__str__` for user-friendly string
+  - `__repr__` for developer representation
+
+- **Advanced methods**:
+  - `@classmethod` for class-level operations
+  - `@staticmethod` for utility functions
+  - `@property` for computed attributes
+
+- **Real-world examples**:
+  - Student management
+  - Shopping cart
+  - Library system
+
+::: {.callout-important}
+## Key Takeaways
+1. **Classes** are blueprints, **objects** are instances
+2. **__init__** initializes new objects
+3. **self** refers to the instance
+4. **Instance attributes** are unique per object
+5. **Class attributes** are shared by all objects
+6. **Methods** are functions in a class
+7. **@property** creates computed attributes
+8. **@classmethod** operates on class level
+9. **@staticmethod** is a utility function
+10. **__str__ and __repr__** customize string representation
+:::
+
+## Practice Exercises
+
+### Exercise 1: Rectangle Class
+
+Create a comprehensive Rectangle class.
+
+```{python}
+class Rectangle:
+    """
+    Solution: Rectangle class with properties
+    """
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    @property
+    def area(self):
+        """Calculate area"""
+        return self.width * self.height
+
+    @property
+    def perimeter(self):
+        """Calculate perimeter"""
+        return 2 * (self.width + self.height)
+
+    @property
+    def diagonal(self):
+        """Calculate diagonal"""
+        return (self.width ** 2 + self.height ** 2) ** 0.5
+
+    def is_square(self):
+        """Check if rectangle is a square"""
+        return self.width == self.height
+
+    def scale(self, factor):
+        """Scale rectangle by factor"""
+        self.width *= factor
+        self.height *= factor
+
+    @classmethod
+    def create_square(cls, side):
+        """Create a square (special rectangle)"""
+        return cls(side, side)
+
+    def __str__(self):
+        return f"Rectangle({self.width}x{self.height})"
+
+    def __repr__(self):
+        return f"Rectangle(width={self.width}, height={self.height})"
+
+# Test
+rect = Rectangle(4, 5)
+print(rect)
+print(f"Area: {rect.area}")
+print(f"Perimeter: {rect.perimeter}")
+print(f"Diagonal: {rect.diagonal:.2f}")
+print(f"Is square? {rect.is_square()}")
+
+square = Rectangle.create_square(5)
+print(f"\n{square}")
+print(f"Is square? {square.is_square()}")
+```
+
+### Exercise 2: Bank Account with Transaction History
+
+```{python}
+from datetime import datetime
+
+class BankAccount:
+    """
+    Solution: Bank account with full transaction history
+    """
+
+    def __init__(self, owner, account_number, initial_balance=0):
+        self.owner = owner
+        self.account_number = account_number
+        self.balance = initial_balance
+        self.transactions = []
+        self._log_transaction("Account opened", initial_balance)
+
+    def _log_transaction(self, transaction_type, amount):
+        """Log a transaction"""
+        self.transactions.append({
+            "type": transaction_type,
+            "amount": amount,
+            "balance": self.balance,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    def deposit(self, amount):
+        """Deposit money"""
+        if amount <= 0:
+            return "Invalid amount"
+
+        self.balance += amount
+        self._log_transaction("Deposit", amount)
+        return f"Deposited ${amount}. New balance: ${self.balance}"
+
+    def withdraw(self, amount):
+        """Withdraw money"""
+        if amount <= 0:
+            return "Invalid amount"
+
+        if amount > self.balance:
+            self._log_transaction("Failed withdrawal", amount)
+            return "Insufficient funds"
+
+        self.balance -= amount
+        self._log_transaction("Withdrawal", amount)
+        return f"Withdrew ${amount}. New balance: ${self.balance}"
+
+    def get_statement(self):
+        """Get account statement"""
+        result = [
+            f"\nAccount Statement for {self.owner}",
+            f"Account: {self.account_number}",
+            f"Current Balance: ${self.balance}",
+            "\nTransaction History:",
+            "-" * 70
+        ]
+
+        for trans in self.transactions:
+            result.append(
+                f"{trans['timestamp']} | {trans['type']:20} | "
+                f"${trans['amount']:8.2f} | Balance: ${trans['balance']:8.2f}"
+            )
+
+        return "\n".join(result)
+
+    def __str__(self):
+        return f"BankAccount({self.owner}, ${self.balance})"
+
+# Test
+account = BankAccount("Alice", "ACC001", 1000)
+account.deposit(500)
+account.withdraw(200)
+account.withdraw(5000)  # Should fail
+account.deposit(1000)
+
+print(account.get_statement())
+```
+
+### Exercise 3: Library System
+
+```{python}
+class Library:
+    """
+    Solution: Complete library management system
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.books = []
+        self.members = []
+
+    def add_book(self, book):
+        """Add a book to library"""
+        self.books.append(book)
+        return f"Added: {book.title}"
+
+    def add_member(self, member):
+        """Add a member"""
+        self.members.append(member)
+        return f"Added member: {member.name}"
+
+    def find_book(self, title):
+        """Find book by title"""
+        for book in self.books:
+            if book.title.lower() == title.lower():
+                return book
+        return None
+
+    def get_available_books(self):
+        """Get list of available books"""
+        return [book for book in self.books if not book.is_borrowed]
+
+    def get_borrowed_books(self):
+        """Get list of borrowed books"""
+        return [book for book in self.books if book.is_borrowed]
+
+    def generate_report(self):
+        """Generate library report"""
+        available = len(self.get_available_books())
+        borrowed = len(self.get_borrowed_books())
+
+        report = [
+            f"\n{self.name} - Library Report",
+            "=" * 50,
+            f"Total Books: {len(self.books)}",
+            f"Available: {available}",
+            f"Borrowed: {borrowed}",
+            f"Total Members: {len(self.members)}",
+            "\nBorrowed Books:",
+            "-" * 50
+        ]
+
+        for book in self.get_borrowed_books():
+            report.append(f"  {book.title} - borrowed by {book.borrower}")
+
+        return "\n".join(report)
+
+class LibraryBook:
+    """Book in a library"""
+
+    def __init__(self, title, author):
+        self.title = title
+        self.author = author
+        self.is_borrowed = False
+        self.borrower = None
+
+    def borrow(self, member_name):
+        """Borrow this book"""
+        if self.is_borrowed:
+            return False
+        self.is_borrowed = True
+        self.borrower = member_name
+        return True
+
+    def return_book(self):
+        """Return this book"""
+        self.is_borrowed = False
+        self.borrower = None
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
+
+# Test
+library = Library("City Library")
+
+# Add books
+library.add_book(LibraryBook("Python Basics", "John Doe"))
+library.add_book(LibraryBook("Advanced Python", "Jane Smith"))
+library.add_book(LibraryBook("Data Science", "Bob Johnson"))
+
+# Borrow books
+book = library.find_book("Python Basics")
+if book:
+    book.borrow("Alice")
+
+print(library.generate_report())
+```
+
+::: {.callout-tip}
+## Keep Practicing!
+Classes and objects are fundamental to Python. Practice creating classes for:
+- Real-world entities (Person, Car, Product)
+- Data structures (Stack, Queue, LinkedList)
+- Game objects (Player, Enemy, Item)
+- Business logic (Invoice, Order, Payment)
+
+The more you practice, the more natural OOP becomes!
+:::
+
+---
+
+Congratulations! You've learned the fundamentals of classes and objects in Python. You can now model real-world entities, create reusable code, and write more organized programs. This is a huge step in your Python journey!

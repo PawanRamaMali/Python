@@ -1,0 +1,1002 @@
+# Dictionaries: Key-Value Power {#sec-dictionaries}
+
+Imagine a real dictionary where you look up a word (key) to find its definition (value). Python dictionaries work the same way! They're unordered collections of key-value pairs, perfect for storing related data, counting items, caching results, and much more.
+
+## What Are Dictionaries?
+
+A **dictionary** is a mutable, unordered collection of key-value pairs. Each key must be unique and immutable (strings, numbers, tuples), while values can be anything.
+
+### Creating Dictionaries
+
+```{python}
+# Empty dictionary
+empty = {}
+print(f"Empty dict: {empty}, Type: {type(empty)}")
+
+# Dictionary with initial data
+person = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York"
+}
+print(f"Person: {person}")
+
+# Using dict() constructor
+person2 = dict(name="Bob", age=30, city="London")
+print(f"Person2: {person2}")
+
+# From list of tuples
+pairs = [("a", 1), ("b", 2), ("c", 3)]
+letters = dict(pairs)
+print(f"Letters: {letters}")
+
+# From two lists using zip
+keys = ["apple", "banana", "orange"]
+values = [0.99, 0.59, 0.79]
+prices = dict(zip(keys, values))
+print(f"Prices: {prices}")
+```
+
+::: {.callout-note}
+## Dictionary Keys Must Be Immutable
+Valid keys: strings, numbers, tuples (without mutable elements)
+Invalid keys: lists, dictionaries, sets
+:::
+
+### Different Value Types
+
+```{python}
+# Mixed value types
+mixed = {
+    "name": "Alice",
+    "age": 25,
+    "scores": [85, 90, 95],
+    "address": {"city": "New York", "zip": "10001"},
+    "is_student": True
+}
+
+print("Mixed dictionary:")
+for key, value in mixed.items():
+    print(f"  {key}: {value}")
+```
+
+## Accessing Dictionary Values
+
+### Basic Access
+
+```{python}
+person = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York"
+}
+
+# Using square brackets
+print(f"Name: {person['name']}")
+print(f"Age: {person['age']}")
+
+# KeyError if key doesn't exist
+try:
+    print(person['phone'])
+except KeyError as e:
+    print(f"KeyError: {e}")
+```
+
+### Safe Access with get()
+
+```{python}
+person = {"name": "Alice", "age": 25}
+
+# get() returns None if key doesn't exist
+phone = person.get("phone")
+print(f"Phone: {phone}")
+
+# get() with default value
+phone = person.get("phone", "Not available")
+print(f"Phone: {phone}")
+
+# Compare with regular access
+name = person.get("name", "Unknown")
+print(f"Name: {name}")
+```
+
+::: {.callout-tip}
+## get() vs []
+- Use `[]` when you're certain the key exists
+- Use `get()` when the key might not exist
+- `get()` allows you to specify a default value
+:::
+
+## Modifying Dictionaries
+
+Dictionaries are mutable, so you can add, update, and remove items:
+
+### Adding and Updating
+
+```{python}
+person = {"name": "Alice", "age": 25}
+print(f"Original: {person}")
+
+# Add new key-value pair
+person["city"] = "New York"
+print(f"After adding city: {person}")
+
+# Update existing value
+person["age"] = 26
+print(f"After updating age: {person}")
+
+# Add multiple items with update()
+person.update({"phone": "555-1234", "email": "alice@email.com"})
+print(f"After update: {person}")
+
+# update() can also take keyword arguments
+person.update(job="Engineer", salary=75000)
+print(f"After keyword update: {person}")
+```
+
+### Removing Items
+
+```{python}
+person = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York",
+    "phone": "555-1234"
+}
+
+# pop() - remove and return value
+phone = person.pop("phone")
+print(f"Removed phone: {phone}")
+print(f"After pop: {person}")
+
+# pop() with default value
+country = person.pop("country", "Unknown")
+print(f"Country (with default): {country}")
+
+# popitem() - remove and return last item (Python 3.7+)
+item = person.popitem()
+print(f"Popped item: {item}")
+print(f"After popitem: {person}")
+
+# del statement
+del person["age"]
+print(f"After del: {person}")
+
+# clear() - remove all items
+person_copy = person.copy()
+person_copy.clear()
+print(f"After clear: {person_copy}")
+```
+
+::: {.callout-important}
+## Dictionary Ordering (Python 3.7+)
+Since Python 3.7, dictionaries maintain insertion order. This means items are returned in the order they were added!
+:::
+
+## Dictionary Methods
+
+### Keys, Values, and Items
+
+```{python}
+person = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York"
+}
+
+# keys() - get all keys
+keys = person.keys()
+print(f"Keys: {list(keys)}")
+
+# values() - get all values
+values = person.values()
+print(f"Values: {list(values)}")
+
+# items() - get key-value pairs
+items = person.items()
+print(f"Items: {list(items)}")
+```
+
+### Checking Membership
+
+```{python}
+person = {"name": "Alice", "age": 25, "city": "New York"}
+
+# Check if key exists
+print(f"'name' in person: {'name' in person}")
+print(f"'phone' in person: {'phone' in person}")
+
+# Check if value exists (slower!)
+print(f"'Alice' in person.values(): {'Alice' in person.values()}")
+print(f"25 in person.values(): {25 in person.values()}")
+```
+
+### setdefault()
+
+```{python}
+# setdefault() - get value or set and return default
+person = {"name": "Alice", "age": 25}
+
+# Get existing key
+name = person.setdefault("name", "Unknown")
+print(f"Name: {name}")
+print(f"Person: {person}")
+
+# Get non-existing key (adds it with default)
+phone = person.setdefault("phone", "555-0000")
+print(f"Phone: {phone}")
+print(f"Person after setdefault: {person}")
+```
+
+### Copying Dictionaries
+
+```{python}
+# copy() - shallow copy
+original = {"name": "Alice", "age": 25}
+copy1 = original.copy()
+copy1["name"] = "Bob"
+
+print(f"Original: {original}")
+print(f"Copy: {copy1}")
+
+# Using dict()
+copy2 = dict(original)
+copy2["age"] = 30
+print(f"Another copy: {copy2}")
+
+# Be careful with nested dictionaries!
+nested = {"person": {"name": "Alice", "age": 25}}
+shallow = nested.copy()
+shallow["person"]["name"] = "Bob"
+
+print(f"Original nested: {nested}")  # Changed!
+print(f"Shallow copy: {shallow}")
+
+# Use deepcopy for nested structures
+import copy
+deep = copy.deepcopy(nested)
+deep["person"]["name"] = "Charlie"
+print(f"Original after deep copy: {nested}")  # Not changed
+print(f"Deep copy: {deep}")
+```
+
+## Iterating Over Dictionaries
+
+### Iterating Over Keys
+
+```{python}
+person = {"name": "Alice", "age": 25, "city": "New York"}
+
+# Default iteration is over keys
+print("Keys (default):")
+for key in person:
+    print(f"  {key}")
+
+# Explicit keys()
+print("\nKeys (explicit):")
+for key in person.keys():
+    print(f"  {key}: {person[key]}")
+```
+
+### Iterating Over Values
+
+```{python}
+scores = {"Alice": 85, "Bob": 92, "Charlie": 78}
+
+print("Values:")
+for score in scores.values():
+    print(f"  {score}")
+
+# Calculate average
+total = sum(scores.values())
+average = total / len(scores)
+print(f"\nAverage: {average:.2f}")
+```
+
+### Iterating Over Items
+
+```{python}
+person = {"name": "Alice", "age": 25, "city": "New York"}
+
+# Best way - iterate over key-value pairs
+print("Items:")
+for key, value in person.items():
+    print(f"  {key}: {value}")
+```
+
+::: {.callout-tip}
+## Best Practice: Use items()
+When you need both keys and values, use `items()` instead of iterating over keys and looking up values:
+
+```python
+# Less efficient
+for key in dict:
+    value = dict[key]
+
+# More efficient
+for key, value in dict.items():
+    # use key and value
+```
+:::
+
+## Dictionary Comprehensions
+
+Create dictionaries concisely using comprehensions:
+
+### Basic Comprehensions
+
+```{python}
+# Create dictionary from range
+squares = {x: x**2 for x in range(6)}
+print(f"Squares: {squares}")
+
+# From two lists
+keys = ["a", "b", "c"]
+values = [1, 2, 3]
+combined = {k: v for k, v in zip(keys, values)}
+print(f"Combined: {combined}")
+
+# Uppercase keys
+words = ["hello", "world", "python"]
+lengths = {word.upper(): len(word) for word in words}
+print(f"Lengths: {lengths}")
+```
+
+### With Conditions
+
+```{python}
+# Filter even numbers
+numbers = {x: x**2 for x in range(10) if x % 2 == 0}
+print(f"Even squares: {numbers}")
+
+# Filter by value
+scores = {"Alice": 85, "Bob": 92, "Charlie": 78, "Diana": 95}
+high_scores = {name: score for name, score in scores.items() if score >= 90}
+print(f"High scores: {high_scores}")
+
+# Transform keys and values
+prices = {"apple": 0.99, "banana": 0.59, "orange": 0.79}
+discounted = {fruit.upper(): price * 0.9 for fruit, price in prices.items()}
+print(f"Discounted: {discounted}")
+```
+
+### Conditional Values
+
+```{python}
+# With if-else
+numbers = {x: "even" if x % 2 == 0 else "odd" for x in range(10)}
+print(f"Even/Odd: {numbers}")
+
+# Grade categories
+scores = {"Alice": 85, "Bob": 92, "Charlie": 78, "Diana": 95}
+grades = {name: "A" if score >= 90 else "B" if score >= 80 else "C"
+          for name, score in scores.items()}
+print(f"Grades: {grades}")
+```
+
+## Nested Dictionaries
+
+Dictionaries can contain other dictionaries:
+
+### Creating Nested Dictionaries
+
+```{python}
+# Student records
+students = {
+    "Alice": {
+        "age": 20,
+        "major": "Computer Science",
+        "gpa": 3.8
+    },
+    "Bob": {
+        "age": 21,
+        "major": "Mathematics",
+        "gpa": 3.6
+    },
+    "Charlie": {
+        "age": 19,
+        "major": "Physics",
+        "gpa": 3.9
+    }
+}
+
+print("Students:")
+for name, info in students.items():
+    print(f"\n{name}:")
+    for key, value in info.items():
+        print(f"  {key}: {value}")
+```
+
+### Accessing Nested Values
+
+```{python}
+students = {
+    "Alice": {"age": 20, "gpa": 3.8},
+    "Bob": {"age": 21, "gpa": 3.6}
+}
+
+# Access nested values
+print(f"Alice's GPA: {students['Alice']['gpa']}")
+
+# Safe access with get()
+charlie_age = students.get("Charlie", {}).get("age", "Not found")
+print(f"Charlie's age: {charlie_age}")
+```
+
+### Modifying Nested Dictionaries
+
+```{python}
+students = {
+    "Alice": {"age": 20, "gpa": 3.8}
+}
+
+# Add new student
+students["Bob"] = {"age": 21, "gpa": 3.6}
+
+# Update nested value
+students["Alice"]["gpa"] = 3.9
+
+# Add new field to student
+students["Alice"]["major"] = "Computer Science"
+
+print("Updated students:")
+for name, info in students.items():
+    print(f"{name}: {info}")
+```
+
+## Counting with Dictionaries
+
+Dictionaries are perfect for counting occurrences:
+
+### Manual Counting
+
+```{python}
+# Count word occurrences
+text = "the quick brown fox jumps over the lazy dog the fox"
+words = text.split()
+
+word_count = {}
+for word in words:
+    if word in word_count:
+        word_count[word] += 1
+    else:
+        word_count[word] = 1
+
+print("Word counts:")
+for word, count in sorted(word_count.items()):
+    print(f"  {word}: {count}")
+```
+
+### Using get() for Counting
+
+```{python}
+# More elegant with get()
+text = "the quick brown fox jumps over the lazy dog the fox"
+words = text.split()
+
+word_count = {}
+for word in words:
+    word_count[word] = word_count.get(word, 0) + 1
+
+print("Word counts:")
+for word, count in sorted(word_count.items()):
+    print(f"  {word}: {count}")
+```
+
+### Using setdefault() for Counting
+
+```{python}
+# With setdefault()
+text = "the quick brown fox jumps over the lazy dog the fox"
+words = text.split()
+
+word_count = {}
+for word in words:
+    word_count.setdefault(word, 0)
+    word_count[word] += 1
+
+print("Word counts:")
+for word, count in sorted(word_count.items()):
+    print(f"  {word}: {count}")
+```
+
+### Using Counter (Recommended)
+
+```{python}
+from collections import Counter
+
+text = "the quick brown fox jumps over the lazy dog the fox"
+words = text.split()
+
+# Counter is a specialized dictionary for counting
+word_count = Counter(words)
+print(f"Word counts: {dict(word_count)}")
+
+# Most common words
+print(f"\nTop 3 words: {word_count.most_common(3)}")
+```
+
+## Merging Dictionaries
+
+### Using update()
+
+```{python}
+dict1 = {"a": 1, "b": 2}
+dict2 = {"c": 3, "d": 4}
+
+dict1.update(dict2)
+print(f"Merged: {dict1}")
+
+# Overlapping keys - last one wins
+dict3 = {"a": 1, "b": 2}
+dict4 = {"b": 3, "c": 4}
+dict3.update(dict4)
+print(f"Overlapping: {dict3}")
+```
+
+### Using Unpacking (Python 3.5+)
+
+```{python}
+dict1 = {"a": 1, "b": 2}
+dict2 = {"c": 3, "d": 4}
+
+# Merge with unpacking
+merged = {**dict1, **dict2}
+print(f"Merged: {merged}")
+
+# Overlapping keys
+dict3 = {"a": 1, "b": 2}
+dict4 = {"b": 3, "c": 4}
+merged2 = {**dict3, **dict4}
+print(f"Overlapping: {merged2}")
+```
+
+### Using | Operator (Python 3.9+)
+
+```{python}
+dict1 = {"a": 1, "b": 2}
+dict2 = {"c": 3, "d": 4}
+
+# Merge with | operator
+merged = dict1 | dict2
+print(f"Merged with |: {merged}")
+
+# Update in place with |=
+dict1 |= dict2
+print(f"Updated dict1: {dict1}")
+```
+
+## Practical Examples
+
+Let's apply dictionaries to real-world problems:
+
+### Contact Book
+
+```{python}
+class ContactBook:
+    """Simple contact book using dictionaries"""
+    def __init__(self):
+        self.contacts = {}
+
+    def add_contact(self, name, phone, email=None):
+        """Add a new contact"""
+        self.contacts[name] = {
+            "phone": phone,
+            "email": email
+        }
+        print(f"Added contact: {name}")
+
+    def get_contact(self, name):
+        """Get contact information"""
+        return self.contacts.get(name, "Contact not found")
+
+    def update_contact(self, name, phone=None, email=None):
+        """Update contact information"""
+        if name not in self.contacts:
+            print(f"Contact {name} not found")
+            return
+
+        if phone:
+            self.contacts[name]["phone"] = phone
+        if email:
+            self.contacts[name]["email"] = email
+
+        print(f"Updated {name}")
+
+    def delete_contact(self, name):
+        """Delete a contact"""
+        if name in self.contacts:
+            del self.contacts[name]
+            print(f"Deleted {name}")
+        else:
+            print(f"Contact {name} not found")
+
+    def list_contacts(self):
+        """List all contacts"""
+        if not self.contacts:
+            print("No contacts")
+            return
+
+        print("\nCONTACTS:")
+        print("-" * 50)
+        for name, info in sorted(self.contacts.items()):
+            print(f"Name: {name}")
+            print(f"  Phone: {info['phone']}")
+            print(f"  Email: {info.get('email', 'N/A')}")
+            print()
+
+# Test
+book = ContactBook()
+book.add_contact("Alice", "555-1234", "alice@email.com")
+book.add_contact("Bob", "555-5678")
+book.list_contacts()
+```
+
+### Inventory System
+
+```{python}
+class Inventory:
+    """Product inventory system"""
+    def __init__(self):
+        self.products = {}
+
+    def add_product(self, name, price, quantity):
+        """Add a product"""
+        self.products[name] = {
+            "price": price,
+            "quantity": quantity
+        }
+
+    def update_quantity(self, name, quantity):
+        """Update product quantity"""
+        if name in self.products:
+            self.products[name]["quantity"] += quantity
+            return True
+        return False
+
+    def sell_product(self, name, quantity):
+        """Sell a product"""
+        if name not in self.products:
+            return False, "Product not found"
+
+        available = self.products[name]["quantity"]
+        if quantity > available:
+            return False, f"Only {available} available"
+
+        self.products[name]["quantity"] -= quantity
+        return True, "Sale successful"
+
+    def get_total_value(self):
+        """Calculate total inventory value"""
+        total = 0
+        for product in self.products.values():
+            total += product["price"] * product["quantity"]
+        return total
+
+    def display_inventory(self):
+        """Display all products"""
+        print("\n" + "=" * 60)
+        print("INVENTORY")
+        print("=" * 60)
+        print(f"{'Product':<20} {'Price':>10} {'Quantity':>10} {'Value':>12}")
+        print("-" * 60)
+
+        for name, info in sorted(self.products.items()):
+            value = info["price"] * info["quantity"]
+            print(f"{name:<20} ${info['price']:>9.2f} {info['quantity']:>10} ${value:>11.2f}")
+
+        print("-" * 60)
+        print(f"{'Total Value:':>45} ${self.get_total_value():>12.2f}")
+        print("=" * 60)
+
+# Test
+inventory = Inventory()
+inventory.add_product("Laptop", 999.99, 10)
+inventory.add_product("Mouse", 29.99, 50)
+inventory.add_product("Keyboard", 79.99, 30)
+
+inventory.sell_product("Laptop", 2)
+inventory.update_quantity("Mouse", 20)
+
+inventory.display_inventory()
+```
+
+### Word Frequency Analyzer
+
+```{python}
+def analyze_text(text):
+    """Analyze word frequency in text"""
+    # Clean and split text
+    words = text.lower().split()
+
+    # Count frequencies
+    frequency = {}
+    for word in words:
+        # Remove punctuation
+        clean_word = ''.join(c for c in word if c.isalnum())
+        if clean_word:
+            frequency[clean_word] = frequency.get(clean_word, 0) + 1
+
+    # Calculate statistics
+    total_words = len(words)
+    unique_words = len(frequency)
+
+    # Find most common
+    sorted_words = sorted(frequency.items(), key=lambda x: x[1], reverse=True)
+
+    print("TEXT ANALYSIS")
+    print("=" * 50)
+    print(f"Total words: {total_words}")
+    print(f"Unique words: {unique_words}")
+    print(f"\nTop 10 most common words:")
+    print("-" * 50)
+
+    for word, count in sorted_words[:10]:
+        percentage = (count / total_words) * 100
+        print(f"{word:<20} {count:>5} ({percentage:>5.2f}%)")
+
+# Test
+sample_text = """
+Python is a great programming language. Python is easy to learn
+and Python is powerful. Many developers love Python because Python
+is versatile and Python has great libraries.
+"""
+
+analyze_text(sample_text)
+```
+
+### Grade Book System
+
+```{python}
+class GradeBook:
+    """Student grade book"""
+    def __init__(self):
+        self.students = {}
+
+    def add_student(self, name):
+        """Add a student"""
+        if name not in self.students:
+            self.students[name] = []
+            print(f"Added student: {name}")
+
+    def add_grade(self, name, grade):
+        """Add a grade for a student"""
+        if name not in self.students:
+            self.add_student(name)
+
+        self.students[name].append(grade)
+
+    def get_average(self, name):
+        """Get student's average"""
+        if name not in self.students or not self.students[name]:
+            return None
+
+        grades = self.students[name]
+        return sum(grades) / len(grades)
+
+    def get_class_average(self):
+        """Get overall class average"""
+        all_grades = []
+        for grades in self.students.values():
+            all_grades.extend(grades)
+
+        if not all_grades:
+            return None
+
+        return sum(all_grades) / len(all_grades)
+
+    def display_report(self):
+        """Display grade report"""
+        print("\n" + "=" * 60)
+        print("GRADE REPORT")
+        print("=" * 60)
+        print(f"{'Student':<20} {'Grades':<25} {'Average':>10}")
+        print("-" * 60)
+
+        for name in sorted(self.students.keys()):
+            grades = self.students[name]
+            if grades:
+                avg = sum(grades) / len(grades)
+                grades_str = ", ".join(str(g) for g in grades)
+                print(f"{name:<20} {grades_str:<25} {avg:>10.2f}")
+            else:
+                print(f"{name:<20} {'No grades':<25} {'N/A':>10}")
+
+        print("-" * 60)
+        class_avg = self.get_class_average()
+        if class_avg:
+            print(f"{'Class Average:':>45} {class_avg:>10.2f}")
+        print("=" * 60)
+
+# Test
+gradebook = GradeBook()
+gradebook.add_student("Alice")
+gradebook.add_grade("Alice", 85)
+gradebook.add_grade("Alice", 90)
+gradebook.add_grade("Alice", 88)
+
+gradebook.add_grade("Bob", 92)
+gradebook.add_grade("Bob", 87)
+gradebook.add_grade("Bob", 95)
+
+gradebook.display_report()
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Creating dictionaries**:
+  - Using `{}` or `dict()`
+  - From lists, tuples, and other sources
+  - Keys must be immutable
+
+- **Accessing values**:
+  - Using `[]` or `get()`
+  - Safe access with default values
+
+- **Modifying dictionaries**:
+  - Adding and updating items
+  - Removing with `pop()`, `popitem()`, `del`
+  - Merging dictionaries
+
+- **Dictionary methods**:
+  - `keys()`, `values()`, `items()`
+  - `get()`, `setdefault()`, `update()`
+  - `pop()`, `popitem()`, `clear()`
+
+- **Iteration**:
+  - Over keys, values, or items
+  - Using `items()` for key-value pairs
+
+- **Dictionary comprehensions**:
+  - Creating dictionaries concisely
+  - With conditions and transformations
+
+- **Advanced uses**:
+  - Nested dictionaries
+  - Counting and frequency analysis
+  - Merging dictionaries
+  - Real-world applications
+
+::: {.callout-important}
+## Key Takeaways
+1. Dictionaries store **key-value pairs**
+2. Keys must be **immutable** and **unique**
+3. Use `get()` for **safe access**
+4. Dictionaries are **ordered** (Python 3.7+)
+5. Use `items()` to iterate over **key-value pairs**
+6. **Dictionary comprehensions** are powerful and concise
+7. Perfect for **counting**, **grouping**, and **mapping**
+:::
+
+## Practice Exercises
+
+### Exercise 1: Reverse Dictionary
+
+Write a function that swaps keys and values in a dictionary.
+
+```{python}
+def reverse_dict(d):
+    """Solution"""
+    return {value: key for key, value in d.items()}
+
+# Test
+original = {"a": 1, "b": 2, "c": 3}
+reversed_d = reverse_dict(original)
+print(f"Original: {original}")
+print(f"Reversed: {reversed_d}")
+```
+
+### Exercise 2: Merge with Sum
+
+Write a function that merges two dictionaries, summing values for common keys.
+
+```{python}
+def merge_sum(dict1, dict2):
+    """Solution"""
+    result = dict1.copy()
+    for key, value in dict2.items():
+        result[key] = result.get(key, 0) + value
+    return result
+
+# Test
+d1 = {"a": 1, "b": 2, "c": 3}
+d2 = {"b": 3, "c": 4, "d": 5}
+merged = merge_sum(d1, d2)
+print(f"Merged: {merged}")
+```
+
+### Exercise 3: Group By
+
+Write a function that groups items in a list by a key function.
+
+```{python}
+def group_by(items, key_func):
+    """Solution"""
+    groups = {}
+    for item in items:
+        key = key_func(item)
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(item)
+    return groups
+
+# Test
+words = ["apple", "banana", "apricot", "blueberry", "cherry"]
+by_first_letter = group_by(words, lambda w: w[0])
+
+print("Grouped by first letter:")
+for letter, word_list in sorted(by_first_letter.items()):
+    print(f"{letter}: {word_list}")
+```
+
+### Exercise 4: Nested Dictionary Access
+
+Write a function that safely gets a value from a nested dictionary using a path.
+
+```{python}
+def get_nested(dictionary, path, default=None):
+    """Solution - path is a list of keys"""
+    result = dictionary
+    for key in path:
+        if isinstance(result, dict) and key in result:
+            result = result[key]
+        else:
+            return default
+    return result
+
+# Test
+data = {
+    "user": {
+        "profile": {
+            "name": "Alice",
+            "age": 25
+        }
+    }
+}
+
+name = get_nested(data, ["user", "profile", "name"])
+email = get_nested(data, ["user", "profile", "email"], "N/A")
+
+print(f"Name: {name}")
+print(f"Email: {email}")
+```
+
+### Exercise 5: Frequency Distribution
+
+Write a function that creates a frequency distribution of characters in a string.
+
+```{python}
+def char_frequency(text):
+    """Solution"""
+    # Remove spaces and convert to lowercase
+    text = text.lower().replace(" ", "")
+
+    frequency = {}
+    for char in text:
+        if char.isalnum():
+            frequency[char] = frequency.get(char, 0) + 1
+
+    # Sort by frequency (descending) then by character
+    sorted_freq = sorted(frequency.items(), key=lambda x: (-x[1], x[0]))
+
+    return dict(sorted_freq)
+
+# Test
+text = "Hello World! How are you?"
+freq = char_frequency(text)
+
+print("Character Frequency:")
+for char, count in freq.items():
+    print(f"  {char}: {count}")
+```
+
+::: {.callout-tip}
+## Master Dictionaries!
+Dictionaries are one of Python's most powerful data structures. Practice using them for different scenarios to become proficient!
+:::
+
+---
+
+Fantastic! You've mastered dictionaries. Next up: sets, Python's unique collection type!

@@ -1,0 +1,498 @@
+# Installing Python and Setting Up Your Environment
+
+## Overview
+
+Before we can start coding, we need to set up our Python development environment. This chapter will guide you through installing Python and setting up the tools you'll need.
+
+:::{.callout-tip}
+## What You'll Install
+
+- Python interpreter (the engine that runs your code)
+- pip (Python package manager)
+- A code editor or IDE
+- Optional: Virtual environment tools
+:::
+
+## Installing Python
+
+### Windows
+
+#### Option 1: From Python.org (Recommended)
+
+1. Visit [python.org/downloads](https://www.python.org/downloads/)
+2. Click the "Download Python 3.x.x" button (get the latest version)
+3. Run the installer
+
+:::{.callout-important}
+## Critical Step for Windows!
+
+**Check the box "Add Python to PATH"** at the bottom of the installer before clicking Install Now. This is crucial!
+:::
+
+4. Click "Install Now"
+5. Wait for installation to complete
+6. Click "Close" when done
+
+#### Option 2: Microsoft Store
+
+1. Open Microsoft Store
+2. Search for "Python 3.12" (or latest version)
+3. Click "Get" or "Install"
+4. Wait for installation
+
+#### Verify Installation (Windows)
+
+Open Command Prompt and type:
+
+```bash
+python --version
+```
+
+You should see something like: `Python 3.12.0`
+
+Also check pip:
+
+```bash
+pip --version
+```
+
+### macOS
+
+#### Option 1: Official Installer
+
+1. Visit [python.org/downloads](https://www.python.org/downloads/)
+2. Download the macOS installer
+3. Open the `.pkg` file
+4. Follow installation wizard
+
+#### Option 2: Homebrew (Recommended for developers)
+
+If you have Homebrew installed:
+
+```bash
+brew install python3
+```
+
+#### Verify Installation (macOS)
+
+Open Terminal and type:
+
+```bash
+python3 --version
+pip3 --version
+```
+
+:::{.callout-note}
+## macOS Note
+
+macOS comes with Python 2.7 pre-installed. Use `python3` and `pip3` commands to use Python 3.
+:::
+
+### Linux
+
+Most Linux distributions come with Python 3 pre-installed. If not:
+
+#### Ubuntu/Debian
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+#### Fedora
+
+```bash
+sudo dnf install python3 python3-pip
+```
+
+#### Arch Linux
+
+```bash
+sudo pacman -S python python-pip
+```
+
+#### Verify Installation (Linux)
+
+```bash
+python3 --version
+pip3 --version
+```
+
+## Choosing a Code Editor or IDE
+
+You need a good editor to write Python code. Here are the best options:
+
+### 1. Visual Studio Code (Recommended for Beginners)
+
+**Pros**: Free, lightweight, excellent Python support, huge extension library
+
+**Installation**:
+1. Visit [code.visualstudio.com](https://code.visualstudio.com/)
+2. Download for your OS
+3. Install the Python extension (in VS Code: Extensions → Search "Python")
+
+**Essential VS Code Extensions for Python**:
+- Python (by Microsoft) - Essential
+- Pylance - Better IntelliSense
+- Python Indent - Smart indentation
+- autoDocstring - Generate docstrings
+- Python Test Explorer - Run tests easily
+
+### 2. PyCharm
+
+**Pros**: Professional IDE, powerful features, great for large projects
+
+**Installation**:
+1. Visit [jetbrains.com/pycharm](https://www.jetbrains.com/pycharm/)
+2. Download Community Edition (free) or Professional (paid)
+3. Run installer
+
+**Editions**:
+- **Community**: Free, perfect for learning and most projects
+- **Professional**: Paid, adds web framework support, database tools
+
+### 3. Jupyter Notebook/JupyterLab
+
+**Pros**: Interactive, great for data science and learning
+
+**Installation**:
+```bash
+pip install jupyter
+# or
+pip install jupyterlab
+```
+
+**Launch**:
+```bash
+jupyter notebook
+# or
+jupyter lab
+```
+
+### 4. Other Options
+
+- **Sublime Text**: Fast, minimalist
+- **Atom**: GitHub's editor (discontinued but still usable)
+- **Vim/Neovim**: For terminal enthusiasts
+- **Emacs**: Highly customizable
+- **Spyder**: Scientific Python IDE
+
+:::{.callout-tip}
+## Our Recommendation
+
+For this book, we recommend **Visual Studio Code** with the Python extension. It's free, beginner-friendly, and powerful enough for professional work.
+:::
+
+## Setting Up VS Code for Python
+
+Let's configure VS Code for optimal Python development:
+
+### 1. Install VS Code
+
+Download and install from [code.visualstudio.com](https://code.visualstudio.com/)
+
+### 2. Install Python Extension
+
+1. Open VS Code
+2. Click Extensions icon (or press Ctrl+Shift+X / Cmd+Shift+X)
+3. Search "Python"
+4. Install "Python" by Microsoft
+
+### 3. Create Your First Python File
+
+1. Create a new folder for your Python projects
+2. Open the folder in VS Code (File → Open Folder)
+3. Create a new file: `hello.py`
+4. Type this code:
+
+```python
+print("Hello, World!")
+print("Python is awesome!")
+```
+
+5. Save the file (Ctrl+S / Cmd+S)
+
+### 4. Run Your Code
+
+Three ways to run Python in VS Code:
+
+**Method 1: Run Button**
+- Click the "Run" button (▶️) in the top-right corner
+
+**Method 2: Right-Click**
+- Right-click in the editor → "Run Python File in Terminal"
+
+**Method 3: Terminal**
+- Open Terminal (Ctrl+` or View → Terminal)
+- Type: `python hello.py` or `python3 hello.py`
+
+You should see:
+```
+Hello, World!
+Python is awesome!
+```
+
+## Understanding Your Python Installation
+
+### Where is Python Installed?
+
+Check Python's location:
+
+```{python}
+import sys
+print(f"Python executable: {sys.executable}")
+print(f"Python version: {sys.version}")
+print(f"Python path: {sys.path}")
+```
+
+### What's Included?
+
+Your Python installation includes:
+
+1. **Python Interpreter**: Runs your code
+2. **Standard Library**: Built-in modules (math, os, sys, etc.)
+3. **pip**: Package manager
+4. **IDLE**: Basic IDE (comes with Python)
+5. **Documentation**: Python docs
+
+## Python Package Manager: pip
+
+pip is Python's package manager. It installs libraries from PyPI (Python Package Index).
+
+### Basic pip Commands
+
+```bash
+# Check pip version
+pip --version
+
+# Install a package
+pip install package_name
+
+# Install specific version
+pip install package_name==1.2.3
+
+# Upgrade a package
+pip install --upgrade package_name
+
+# Uninstall a package
+pip uninstall package_name
+
+# List installed packages
+pip list
+
+# Show package info
+pip show package_name
+
+# Search for packages
+pip search search_term
+```
+
+### Example: Installing Requests
+
+```bash
+pip install requests
+```
+
+Then use it:
+
+```{python}
+#| eval: false
+import requests
+response = requests.get('https://api.github.com')
+print(response.status_code)
+```
+
+## Virtual Environments
+
+Virtual environments create isolated Python installations for different projects.
+
+### Why Use Virtual Environments?
+
+- **Isolation**: Each project has its own dependencies
+- **No Conflicts**: Different projects can use different package versions
+- **Clean**: Keep your global Python clean
+- **Reproducibility**: Easy to share exact dependencies
+
+### Creating Virtual Environments
+
+#### Using venv (Built-in)
+
+**Create**:
+```bash
+# Windows
+python -m venv myenv
+
+# macOS/Linux
+python3 -m venv myenv
+```
+
+**Activate**:
+```bash
+# Windows
+myenv\Scripts\activate
+
+# macOS/Linux
+source myenv/bin/activate
+```
+
+You'll see `(myenv)` in your terminal prompt.
+
+**Deactivate**:
+```bash
+deactivate
+```
+
+**Install Packages in Virtual Environment**:
+```bash
+# Make sure virtual environment is activated
+pip install requests pandas numpy
+```
+
+### Example Workflow
+
+```bash
+# Create project folder
+mkdir my_project
+cd my_project
+
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+source venv/bin/activate  # macOS/Linux
+# or
+venv\Scripts\activate  # Windows
+
+# Install packages
+pip install requests flask
+
+# Work on your project...
+
+# Save dependencies
+pip freeze > requirements.txt
+
+# Deactivate when done
+deactivate
+```
+
+## Python Interactive Mode (REPL)
+
+REPL = Read-Eval-Print Loop. It's Python's interactive shell.
+
+### Starting the REPL
+
+```bash
+python
+# or
+python3
+```
+
+You'll see:
+```
+Python 3.12.0 (main, Oct  2 2023, 12:00:00)
+>>>
+```
+
+The `>>>` is the prompt where you type code.
+
+### Using the REPL
+
+```{python}
+#| eval: false
+>>> 2 + 2
+4
+>>> print("Hello!")
+Hello!
+>>> x = 10
+>>> x * 5
+50
+>>> exit()  # or Ctrl+D (Unix) / Ctrl+Z (Windows)
+```
+
+:::{.callout-tip}
+## REPL is Great For:
+
+- Quick calculations
+- Testing code snippets
+- Exploring libraries
+- Learning Python interactively
+:::
+
+## Troubleshooting Common Issues
+
+### "python: command not found"
+
+**Problem**: Python not in PATH
+
+**Solution**:
+- Windows: Reinstall Python, check "Add Python to PATH"
+- macOS/Linux: Try `python3` instead of `python`
+
+### "pip: command not found"
+
+**Problem**: pip not installed or not in PATH
+
+**Solution**:
+```bash
+# Install pip
+python -m ensurepip --upgrade
+
+# Use it via python -m
+python -m pip install package_name
+```
+
+### Permission Errors on Linux/macOS
+
+**Problem**: Need admin rights
+
+**Solution**: Use `--user` flag:
+```bash
+pip install --user package_name
+```
+
+### Multiple Python Versions
+
+**Problem**: Which Python am I using?
+
+**Solution**: Check:
+```bash
+which python
+which python3
+python --version
+python3 --version
+```
+
+## Summary
+
+In this chapter, you learned how to:
+
+- ✅ Install Python on Windows, macOS, and Linux
+- ✅ Set up a code editor (VS Code recommended)
+- ✅ Use pip to install packages
+- ✅ Create and use virtual environments
+- ✅ Use Python's interactive REPL
+- ✅ Troubleshoot common installation issues
+
+:::{.callout-tip}
+## Next Steps
+
+Your development environment is ready! In the next chapter, we'll write and understand your first Python program.
+:::
+
+## Practice Exercises
+
+1. Verify your Python installation and note the version
+2. Install VS Code and the Python extension
+3. Create a new Python file and make it print your name
+4. Create a virtual environment called "learning"
+5. Activate it and install the `requests` library
+6. Open Python REPL and do some calculations
+
+:::{.callout-note}
+## Resources
+
+- [Python Official Documentation](https://docs.python.org/3/)
+- [VS Code Python Tutorial](https://code.visualstudio.com/docs/python/python-tutorial)
+- [pip Documentation](https://pip.pypa.io/en/stable/)
+- [Virtual Environments Guide](https://docs.python.org/3/tutorial/venv.html)
+:::

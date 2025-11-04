@@ -1,0 +1,868 @@
+# Decorators {#sec-decorators}
+
+## Introduction
+
+Imagine you could add superpowers to your functions without changing their code. That's exactly what decorators do! Decorators are one of Python's most elegant and powerful features, allowing you to modify or enhance functions and methods in a clean, reusable way.
+
+In this chapter, we'll unwrap the mystery of decorators (pun intended!), learning how to use them, create them, and apply them to write more maintainable code.
+
+::: {.callout-note}
+## What You'll Learn
+
+- Understanding decorator syntax
+- Creating function decorators
+- Decorators with arguments
+- Using `functools.wraps`
+- Class decorators
+- Practical decorator examples
+- Decorator patterns and best practices
+:::
+
+## What Are Decorators?
+
+Decorators are functions that modify or enhance other functions. They "wrap" a function, adding functionality before, after, or around the original function's execution.
+
+```python
+@decorator
+def my_function():
+    pass
+
+# Is equivalent to:
+def my_function():
+    pass
+my_function = decorator(my_function)
+```
+
+## Functions as First-Class Objects
+
+Before understanding decorators, remember that in Python, functions are first-class objects:
+
+```python
+def greet(name):
+    return f"Hello, {name}!"
+
+# Assign function to variable
+say_hello = greet
+print(say_hello("Alice"))  # Hello, Alice!
+
+# Pass function as argument
+def execute_function(func, arg):
+    return func(arg)
+
+result = execute_function(greet, "Bob")
+print(result)  # Hello, Bob!
+
+# Return function from function
+def get_greeting_function():
+    def greet_inner(name):
+        return f"Hi, {name}!"
+    return greet_inner
+
+greeter = get_greeting_function()
+print(greeter("Charlie"))  # Hi, Charlie!
+```
+
+## Your First Decorator
+
+Let's create a simple decorator that prints when a function is called:
+
+```python
+def simple_decorator(func):
+    def wrapper():
+        print("Before function call")
+        func()
+        print("After function call")
+    return wrapper
+
+@simple_decorator
+def say_hello():
+    print("Hello!")
+
+# Using it
+say_hello()
+```
+
+Output:
+```
+Before function call
+Hello!
+After function call
+```
+
+## Decorator Syntax
+
+### The @ Symbol
+
+The `@` symbol is syntactic sugar for decorators:
+
+```python
+# Using @ syntax
+@my_decorator
+def my_function():
+    pass
+
+# Equivalent to:
+def my_function():
+    pass
+my_function = my_decorator(my_function)
+```
+
+### Multiple Decorators
+
+You can stack decorators:
+
+```python
+def decorator1(func):
+    def wrapper():
+        print("Decorator 1")
+        func()
+    return wrapper
+
+def decorator2(func):
+    def wrapper():
+        print("Decorator 2")
+        func()
+    return wrapper
+
+@decorator1
+@decorator2
+def my_function():
+    print("Original function")
+
+my_function()
+```
+
+Output:
+```
+Decorator 1
+Decorator 2
+Original function
+```
+
+::: {.callout-note}
+## Decorator Order
+
+Decorators are applied from bottom to top (inside out). The decorator closest to the function is applied first.
+:::
+
+## Decorators with Arguments
+
+### Function Arguments
+
+Most functions take arguments, so decorators need to handle them:
+
+```python
+def smart_decorator(func):
+    def wrapper(*args, **kwargs):
+        print(f"Calling {func.__name__}")
+        result = func(*args, **kwargs)
+        print(f"Function returned: {result}")
+        return result
+    return wrapper
+
+@smart_decorator
+def add(a, b):
+    return a + b
+
+@smart_decorator
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+# Using them
+print(add(5, 3))
+print(greet("Alice"))
+print(greet("Bob", greeting="Hi"))
+```
+
+::: {.callout-tip}
+## Use `*args` and `**kwargs`
+
+Always use `*args` and `**kwargs` in wrapper functions to handle any arguments the decorated function might receive.
+:::
+
+## Practical Decorator Examples
+
+### Timing Decorator
+
+Measure how long a function takes to execute:
+
+```python
+import time
+from functools import wraps
+
+def timer(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"{func.__name__} took {end - start:.4f} seconds")
+        return result
+    return wrapper
+
+@timer
+def slow_function():
+    time.sleep(1)
+    return "Done!"
+
+@timer
+def calculate_sum(n):
+    return sum(range(n))
+
+# Using them
+result = slow_function()
+result = calculate_sum(1000000)
+```
+
+### Debug Decorator
+
+Print function calls and arguments:
+
+```python
+from functools import wraps
+
+def debug(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        print(f"Calling {func.__name__}({signature})")
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} returned {result!r}")
+        return result
+    return wrapper
+
+@debug
+def add(a, b):
+    return a + b
+
+@debug
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+# Using them
+add(5, 3)
+greet("Alice", greeting="Hi")
+```
+
+### Retry Decorator
+
+Retry a function if it fails:
+
+```python
+import time
+from functools import wraps
+
+def retry(max_attempts=3, delay=1):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < max_attempts:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    attempts += 1
+                    if attempts == max_attempts:
+                        print(f"Failed after {max_attempts} attempts")
+                        raise
+                    print(f"Attempt {attempts} failed: {e}. Retrying in {delay}s...")
+                    time.sleep(delay)
+        return wrapper
+    return decorator
+
+@retry(max_attempts=3, delay=0.5)
+def unreliable_function():
+    import random
+    if random.random() < 0.7:
+        raise ValueError("Random failure!")
+    return "Success!"
+
+# Using it
+try:
+    result = unreliable_function()
+    print(result)
+except ValueError:
+    print("All attempts failed")
+```
+
+### Memoization Decorator
+
+Cache function results for better performance:
+
+```python
+from functools import wraps
+
+def memoize(func):
+    cache = {}
+
+    @wraps(func)
+    def wrapper(*args):
+        if args not in cache:
+            cache[args] = func(*args)
+        return cache[args]
+    return wrapper
+
+@memoize
+def fibonacci(n):
+    if n < 2:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+@memoize
+def expensive_calculation(x, y):
+    print(f"Computing {x} * {y}...")
+    time.sleep(1)  # Simulate expensive operation
+    return x * y
+
+# Using them
+print(fibonacci(100))  # Fast!
+print(expensive_calculation(5, 3))  # Slow first time
+print(expensive_calculation(5, 3))  # Instant second time
+```
+
+::: {.callout-note}
+## Python's Built-in Memoization
+
+Python's `functools.lru_cache` provides a more sophisticated memoization decorator with size limits and statistics.
+:::
+
+## Decorators with Arguments
+
+### The Three-Layer Pattern
+
+Decorators that take arguments need an extra layer:
+
+```python
+def repeat(times):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(times):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+@repeat(times=3)
+def greet(name):
+    print(f"Hello, {name}!")
+
+# Using it
+greet("Alice")
+```
+
+Output:
+```
+Hello, Alice!
+Hello, Alice!
+Hello, Alice!
+```
+
+### Optional Arguments
+
+Create decorators that work with or without arguments:
+
+```python
+from functools import wraps
+
+def smart_decorator(arg=None):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            print(f"Decorator argument: {arg}")
+            return func(*args, **kwargs)
+        return wrapper
+
+    # If called without arguments
+    if callable(arg):
+        return decorator(arg)
+    # If called with arguments
+    return decorator
+
+# Both work!
+@smart_decorator
+def func1():
+    print("Function 1")
+
+@smart_decorator(arg="custom value")
+def func2():
+    print("Function 2")
+
+func1()
+func2()
+```
+
+## The `functools.wraps` Decorator
+
+`functools.wraps` preserves the original function's metadata:
+
+```python
+from functools import wraps
+
+# Without @wraps
+def bad_decorator(func):
+    def wrapper(*args, **kwargs):
+        """Wrapper function"""
+        return func(*args, **kwargs)
+    return wrapper
+
+# With @wraps
+def good_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        """Wrapper function"""
+        return func(*args, **kwargs)
+    return wrapper
+
+def original_function():
+    """Original function docstring"""
+    pass
+
+# Without @wraps
+bad_decorated = bad_decorator(original_function)
+print(bad_decorated.__name__)  # wrapper
+print(bad_decorated.__doc__)   # Wrapper function
+
+# With @wraps
+good_decorated = good_decorator(original_function)
+print(good_decorated.__name__)  # original_function
+print(good_decorated.__doc__)   # Original function docstring
+```
+
+::: {.callout-important}
+## Always Use `@wraps`
+
+Always use `@wraps(func)` in your decorators to preserve the original function's name, docstring, and other metadata. This is crucial for debugging and documentation.
+:::
+
+## Class Decorators
+
+### Decorators as Classes
+
+You can also implement decorators as classes:
+
+```python
+class CountCalls:
+    def __init__(self, func):
+        self.func = func
+        self.count = 0
+
+    def __call__(self, *args, **kwargs):
+        self.count += 1
+        print(f"Call {self.count} of {self.func.__name__}")
+        return self.func(*args, **kwargs)
+
+@CountCalls
+def say_hello():
+    print("Hello!")
+
+# Using it
+say_hello()  # Call 1 of say_hello
+say_hello()  # Call 2 of say_hello
+say_hello()  # Call 3 of say_hello
+```
+
+### Class Decorator with Arguments
+
+```python
+class Repeat:
+    def __init__(self, times):
+        self.times = times
+
+    def __call__(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(self.times):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+
+@Repeat(times=3)
+def greet(name):
+    print(f"Hello, {name}!")
+
+greet("Bob")
+```
+
+### Decorating Classes
+
+Decorators can also modify classes:
+
+```python
+def add_str_method(cls):
+    """Add a __str__ method to a class"""
+    def __str__(self):
+        return f"{cls.__name__} instance"
+    cls.__str__ = __str__
+    return cls
+
+@add_str_method
+class MyClass:
+    pass
+
+obj = MyClass()
+print(obj)  # MyClass instance
+```
+
+## Advanced Decorator Patterns
+
+### Decorator Factory
+
+Create decorators dynamically:
+
+```python
+def make_decorator(prefix):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            print(f"{prefix}: Calling {func.__name__}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+# Create different decorators
+debug_decorator = make_decorator("[DEBUG]")
+info_decorator = make_decorator("[INFO]")
+
+@debug_decorator
+def function1():
+    print("Function 1")
+
+@info_decorator
+def function2():
+    print("Function 2")
+
+function1()  # [DEBUG]: Calling function1
+function2()  # [INFO]: Calling function2
+```
+
+### Stateful Decorators
+
+Decorators that maintain state:
+
+```python
+class RateLimiter:
+    def __init__(self, max_calls, time_window):
+        self.max_calls = max_calls
+        self.time_window = time_window
+        self.calls = []
+
+    def __call__(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            import time
+            now = time.time()
+            # Remove old calls
+            self.calls = [c for c in self.calls if now - c < self.time_window]
+
+            if len(self.calls) >= self.max_calls:
+                raise Exception(f"Rate limit exceeded: {self.max_calls} calls per {self.time_window}s")
+
+            self.calls.append(now)
+            return func(*args, **kwargs)
+        return wrapper
+
+@RateLimiter(max_calls=3, time_window=5)
+def api_call():
+    print("API call executed")
+
+# Try calling rapidly
+for i in range(5):
+    try:
+        api_call()
+    except Exception as e:
+        print(f"Call {i + 1}: {e}")
+```
+
+### Chaining Decorators
+
+Create decorators that work together:
+
+```python
+def uppercase(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return result.upper()
+    return wrapper
+
+def exclamation(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return f"{result}!!!"
+    return wrapper
+
+@exclamation
+@uppercase
+def greet(name):
+    return f"hello, {name}"
+
+print(greet("Alice"))  # HELLO, ALICE!!!
+```
+
+## Built-in Decorators
+
+### `@property`
+
+Convert methods to properties:
+
+```python
+class Circle:
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def radius(self):
+        """Get the radius"""
+        return self._radius
+
+    @radius.setter
+    def radius(self, value):
+        """Set the radius"""
+        if value < 0:
+            raise ValueError("Radius cannot be negative")
+        self._radius = value
+
+    @property
+    def area(self):
+        """Calculate area"""
+        return 3.14159 * self._radius ** 2
+
+# Using it
+circle = Circle(5)
+print(circle.radius)  # 5
+print(circle.area)    # 78.53975
+circle.radius = 10
+print(circle.area)    # 314.159
+```
+
+### `@staticmethod` and `@classmethod`
+
+```python
+class MathOperations:
+    pi = 3.14159
+
+    @staticmethod
+    def add(x, y):
+        """Static method - no access to class or instance"""
+        return x + y
+
+    @classmethod
+    def circle_area(cls, radius):
+        """Class method - has access to class"""
+        return cls.pi * radius ** 2
+
+# Using them
+print(MathOperations.add(5, 3))           # 8
+print(MathOperations.circle_area(10))     # 314.159
+```
+
+### `@functools.lru_cache`
+
+Built-in memoization with LRU (Least Recently Used) cache:
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def fibonacci(n):
+    if n < 2:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# Very fast, even for large numbers
+print(fibonacci(100))
+
+# Check cache info
+print(fibonacci.cache_info())
+```
+
+## Real-World Examples
+
+### Authentication Decorator
+
+```python
+def require_authentication(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Simulated user check
+        user = kwargs.get('user')
+        if not user or not user.get('authenticated'):
+            raise PermissionError("Authentication required")
+        return func(*args, **kwargs)
+    return wrapper
+
+@require_authentication
+def view_profile(user=None):
+    return f"Profile: {user['name']}"
+
+@require_authentication
+def delete_account(user=None):
+    return f"Account deleted: {user['name']}"
+
+# Using them
+authenticated_user = {'name': 'Alice', 'authenticated': True}
+print(view_profile(user=authenticated_user))  # Works
+
+unauthenticated_user = {'name': 'Bob', 'authenticated': False}
+try:
+    print(view_profile(user=unauthenticated_user))  # Fails
+except PermissionError as e:
+    print(f"Error: {e}")
+```
+
+### Validation Decorator
+
+```python
+def validate_types(**expected_types):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Check types
+            for arg_name, expected_type in expected_types.items():
+                if arg_name in kwargs:
+                    value = kwargs[arg_name]
+                    if not isinstance(value, expected_type):
+                        raise TypeError(
+                            f"{arg_name} must be {expected_type.__name__}, "
+                            f"got {type(value).__name__}"
+                        )
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@validate_types(name=str, age=int, score=float)
+def process_data(name, age, score):
+    return f"{name} is {age} years old with score {score}"
+
+# Using it
+print(process_data(name="Alice", age=30, score=95.5))  # Works
+
+try:
+    print(process_data(name="Bob", age="30", score=95.5))  # Fails
+except TypeError as e:
+    print(f"Error: {e}")
+```
+
+### Logging Decorator
+
+```python
+import logging
+from functools import wraps
+from datetime import datetime
+
+logging.basicConfig(level=logging.INFO)
+
+def log_calls(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logging.info(f"[{timestamp}] Calling {func.__name__}")
+
+        try:
+            result = func(*args, **kwargs)
+            logging.info(f"[{timestamp}] {func.__name__} completed successfully")
+            return result
+        except Exception as e:
+            logging.error(f"[{timestamp}] {func.__name__} failed: {e}")
+            raise
+    return wrapper
+
+@log_calls
+def divide(a, b):
+    return a / b
+
+# Using it
+print(divide(10, 2))
+try:
+    print(divide(10, 0))
+except ZeroDivisionError:
+    pass
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **Decorators** are functions that modify other functions
+- **The @ syntax** provides clean decorator application
+- **`functools.wraps`** preserves function metadata
+- **Decorator patterns** include timing, caching, validation, and more
+- **Class decorators** can modify both functions and classes
+- **Built-in decorators** like `@property`, `@staticmethod`, and `@lru_cache`
+
+Decorators are a powerful tool for writing clean, reusable code. Master them to add elegant functionality to your programs!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Decorators wrap functions to add functionality
+- Use `*args` and `**kwargs` to handle any arguments
+- Always use `@wraps` to preserve metadata
+- Decorators with arguments need three layers
+- Built-in decorators solve common problems
+:::
+
+## Practice Exercises
+
+### Exercise 1: Slow Down Decorator
+Create a decorator that adds a delay before function execution:
+
+```python
+@slow_down(seconds=1)
+def say_hello():
+    print("Hello!")
+```
+
+### Exercise 2: Count Calls
+Create a decorator that counts how many times a function is called:
+
+```python
+@count_calls
+def process_data(x):
+    return x * 2
+
+process_data(5)
+process_data(10)
+print(process_data.call_count)  # 2
+```
+
+### Exercise 3: Range Validator
+Create a decorator that validates numeric arguments are within a range:
+
+```python
+@validate_range(min_val=0, max_val=100)
+def set_volume(volume):
+    print(f"Volume set to {volume}")
+
+set_volume(50)   # Works
+set_volume(150)  # Raises ValueError
+```
+
+### Exercise 4: Deprecation Warning
+Create a decorator that warns when a deprecated function is used:
+
+```python
+@deprecated(message="Use new_function() instead")
+def old_function():
+    return "Old implementation"
+```
+
+### Exercise 5: Single Execution
+Create a decorator that ensures a function runs only once:
+
+```python
+@run_once
+def initialize():
+    print("Initializing...")
+
+initialize()  # Prints "Initializing..."
+initialize()  # Does nothing
+```
+
+## Next Steps
+
+In the next chapter, we'll explore **generators**, a memory-efficient way to create iterators using the `yield` keyword. Get ready to generate some powerful code!

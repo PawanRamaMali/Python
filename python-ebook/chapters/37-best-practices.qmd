@@ -1,0 +1,888 @@
+# Python Best Practices and Clean Code {#sec-best-practices}
+
+## Introduction
+
+Anyone can write code that works. But can you write code that others (including your future self) can easily read, understand, and maintain? Clean, well-written code is a hallmark of professional developers. In this chapter, we'll explore best practices that will take your Python code from "working" to "excellent."
+
+::: {.callout-note}
+## What You'll Learn
+
+- PEP 8 style guide
+- Writing clean, readable code
+- Documentation with docstrings
+- Type hints for better code
+- Code organization principles
+- Common anti-patterns to avoid
+:::
+
+## PEP 8: Python's Style Guide
+
+PEP 8 is Python's official style guide. Following it makes your code more readable and consistent with the Python community.
+
+### Naming Conventions
+
+```python
+# Module names: lowercase with underscores
+# my_module.py
+
+# Class names: CapWords (PascalCase)
+class MyClass:
+    pass
+
+class DataProcessor:
+    pass
+
+# Function and variable names: lowercase with underscores
+def calculate_average():
+    pass
+
+user_name = "Alice"
+item_count = 10
+
+# Constants: UPPERCASE with underscores
+MAX_SIZE = 100
+DEFAULT_TIMEOUT = 30
+
+# Private attributes: prefix with single underscore
+class BankAccount:
+    def __init__(self):
+        self._balance = 0  # "Private" by convention
+
+# Name mangling: prefix with double underscore (rare)
+class MyClass:
+    def __init__(self):
+        self.__private = "truly private"
+```
+
+### Code Layout
+
+```python
+# Indentation: 4 spaces (never tabs!)
+def my_function():
+    if condition:
+        do_something()
+
+# Line length: max 79 characters for code, 72 for docstrings
+# Break long lines with parentheses
+result = (some_long_function_name(argument1, argument2)
+          + another_function(argument3, argument4))
+
+# Blank lines:
+# - 2 blank lines between top-level functions and classes
+# - 1 blank line between methods inside a class
+
+
+class MyClass:
+    def method1(self):
+        pass
+
+    def method2(self):
+        pass
+
+
+def function1():
+    pass
+
+
+def function2():
+    pass
+```
+
+### Imports
+
+```python
+# Import order:
+# 1. Standard library
+# 2. Related third-party
+# 3. Local application
+
+import os
+import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from flask import Flask
+
+from mypackage import mymodule
+from mypackage.subpackage import utils
+
+# One import per line
+import os
+import sys
+
+# Or grouped for 'from' imports
+from pathlib import Path, PurePath
+
+# Absolute imports preferred
+from mypackage.utils import helper_function
+
+# Avoid wildcard imports
+# from module import *  # Don't do this!
+```
+
+### Whitespace
+
+```python
+# Operators: surround with spaces
+x = 1 + 2
+result = x * 5 - 3
+
+# Function arguments: no spaces around =
+def function(arg1, arg2=None):
+    pass
+
+# Commas: space after, not before
+items = [1, 2, 3, 4]
+dict_obj = {'a': 1, 'b': 2}
+
+# Slicing: no spaces around :
+items[1:5]
+items[::2]
+
+# Function calls: no space before (
+function(arg1, arg2)
+
+# Indexing: no space before [
+items[0]
+```
+
+### Comments
+
+```python
+# Block comments: full sentences, properly capitalized
+# This function calculates the average of a list of numbers.
+# It returns 0 for an empty list to avoid division by zero.
+
+# Inline comments: sparingly, two spaces from code
+x = x + 1  # Increment x
+
+# Don't state the obvious
+x = x + 1  # Bad: Add 1 to x
+
+# Explain the why, not the what
+x = x + 1  # Good: Compensate for border
+```
+
+## Writing Clean Code
+
+### Clear Naming
+
+```python
+# Bad: Unclear names
+def calc(l):
+    t = 0
+    for i in l:
+        t += i
+    return t / len(l)
+
+# Good: Descriptive names
+def calculate_average(numbers):
+    total = 0
+    for number in numbers:
+        total += number
+    return total / len(numbers)
+
+# Even better: Built-in functions
+def calculate_average(numbers):
+    return sum(numbers) / len(numbers) if numbers else 0
+```
+
+### Functions Should Do One Thing
+
+```python
+# Bad: Function does too much
+def process_user_data(user_id):
+    # Fetch user
+    user = db.get_user(user_id)
+    # Validate
+    if not user.email:
+        raise ValueError("Invalid email")
+    # Update
+    user.last_login = datetime.now()
+    db.save(user)
+    # Send email
+    send_welcome_email(user.email)
+    # Log
+    logger.info(f"Processed user {user_id}")
+    return user
+
+# Good: Split into focused functions
+def get_user(user_id):
+    return db.get_user(user_id)
+
+def validate_user(user):
+    if not user.email:
+        raise ValueError("Invalid email")
+
+def update_login_time(user):
+    user.last_login = datetime.now()
+    db.save(user)
+
+def process_user_data(user_id):
+    user = get_user(user_id)
+    validate_user(user)
+    update_login_time(user)
+    send_welcome_email(user.email)
+    logger.info(f"Processed user {user_id}")
+    return user
+```
+
+### Avoid Magic Numbers
+
+```python
+# Bad: Magic numbers
+if user.age > 18:
+    allow_access()
+
+if len(password) < 8:
+    raise ValueError("Password too short")
+
+# Good: Named constants
+MINIMUM_AGE = 18
+MINIMUM_PASSWORD_LENGTH = 8
+
+if user.age > MINIMUM_AGE:
+    allow_access()
+
+if len(password) < MINIMUM_PASSWORD_LENGTH:
+    raise ValueError(f"Password must be at least {MINIMUM_PASSWORD_LENGTH} characters")
+```
+
+### Keep Functions Short
+
+```python
+# Bad: Long function
+def process_order(order):
+    # 100+ lines of code
+    pass
+
+# Good: Break into smaller functions
+def validate_order(order):
+    # Validation logic
+    pass
+
+def calculate_total(order):
+    # Calculation logic
+    pass
+
+def apply_discount(order, discount):
+    # Discount logic
+    pass
+
+def process_order(order):
+    validate_order(order)
+    total = calculate_total(order)
+    if order.has_discount:
+        total = apply_discount(order, order.discount)
+    return total
+```
+
+## Docstrings
+
+Document your code with docstrings!
+
+### Function Docstrings
+
+```python
+def calculate_average(numbers):
+    """
+    Calculate the average of a list of numbers.
+
+    Args:
+        numbers (list): A list of numbers (int or float).
+
+    Returns:
+        float: The average of the numbers.
+
+    Raises:
+        ValueError: If the list is empty.
+
+    Example:
+        >>> calculate_average([1, 2, 3, 4, 5])
+        3.0
+    """
+    if not numbers:
+        raise ValueError("Cannot calculate average of empty list")
+    return sum(numbers) / len(numbers)
+```
+
+### Class Docstrings
+
+```python
+class BankAccount:
+    """
+    A simple bank account class.
+
+    This class represents a bank account with basic deposit
+    and withdrawal operations.
+
+    Attributes:
+        balance (float): The current account balance.
+        owner (str): The account owner's name.
+
+    Example:
+        >>> account = BankAccount("Alice", 1000)
+        >>> account.deposit(500)
+        >>> print(account.balance)
+        1500
+    """
+
+    def __init__(self, owner, initial_balance=0):
+        """
+        Initialize a new bank account.
+
+        Args:
+            owner (str): The account owner's name.
+            initial_balance (float, optional): Starting balance. Defaults to 0.
+        """
+        self.owner = owner
+        self.balance = initial_balance
+
+    def deposit(self, amount):
+        """
+        Deposit money into the account.
+
+        Args:
+            amount (float): Amount to deposit.
+
+        Raises:
+            ValueError: If amount is negative.
+        """
+        if amount < 0:
+            raise ValueError("Cannot deposit negative amount")
+        self.balance += amount
+```
+
+### Module Docstrings
+
+```python
+"""
+Math Utilities Module
+
+This module provides mathematical utility functions for
+common operations like calculating averages, finding
+medians, and statistical analysis.
+
+Author: Your Name
+Date: 2025-11-04
+Version: 1.0
+"""
+
+def calculate_average(numbers):
+    """Calculate average of numbers."""
+    return sum(numbers) / len(numbers)
+```
+
+## Type Hints
+
+Type hints improve code clarity and enable static type checking.
+
+### Basic Type Hints
+
+```python
+def greet(name: str) -> str:
+    """Greet a person by name."""
+    return f"Hello, {name}!"
+
+def add(a: int, b: int) -> int:
+    """Add two integers."""
+    return a + b
+
+age: int = 30
+name: str = "Alice"
+is_active: bool = True
+score: float = 95.5
+```
+
+### Collection Type Hints
+
+```python
+from typing import List, Dict, Set, Tuple, Optional
+
+def process_names(names: List[str]) -> List[str]:
+    """Process a list of names."""
+    return [name.upper() for name in names]
+
+def get_user_data() -> Dict[str, any]:
+    """Get user data as dictionary."""
+    return {'name': 'Alice', 'age': 30}
+
+def get_unique_items(items: List[int]) -> Set[int]:
+    """Return unique items."""
+    return set(items)
+
+def get_coordinates() -> Tuple[int, int]:
+    """Return x, y coordinates."""
+    return (10, 20)
+
+def find_user(user_id: int) -> Optional[Dict]:
+    """Find user by ID, return None if not found."""
+    # Could return None
+    return user_dict if found else None
+```
+
+### Advanced Type Hints
+
+```python
+from typing import Union, Callable, Any, TypeVar, Generic
+
+# Union types
+def process_id(id_value: Union[int, str]) -> str:
+    """Accept int or string ID."""
+    return str(id_value)
+
+# Callable (function types)
+def apply_function(func: Callable[[int], int], value: int) -> int:
+    """Apply a function to a value."""
+    return func(value)
+
+# TypeVar for generics
+T = TypeVar('T')
+
+def first_element(items: List[T]) -> T:
+    """Get first element of list."""
+    return items[0]
+
+# Generic classes
+from typing import Generic
+
+class Box(Generic[T]):
+    def __init__(self, content: T):
+        self.content: T = content
+
+    def get(self) -> T:
+        return self.content
+```
+
+## SOLID Principles (Pythonic)
+
+### Single Responsibility Principle
+
+```python
+# Bad: Class does too much
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def save_to_database(self):
+        # Database logic
+        pass
+
+    def send_email(self):
+        # Email logic
+        pass
+
+    def generate_report(self):
+        # Report logic
+        pass
+
+# Good: Separate concerns
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+class UserRepository:
+    def save(self, user):
+        # Database logic
+        pass
+
+class EmailService:
+    def send(self, email, message):
+        # Email logic
+        pass
+
+class ReportGenerator:
+    def generate(self, user):
+        # Report logic
+        pass
+```
+
+### Open/Closed Principle
+
+```python
+# Good: Open for extension, closed for modification
+from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        pass
+
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return 3.14159 * self.radius ** 2
+
+def calculate_total_area(shapes: List[Shape]) -> float:
+    return sum(shape.area() for shape in shapes)
+```
+
+### Dependency Inversion
+
+```python
+# Bad: High-level depends on low-level
+class MySQLDatabase:
+    def save(self, data):
+        print("Saving to MySQL")
+
+class UserService:
+    def __init__(self):
+        self.db = MySQLDatabase()  # Tight coupling!
+
+# Good: Both depend on abstraction
+from abc import ABC, abstractmethod
+
+class Database(ABC):
+    @abstractmethod
+    def save(self, data):
+        pass
+
+class MySQLDatabase(Database):
+    def save(self, data):
+        print("Saving to MySQL")
+
+class PostgreSQLDatabase(Database):
+    def save(self, data):
+        print("Saving to PostgreSQL")
+
+class UserService:
+    def __init__(self, database: Database):
+        self.db = database  # Flexible!
+```
+
+## Code Organization
+
+### Project Structure
+
+```
+my_project/
+│
+├── my_package/
+│   ├── __init__.py
+│   ├── module1.py
+│   ├── module2.py
+│   └── utils/
+│       ├── __init__.py
+│       └── helpers.py
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_module1.py
+│   └── test_module2.py
+│
+├── docs/
+│   └── README.md
+│
+├── requirements.txt
+├── setup.py
+└── README.md
+```
+
+### Organize Imports
+
+```python
+# Good organization
+"""Module docstring"""
+
+# Standard library
+import os
+import sys
+from pathlib import Path
+
+# Third-party
+import numpy as np
+import requests
+
+# Local
+from mypackage import utils
+from mypackage.models import User
+
+# Constants
+MAX_RETRIES = 3
+DEFAULT_TIMEOUT = 30
+
+# Classes
+class MyClass:
+    pass
+
+# Functions
+def my_function():
+    pass
+
+# Main execution
+if __name__ == '__main__':
+    main()
+```
+
+## Common Anti-Patterns to Avoid
+
+### God Object
+
+```python
+# Bad: Object that knows/does too much
+class Application:
+    def __init__(self):
+        self.database = Database()
+        self.email = EmailService()
+        self.logger = Logger()
+        # ... 20 more things
+
+    def do_everything(self):
+        # ... 1000 lines
+        pass
+
+# Good: Focused objects
+class UserService:
+    def __init__(self, repository):
+        self.repository = repository
+
+    def create_user(self, user_data):
+        # Just user-related logic
+        pass
+```
+
+### Overusing Exceptions for Control Flow
+
+```python
+# Bad: Using exceptions for normal flow
+try:
+    value = dictionary['key']
+except KeyError:
+    value = default
+
+# Good: Use dict.get()
+value = dictionary.get('key', default)
+```
+
+### Premature Optimization
+
+```python
+# Bad: Optimizing before needed
+def calculate(data):
+    # Complex, hard-to-read "optimization"
+    return ((x << 2) for x in data if x & 1)
+
+# Good: Clear first, optimize if needed
+def calculate(data):
+    return (x * 4 for x in data if x % 2 == 1)
+```
+
+## Pythonic Idioms
+
+### Use Context Managers
+
+```python
+# Bad
+f = open('file.txt')
+data = f.read()
+f.close()
+
+# Good
+with open('file.txt') as f:
+    data = f.read()
+```
+
+### Use Comprehensions (When Clear)
+
+```python
+# Bad
+squares = []
+for x in range(10):
+    squares.append(x ** 2)
+
+# Good
+squares = [x ** 2 for x in range(10)]
+```
+
+### Use enumerate()
+
+```python
+# Bad
+for i in range(len(items)):
+    print(f"{i}: {items[i]}")
+
+# Good
+for i, item in enumerate(items):
+    print(f"{i}: {item}")
+```
+
+### Use zip()
+
+```python
+# Bad
+names = ['Alice', 'Bob', 'Charlie']
+ages = [25, 30, 35]
+for i in range(len(names)):
+    print(f"{names[i]} is {ages[i]}")
+
+# Good
+for name, age in zip(names, ages):
+    print(f"{name} is {age}")
+```
+
+### Use Dictionary get()
+
+```python
+# Bad
+if 'key' in dictionary:
+    value = dictionary['key']
+else:
+    value = default
+
+# Good
+value = dictionary.get('key', default)
+```
+
+## Error Handling
+
+### Specific Exceptions
+
+```python
+# Bad: Catching everything
+try:
+    result = risky_operation()
+except:
+    print("Something went wrong")
+
+# Good: Specific exceptions
+try:
+    result = risky_operation()
+except ValueError as e:
+    print(f"Invalid value: {e}")
+except ConnectionError as e:
+    print(f"Connection failed: {e}")
+```
+
+### Clean Up Resources
+
+```python
+# Good: Always clean up
+try:
+    resource = acquire_resource()
+    use_resource(resource)
+finally:
+    release_resource(resource)
+
+# Better: Use context manager
+with acquire_resource() as resource:
+    use_resource(resource)
+```
+
+## Code Quality Tools
+
+### Use Linters
+
+```bash
+# Install
+pip install pylint flake8 black mypy
+
+# Run checks
+pylint mymodule.py
+flake8 mymodule.py
+
+# Auto-format
+black mymodule.py
+
+# Type checking
+mypy mymodule.py
+```
+
+### Example: Using Black
+
+```python
+# Before black
+def my_function(x,y,z):
+    return x+y+z
+
+# After black
+def my_function(x, y, z):
+    return x + y + z
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **PEP 8** - Python's style guide
+- **Clean code** - Readable, maintainable code principles
+- **Docstrings** - Documenting code properly
+- **Type hints** - Adding type information
+- **SOLID principles** - Object-oriented design
+- **Anti-patterns** - Common mistakes to avoid
+- **Pythonic idioms** - Writing idiomatic Python
+
+Writing clean code is a skill that improves with practice. Your future self (and your colleagues) will thank you!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Follow PEP 8 for consistency
+- Write self-documenting code with clear names
+- Document with docstrings and type hints
+- Keep functions short and focused
+- Use Python idioms and best practices
+- Run linters and formatters regularly
+- Code is read more than written - optimize for readability!
+:::
+
+## Practice Exercises
+
+### Exercise 1: Refactor This Code
+Improve this code following best practices:
+
+```python
+def f(l):
+    t=0
+    for i in l:t+=i
+    return t/len(l)
+```
+
+### Exercise 2: Add Type Hints
+Add comprehensive type hints:
+
+```python
+def process_data(data, threshold):
+    result = []
+    for item in data:
+        if item > threshold:
+            result.append(item * 2)
+    return result
+```
+
+### Exercise 3: Write Docstrings
+Add proper docstrings:
+
+```python
+class ShoppingCart:
+    def __init__(self):
+        self.items = []
+
+    def add_item(self, item, price):
+        self.items.append({'item': item, 'price': price})
+
+    def get_total(self):
+        return sum(item['price'] for item in self.items)
+```
+
+### Exercise 4: Break Up Long Function
+Refactor this long function into smaller, focused functions.
+
+### Exercise 5: Apply SOLID
+Refactor a class that violates single responsibility principle.
+
+## Next Steps
+
+Congratulations! You've learned Python fundamentals and best practices. In the final chapter, we'll explore **next steps** - career paths, frameworks, and resources to continue your Python journey. Your learning adventure is just beginning!

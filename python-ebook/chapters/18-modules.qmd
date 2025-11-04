@@ -1,0 +1,942 @@
+# Modules: Organizing Your Code {#sec-modules}
+
+As your programs grow, keeping everything in one file becomes unwieldy. Python modules let you organize code into separate files, making your projects maintainable and reusable. Think of modules as tool boxes - each contains related tools you can use whenever needed!
+
+## What Are Modules?
+
+A **module** is simply a Python file containing functions, classes, and variables. Any `.py` file is a module that can be imported into other Python files.
+
+### Why Use Modules?
+
+```{python}
+# Without modules: everything in one huge file
+# - Hard to navigate
+# - Difficult to maintain
+# - Can't reuse code easily
+
+# With modules: organized, maintainable code
+# math_utils.py - math functions
+# string_utils.py - string functions
+# main.py - your program
+
+print("Modules help organize code into logical units!")
+```
+
+::: {.callout-note}
+## Benefits of Modules
+- **Organization**: Group related code together
+- **Reusability**: Use code across multiple files
+- **Namespace**: Avoid name conflicts
+- **Maintainability**: Easier to find and fix bugs
+- **Collaboration**: Multiple people can work on different modules
+:::
+
+## Importing Modules
+
+Python comes with many built-in modules you can use immediately.
+
+### Basic Import
+
+```{python}
+# Import entire module
+import math
+
+# Use module.function()
+print(f"π = {math.pi}")
+print(f"√16 = {math.sqrt(16)}")
+print(f"5! = {math.factorial(5)}")
+```
+
+### Multiple Imports
+
+```{python}
+# Import multiple modules
+import random
+import datetime
+
+# Use them
+print(f"Random number: {random.randint(1, 100)}")
+print(f"Today: {datetime.date.today()}")
+```
+
+### Viewing Module Contents
+
+```{python}
+import math
+
+# See what's in a module
+print("Math module contents:")
+print([item for item in dir(math) if not item.startswith('_')][:10])
+
+# Get help
+# help(math.sqrt)
+```
+
+::: {.callout-tip}
+## Exploring Modules
+- Use `dir(module)` to see module contents
+- Use `help(module)` or `help(module.function)` for documentation
+- Use `module.__file__` to see where module is located
+:::
+
+## from...import Statement
+
+Import specific items from a module without importing the whole module.
+
+### Import Specific Functions
+
+```{python}
+# Import specific items
+from math import sqrt, pi, factorial
+
+# Use directly without module prefix
+print(f"π = {pi}")
+print(f"√25 = {sqrt(25)}")
+print(f"6! = {factorial(6)}")
+```
+
+### Import Multiple Items
+
+```{python}
+# Import multiple items
+from random import randint, choice, shuffle
+
+# Use directly
+numbers = list(range(1, 11))
+print(f"Random int: {randint(1, 100)}")
+print(f"Random choice: {choice(numbers)}")
+shuffle(numbers)
+print(f"Shuffled: {numbers}")
+```
+
+### Import All (Not Recommended!)
+
+```{python}
+# Import everything from module
+from math import *
+
+# All functions available without prefix
+print(f"sin(π/2) = {sin(pi/2)}")
+print(f"cos(0) = {cos(0)}")
+
+# But this is risky - namespace pollution!
+```
+
+::: {.callout-warning}
+## Avoid `from module import *`
+Using `import *` is generally discouraged because:
+- **Namespace pollution**: You don't know what's imported
+- **Name conflicts**: Might override existing names
+- **Readability**: Hard to tell where functions come from
+- **Maintenance**: Difficult to track dependencies
+
+**Exception**: Interactive sessions or very well-known modules like `tkinter`
+:::
+
+### Best Practices
+
+```{python}
+# Good: Explicit imports
+from math import sqrt, pi
+
+# Good: Import module
+import math
+
+# Avoid: Import everything
+# from math import *
+
+# Good: Multiple lines for clarity
+from collections import (
+    Counter,
+    defaultdict,
+    OrderedDict
+)
+```
+
+## import...as (Aliases)
+
+Give modules or functions shorter or clearer names.
+
+### Module Aliases
+
+```{python}
+# Long module names
+import datetime as dt
+
+# Use shorter alias
+today = dt.date.today()
+print(f"Today: {today}")
+
+# Common convention for popular modules
+import numpy as np  # If you have numpy
+# import pandas as pd
+# import matplotlib.pyplot as plt
+```
+
+### Function Aliases
+
+```{python}
+# Rename imported function
+from math import factorial as fact
+
+print(f"5! = {fact(5)}")
+print(f"10! = {fact(10)}")
+
+# Avoid name conflicts
+from statistics import mean as avg_value
+
+numbers = [1, 2, 3, 4, 5]
+print(f"Average: {avg_value(numbers)}")
+```
+
+### When to Use Aliases
+
+```{python}
+# Long names
+from collections import defaultdict as dd
+
+# Avoid conflicts
+from statistics import mean as stats_mean
+from numpy import mean as np_mean  # If you have numpy
+
+# Common conventions
+import datetime as dt
+import random as rnd
+```
+
+::: {.callout-note}
+## Common Alias Conventions
+Some modules have standard aliases in the Python community:
+- `import numpy as np`
+- `import pandas as pd`
+- `import matplotlib.pyplot as plt`
+- `import seaborn as sns`
+- `import tensorflow as tf`
+
+Following conventions makes your code more readable to others!
+:::
+
+## Creating Your Own Modules
+
+Any Python file is a module! Let's create some.
+
+### Simple Module Example
+
+Let's create a module called `math_utils.py`:
+
+```python
+# math_utils.py
+"""Utility functions for math operations"""
+
+def add(a, b):
+    """Add two numbers"""
+    return a + b
+
+def multiply(a, b):
+    """Multiply two numbers"""
+    return a * b
+
+def is_even(n):
+    """Check if number is even"""
+    return n % 2 == 0
+
+def is_prime(n):
+    """Check if number is prime"""
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+# Module-level constant
+PI = 3.14159
+```
+
+Now use it in another file:
+
+```python
+# main.py
+import math_utils
+
+print(math_utils.add(5, 3))
+print(math_utils.is_prime(17))
+print(math_utils.PI)
+
+# Or
+from math_utils import add, is_prime, PI
+
+print(add(10, 20))
+print(is_prime(25))
+```
+
+### Module with Classes
+
+```python
+# shapes.py
+"""Geometric shapes module"""
+
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return 3.14159 * self.radius ** 2
+
+    def circumference(self):
+        return 2 * 3.14159 * self.radius
+
+class Rectangle:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+```
+
+Usage:
+
+```python
+# main.py
+from shapes import Circle, Rectangle
+
+circle = Circle(5)
+print(f"Circle area: {circle.area()}")
+
+rect = Rectangle(4, 6)
+print(f"Rectangle area: {rect.area()}")
+```
+
+### Module Documentation
+
+```python
+# calculator.py
+"""
+Calculator Module
+=================
+
+This module provides basic calculator operations.
+
+Example:
+    >>> from calculator import add, multiply
+    >>> add(2, 3)
+    5
+    >>> multiply(4, 5)
+    20
+"""
+
+def add(x, y):
+    """
+    Add two numbers.
+
+    Args:
+        x: First number
+        y: Second number
+
+    Returns:
+        Sum of x and y
+    """
+    return x + y
+
+def subtract(x, y):
+    """Subtract y from x"""
+    return x - y
+
+def multiply(x, y):
+    """Multiply two numbers"""
+    return x * y
+
+def divide(x, y):
+    """Divide x by y"""
+    if y == 0:
+        raise ValueError("Cannot divide by zero")
+    return x / y
+```
+
+::: {.callout-important}
+## Module Best Practices
+1. **One purpose per module**: Keep modules focused
+2. **Clear names**: Use descriptive module names
+3. **Documentation**: Add module and function docstrings
+4. **Constants**: Use UPPER_CASE for module constants
+5. **Imports**: Place all imports at the top
+6. **Private items**: Prefix with `_` for internal use
+:::
+
+## The __name__ == "__main__" Pattern
+
+This special pattern lets you write code that runs only when the file is executed directly.
+
+### Understanding __name__
+
+```{python}
+# Every module has a __name__ attribute
+print(f"Module name: {__name__}")
+
+# When run directly: __name__ == "__main__"
+# When imported: __name__ == module name
+```
+
+### Practical Example
+
+```python
+# math_operations.py
+"""Math operations module"""
+
+def add(a, b):
+    return a + b
+
+def multiply(a, b):
+    return a * b
+
+# This runs only when file is executed directly
+if __name__ == "__main__":
+    # Test code
+    print("Testing math_operations module...")
+    print(f"add(2, 3) = {add(2, 3)}")
+    print(f"multiply(4, 5) = {multiply(4, 5)}")
+    print("All tests passed!")
+```
+
+When you run `python math_operations.py`, the test code runs.
+When you `import math_operations`, only the functions are available.
+
+### More Complex Example
+
+```python
+# temperature.py
+"""Temperature conversion module"""
+
+def celsius_to_fahrenheit(c):
+    """Convert Celsius to Fahrenheit"""
+    return (c * 9/5) + 32
+
+def fahrenheit_to_celsius(f):
+    """Convert Fahrenheit to Celsius"""
+    return (f - 32) * 5/9
+
+def main():
+    """Main function for testing"""
+    print("Temperature Converter")
+    print("=" * 40)
+
+    # Test conversions
+    temps_c = [0, 20, 37, 100]
+    for temp in temps_c:
+        f = celsius_to_fahrenheit(temp)
+        print(f"{temp}°C = {f}°F")
+
+    print()
+
+    temps_f = [32, 68, 98.6, 212]
+    for temp in temps_f:
+        c = fahrenheit_to_celsius(temp)
+        print(f"{temp}°F = {c:.1f}°C")
+
+if __name__ == "__main__":
+    main()
+```
+
+::: {.callout-note}
+## Why Use __name__ == "__main__"?
+- **Testing**: Test your module functions
+- **Examples**: Show usage examples
+- **Dual purpose**: Module can be imported OR run standalone
+- **Command-line tools**: Create runnable scripts
+- **Development**: Quick testing during development
+:::
+
+## Module Search Path
+
+Python looks for modules in specific locations.
+
+### Where Python Searches
+
+```{python}
+import sys
+
+print("Python searches for modules in:")
+for path in sys.path[:5]:  # Show first 5
+    print(f"  {path}")
+```
+
+### Search Order
+
+1. Current directory
+2. PYTHONPATH environment variable directories
+3. Standard library directories
+4. Site-packages (third-party packages)
+
+### Adding to Path
+
+```python
+import sys
+
+# Add custom directory
+sys.path.append('/path/to/my/modules')
+
+# Now can import from that directory
+import my_custom_module
+```
+
+::: {.callout-tip}
+## Module Organization
+For larger projects:
+```
+my_project/
+    main.py
+    utils/
+        math_utils.py
+        string_utils.py
+    models/
+        user.py
+        product.py
+```
+
+Import with: `from utils import math_utils`
+:::
+
+## Popular Built-in Modules
+
+### math Module
+
+```{python}
+import math
+
+# Constants
+print(f"π = {math.pi}")
+print(f"e = {math.e}")
+
+# Functions
+print(f"√16 = {math.sqrt(16)}")
+print(f"sin(π/2) = {math.sin(math.pi/2)}")
+print(f"log(10) = {math.log10(10)}")
+print(f"5! = {math.factorial(5)}")
+```
+
+### random Module
+
+```{python}
+import random
+
+# Random integers
+print(f"Random int 1-10: {random.randint(1, 10)}")
+
+# Random float
+print(f"Random float 0-1: {random.random()}")
+
+# Random choice
+colors = ["red", "green", "blue"]
+print(f"Random color: {random.choice(colors)}")
+
+# Shuffle
+numbers = [1, 2, 3, 4, 5]
+random.shuffle(numbers)
+print(f"Shuffled: {numbers}")
+
+# Random sample
+print(f"Sample of 3: {random.sample(range(1, 11), 3)}")
+```
+
+### datetime Module
+
+```{python}
+from datetime import datetime, date, time, timedelta
+
+# Current date/time
+now = datetime.now()
+print(f"Now: {now}")
+print(f"Today: {date.today()}")
+
+# Create specific date
+birthday = date(2000, 1, 15)
+print(f"Birthday: {birthday}")
+
+# Time delta
+tomorrow = date.today() + timedelta(days=1)
+print(f"Tomorrow: {tomorrow}")
+
+# Formatting
+formatted = now.strftime("%Y-%m-%d %H:%M:%S")
+print(f"Formatted: {formatted}")
+```
+
+### collections Module
+
+```{python}
+from collections import Counter, defaultdict, namedtuple
+
+# Counter
+words = ["apple", "banana", "apple", "cherry", "banana", "apple"]
+counts = Counter(words)
+print(f"Counts: {counts}")
+print(f"Most common: {counts.most_common(2)}")
+
+# defaultdict
+scores = defaultdict(list)
+scores["math"].append(95)
+scores["math"].append(87)
+scores["science"].append(92)
+print(f"Scores: {dict(scores)}")
+
+# namedtuple
+Point = namedtuple("Point", ["x", "y"])
+p = Point(10, 20)
+print(f"Point: {p.x}, {p.y}")
+```
+
+### os Module
+
+```{python}
+import os
+
+# Current directory
+print(f"Current dir: {os.getcwd()}")
+
+# Environment variables
+print(f"Home: {os.environ.get('HOME', 'Not set')}")
+
+# Path operations
+path = os.path.join("folder", "subfolder", "file.txt")
+print(f"Path: {path}")
+
+# Check existence
+exists = os.path.exists(".")
+print(f"Current dir exists: {exists}")
+```
+
+### sys Module
+
+```{python}
+import sys
+
+# Python version
+print(f"Python version: {sys.version}")
+
+# Platform
+print(f"Platform: {sys.platform}")
+
+# Command line arguments (when run as script)
+print(f"Script name: {sys.argv[0] if sys.argv else 'N/A'}")
+```
+
+::: {.callout-note}
+## Essential Built-in Modules
+- **math**: Mathematical functions
+- **random**: Random number generation
+- **datetime**: Date and time handling
+- **collections**: Specialized container types
+- **os**: Operating system interface
+- **sys**: System-specific parameters
+- **json**: JSON encoding/decoding
+- **re**: Regular expressions
+- **pathlib**: Object-oriented filesystem paths
+:::
+
+## Real-World Module Examples
+
+### String Utilities Module
+
+```python
+# string_utils.py
+"""String manipulation utilities"""
+
+def reverse_words(text):
+    """Reverse the order of words"""
+    return " ".join(text.split()[::-1])
+
+def capitalize_words(text):
+    """Capitalize first letter of each word"""
+    return " ".join(word.capitalize() for word in text.split())
+
+def remove_punctuation(text):
+    """Remove punctuation from text"""
+    import string
+    return text.translate(str.maketrans("", "", string.punctuation))
+
+def word_count(text):
+    """Count words in text"""
+    return len(text.split())
+
+if __name__ == "__main__":
+    sample = "hello world, this is python!"
+    print(f"Original: {sample}")
+    print(f"Reversed: {reverse_words(sample)}")
+    print(f"Capitalized: {capitalize_words(sample)}")
+    print(f"No punctuation: {remove_punctuation(sample)}")
+    print(f"Word count: {word_count(sample)}")
+```
+
+### Validation Module
+
+```python
+# validators.py
+"""Input validation utilities"""
+
+import re
+
+def is_valid_email(email):
+    """Check if email format is valid"""
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return bool(re.match(pattern, email))
+
+def is_valid_phone(phone):
+    """Check if phone number is valid (US format)"""
+    pattern = r'^\+?1?\d{10}$'
+    clean = re.sub(r'[\s\-\(\)]', '', phone)
+    return bool(re.match(pattern, clean))
+
+def is_valid_password(password):
+    """Check if password meets requirements"""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters"
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain uppercase letter"
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain lowercase letter"
+    if not re.search(r'\d', password):
+        return False, "Password must contain digit"
+    return True, "Valid"
+
+if __name__ == "__main__":
+    # Test validations
+    print(is_valid_email("test@example.com"))
+    print(is_valid_phone("123-456-7890"))
+    print(is_valid_password("Weak"))
+    print(is_valid_password("Strong123"))
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Module basics**:
+  - What modules are
+  - Why to use them
+  - Organizing code
+
+- **Importing modules**:
+  - `import module`
+  - `from module import item`
+  - `import module as alias`
+  - Module search path
+
+- **Creating modules**:
+  - Any `.py` file is a module
+  - Documenting modules
+  - Module-level constants
+
+- **Special patterns**:
+  - `__name__ == "__main__"`
+  - Testing modules
+  - Dual-purpose modules
+
+- **Built-in modules**:
+  - math, random, datetime
+  - collections, os, sys
+  - And many more!
+
+::: {.callout-important}
+## Key Takeaways
+1. **Modules organize** code into separate files
+2. **Import syntax**: `import`, `from...import`, `as`
+3. **Create modules** by writing `.py` files
+4. **__name__ == "__main__"** for test code
+5. **Document modules** with docstrings
+6. **Python's standard library** has many useful modules
+7. **One responsibility** per module
+8. **Avoid import*** - be explicit
+:::
+
+## Practice Exercises
+
+### Exercise 1: Create a Calculator Module
+
+Create a complete calculator module with tests.
+
+```python
+# calculator.py
+"""
+Solution: Calculator module with basic operations
+"""
+
+def add(x, y):
+    """Add two numbers"""
+    return x + y
+
+def subtract(x, y):
+    """Subtract y from x"""
+    return x - y
+
+def multiply(x, y):
+    """Multiply two numbers"""
+    return x * y
+
+def divide(x, y):
+    """Divide x by y"""
+    if y == 0:
+        raise ValueError("Cannot divide by zero")
+    return x / y
+
+def power(x, y):
+    """Raise x to power y"""
+    return x ** y
+
+def modulo(x, y):
+    """Return remainder of x / y"""
+    return x % y
+
+def calculate(expression):
+    """
+    Evaluate simple expressions.
+    Example: "5 + 3" returns 8
+    """
+    # Simple implementation
+    parts = expression.split()
+    if len(parts) != 3:
+        raise ValueError("Invalid expression")
+
+    x, op, y = float(parts[0]), parts[1], float(parts[2])
+
+    operations = {
+        '+': add, '-': subtract, '*': multiply,
+        '/': divide, '**': power, '%': modulo
+    }
+
+    if op not in operations:
+        raise ValueError(f"Unknown operator: {op}")
+
+    return operations[op](x, y)
+
+if __name__ == "__main__":
+    print("Calculator Module Tests")
+    print("=" * 40)
+
+    tests = [
+        ("5 + 3", 8),
+        ("10 - 4", 6),
+        ("6 * 7", 42),
+        ("20 / 4", 5),
+        ("2 ** 8", 256),
+        ("17 % 5", 2)
+    ]
+
+    for expr, expected in tests:
+        result = calculate(expr)
+        status = "✓" if result == expected else "✗"
+        print(f"{status} {expr} = {result} (expected {expected})")
+```
+
+### Exercise 2: Text Processing Module
+
+Create utilities for text processing.
+
+```python
+# text_utils.py
+"""Solution: Text processing utilities"""
+
+def clean_text(text):
+    """Remove extra whitespace"""
+    return " ".join(text.split())
+
+def count_words(text):
+    """Count words in text"""
+    return len(text.split())
+
+def count_characters(text, include_spaces=False):
+    """Count characters"""
+    if include_spaces:
+        return len(text)
+    return len(text.replace(" ", ""))
+
+def longest_word(text):
+    """Find longest word"""
+    words = text.split()
+    return max(words, key=len) if words else ""
+
+def word_frequency(text):
+    """Count frequency of each word"""
+    words = text.lower().split()
+    freq = {}
+    for word in words:
+        freq[word] = freq.get(word, 0) + 1
+    return freq
+
+def truncate(text, length, suffix="..."):
+    """Truncate text to length"""
+    if len(text) <= length:
+        return text
+    return text[:length - len(suffix)] + suffix
+
+if __name__ == "__main__":
+    sample = "Python is amazing. Python is powerful. Python is fun."
+
+    print(f"Original: {sample}")
+    print(f"Words: {count_words(sample)}")
+    print(f"Characters: {count_characters(sample)}")
+    print(f"Longest word: {longest_word(sample)}")
+    print(f"Frequency: {word_frequency(sample)}")
+    print(f"Truncated: {truncate(sample, 30)}")
+```
+
+### Exercise 3: Date Utilities Module
+
+Create useful date manipulation functions.
+
+```python
+# date_utils.py
+"""Solution: Date utility functions"""
+
+from datetime import datetime, timedelta
+
+def days_between(date1, date2):
+    """Calculate days between two dates"""
+    d1 = datetime.strptime(date1, "%Y-%m-%d")
+    d2 = datetime.strptime(date2, "%Y-%m-%d")
+    return abs((d2 - d1).days)
+
+def add_days(date_str, days):
+    """Add days to a date"""
+    date = datetime.strptime(date_str, "%Y-%m-%d")
+    new_date = date + timedelta(days=days)
+    return new_date.strftime("%Y-%m-%d")
+
+def is_weekend(date_str):
+    """Check if date is weekend"""
+    date = datetime.strptime(date_str, "%Y-%m-%d")
+    return date.weekday() >= 5  # 5=Saturday, 6=Sunday
+
+def get_age(birth_date):
+    """Calculate age from birth date"""
+    birth = datetime.strptime(birth_date, "%Y-%m-%d")
+    today = datetime.now()
+    age = today.year - birth.year
+    if (today.month, today.day) < (birth.month, birth.day):
+        age -= 1
+    return age
+
+if __name__ == "__main__":
+    print(f"Days between 2024-01-01 and 2024-12-31: {days_between('2024-01-01', '2024-12-31')}")
+    print(f"30 days after 2024-01-01: {add_days('2024-01-01', 30)}")
+    print(f"Is 2024-11-02 weekend? {is_weekend('2024-11-02')}")
+    print(f"Age from 2000-01-01: {get_age('2000-01-01')}")
+```
+
+::: {.callout-tip}
+## Keep Organizing!
+Modules are fundamental to well-structured Python projects. Practice creating modules for different purposes:
+- Utilities (string, math, date)
+- Models (data structures)
+- Views (display logic)
+- Controllers (business logic)
+
+Good organization makes development faster and more enjoyable!
+:::
+
+---
+
+Congratulations! You've mastered Python modules. You can now organize code into reusable components, import built-in modules, and create your own modules. This is a crucial skill for building larger applications!

@@ -1,0 +1,595 @@
+# Strings: The Art of Text Manipulation {#sec-strings}
+
+Welcome to the wonderful world of strings! In Python, strings are one of the most commonly used data types. Whether you're building a chatbot, processing user input, or analyzing text data, mastering strings is essential for any Python programmer.
+
+## What Are Strings?
+
+A **string** is a sequence of characters enclosed in quotes. In Python, you can use single quotes (`'`), double quotes (`"`), or even triple quotes (`'''` or `"""`) for multi-line strings.
+
+```{python}
+# Different ways to create strings
+single_quote = 'Hello, Python!'
+double_quote = "Hello, World!"
+multi_line = """This is a
+multi-line
+string"""
+
+print(single_quote)
+print(double_quote)
+print(multi_line)
+```
+
+::: {.callout-tip}
+## Pro Tip: When to Use Which Quotes?
+- Use single quotes for simple strings
+- Use double quotes when your string contains single quotes
+- Use triple quotes for multi-line strings or docstrings
+:::
+
+## String Basics
+
+### String Length
+
+The `len()` function returns the number of characters in a string:
+
+```{python}
+message = "Python is awesome!"
+print(f"Length of message: {len(message)}")
+```
+
+### String Concatenation
+
+You can join strings using the `+` operator:
+
+```{python}
+first_name = "Ada"
+last_name = "Lovelace"
+full_name = first_name + " " + last_name
+print(full_name)
+
+# Using f-strings (modern and recommended)
+full_name = f"{first_name} {last_name}"
+print(full_name)
+```
+
+### String Repetition
+
+Multiply a string by a number to repeat it:
+
+```{python}
+laugh = "ha" * 5
+print(laugh)
+
+separator = "=" * 40
+print(separator)
+print("IMPORTANT MESSAGE")
+print(separator)
+```
+
+## String Indexing and Slicing
+
+Strings are sequences, which means you can access individual characters using indices.
+
+### Indexing
+
+```{python}
+text = "Python"
+print(f"First character: {text[0]}")
+print(f"Second character: {text[1]}")
+print(f"Last character: {text[-1]}")
+print(f"Second to last: {text[-2]}")
+```
+
+::: {.callout-note}
+## Remember!
+- Python uses **0-based indexing** (first character is at index 0)
+- Negative indices count from the end (-1 is the last character)
+:::
+
+### Slicing
+
+Slicing lets you extract a substring using the syntax `string[start:end:step]`:
+
+```{python}
+text = "Python Programming"
+
+# Basic slicing
+print(f"First 6 characters: {text[0:6]}")
+print(f"Same as above: {text[:6]}")
+print(f"From index 7 onwards: {text[7:]}")
+print(f"Last 11 characters: {text[-11:]}")
+
+# Slicing with step
+print(f"Every other character: {text[::2]}")
+print(f"Reverse string: {text[::-1]}")
+```
+
+::: {.callout-important}
+## Slicing Rules
+- `start` is inclusive, `end` is exclusive
+- Omitting `start` defaults to 0
+- Omitting `end` defaults to the length of the string
+- Negative step reverses the string
+:::
+
+## Escape Characters
+
+Escape characters let you include special characters in strings:
+
+```{python}
+# Common escape characters
+print("Line 1\nLine 2")  # \n for newline
+print("Column1\tColumn2\tColumn3")  # \t for tab
+print("She said, \"Hello!\"")  # \" for quotes
+print("Path: C:\\Users\\Python")  # \\ for backslash
+```
+
+### Raw Strings
+
+Use raw strings (prefix with `r`) to treat backslashes literally:
+
+```{python}
+# Regular string
+regular = "C:\new\folder"
+print(f"Regular: {regular}")
+
+# Raw string
+raw = r"C:\new\folder"
+print(f"Raw: {raw}")
+```
+
+::: {.callout-tip}
+## When to Use Raw Strings?
+Raw strings are perfect for:
+- File paths on Windows
+- Regular expressions
+- Any string with many backslashes
+:::
+
+## String Formatting
+
+Python offers several ways to format strings. Let's explore the modern and best approaches!
+
+### F-Strings (Modern Python 3.6+)
+
+F-strings are the most readable and efficient way to format strings:
+
+```{python}
+name = "Alice"
+age = 30
+height = 5.6
+
+# Basic f-string
+print(f"My name is {name} and I'm {age} years old.")
+
+# Expressions inside f-strings
+print(f"Next year, I'll be {age + 1} years old.")
+
+# Formatting numbers
+pi = 3.14159265359
+print(f"Pi to 2 decimals: {pi:.2f}")
+print(f"Height: {height:.1f} feet")
+```
+
+### Advanced F-String Formatting
+
+```{python}
+# Alignment and padding
+name = "Python"
+print(f"|{name:<10}|")  # Left align
+print(f"|{name:>10}|")  # Right align
+print(f"|{name:^10}|")  # Center align
+
+# Numbers with thousands separator
+big_number = 1234567890
+print(f"Formatted: {big_number:,}")
+
+# Percentages
+score = 0.856
+print(f"Score: {score:.1%}")
+
+# Hexadecimal, binary, octal
+number = 42
+print(f"Decimal: {number}, Hex: {number:x}, Binary: {number:b}, Octal: {number:o}")
+```
+
+### Format Method (Still Useful)
+
+```{python}
+# Using format() method
+template = "Hello, {}! You are {} years old."
+print(template.format("Bob", 25))
+
+# With named placeholders
+template = "Hello, {name}! You are {age} years old."
+print(template.format(name="Carol", age=28))
+```
+
+## Essential String Methods
+
+Python strings come with many built-in methods. Let's explore the most useful ones!
+
+### Case Conversion
+
+```{python}
+text = "Python Programming"
+
+print(text.upper())      # PYTHON PROGRAMMING
+print(text.lower())      # python programming
+print(text.title())      # Python Programming
+print(text.swapcase())   # pYTHON pROGRAMMING
+print(text.capitalize()) # Python programming
+```
+
+### Finding and Checking
+
+```{python}
+sentence = "Python is fun and Python is powerful"
+
+# Find substring
+print(f"First 'Python': {sentence.find('Python')}")
+print(f"Last 'Python': {sentence.rfind('Python')}")
+print(f"Count 'Python': {sentence.count('Python')}")
+
+# Check if substring exists
+print(f"Contains 'fun': {'fun' in sentence}")
+print(f"Starts with 'Python': {sentence.startswith('Python')}")
+print(f"Ends with 'powerful': {sentence.endswith('powerful')}")
+```
+
+::: {.callout-note}
+## find() vs index()
+- `find()` returns -1 if substring not found
+- `index()` raises an exception if substring not found
+- Use `find()` when you want to check if substring exists
+:::
+
+### Replacing Text
+
+```{python}
+text = "I love Java. Java is great!"
+
+# Replace all occurrences
+new_text = text.replace("Java", "Python")
+print(new_text)
+
+# Replace only first occurrence
+new_text = text.replace("Java", "Python", 1)
+print(new_text)
+```
+
+### Stripping Whitespace
+
+```{python}
+messy = "   Hello, World!   \n"
+
+print(f"Original: '{messy}'")
+print(f"strip(): '{messy.strip()}'")      # Remove both ends
+print(f"lstrip(): '{messy.lstrip()}'")    # Remove left side
+print(f"rstrip(): '{messy.rstrip()}'")    # Remove right side
+
+# Strip specific characters
+url = "https://example.com/"
+print(url.rstrip('/'))
+```
+
+### Splitting and Joining
+
+```{python}
+# Splitting strings
+sentence = "Python is awesome and powerful"
+words = sentence.split()  # Split by whitespace
+print(words)
+
+csv_data = "apple,banana,orange,grape"
+fruits = csv_data.split(',')
+print(fruits)
+
+# Joining strings
+words = ["Python", "is", "awesome"]
+sentence = " ".join(words)
+print(sentence)
+
+path = "/".join(["home", "user", "documents"])
+print(path)
+```
+
+::: {.callout-tip}
+## Power Combo: Split and Join
+Splitting and joining are incredibly useful for text processing:
+- Parse CSV data
+- Clean up spacing
+- Manipulate paths
+- Process log files
+:::
+
+### Checking String Content
+
+```{python}
+# Check string characteristics
+print("abc123".isalnum())      # True (alphanumeric)
+print("abc".isalpha())         # True (only letters)
+print("123".isdigit())         # True (only digits)
+print("   ".isspace())         # True (only whitespace)
+print("Hello World".istitle()) # True (title case)
+print("HELLO".isupper())       # True (all uppercase)
+print("hello".islower())       # True (all lowercase)
+```
+
+### Justification and Alignment
+
+```{python}
+text = "Python"
+
+print(text.ljust(20, '-'))   # Left justify
+print(text.rjust(20, '-'))   # Right justify
+print(text.center(20, '-'))  # Center
+print(text.zfill(10))        # Pad with zeros (for numbers)
+```
+
+### Advanced String Methods
+
+```{python}
+# Partition - split into 3 parts
+email = "user@example.com"
+username, at, domain = email.partition('@')
+print(f"Username: {username}, Domain: {domain}")
+
+# splitlines - split by line breaks
+multi_line = "Line 1\nLine 2\nLine 3"
+lines = multi_line.splitlines()
+print(lines)
+
+# translate - character mapping
+text = "hello world"
+translation = str.maketrans("helo", "HELO")
+print(text.translate(translation))
+```
+
+## String Immutability
+
+An important concept: strings in Python are **immutable** (cannot be changed after creation).
+
+```{python}
+text = "Hello"
+
+# This doesn't modify the original string
+text.upper()
+print(text)  # Still "Hello"
+
+# You must assign the result to use it
+text = text.upper()
+print(text)  # Now "HELLO"
+```
+
+::: {.callout-warning}
+## Strings Are Immutable!
+You cannot change a character in a string directly:
+```python
+text = "Hello"
+text[0] = "h"  # This will raise an error!
+```
+Instead, create a new string:
+```python
+text = "h" + text[1:]  # This works!
+```
+:::
+
+## Practical Examples
+
+Let's put it all together with some real-world examples:
+
+### Email Validator
+
+```{python}
+def is_valid_email(email):
+    """Simple email validation"""
+    email = email.strip().lower()
+    return (
+        '@' in email and
+        email.count('@') == 1 and
+        '.' in email.split('@')[1] and
+        not email.startswith('@') and
+        not email.endswith('@')
+    )
+
+# Test the validator
+emails = ["user@example.com", "invalid.email", "@example.com", "test@domain"]
+for email in emails:
+    print(f"{email}: {is_valid_email(email)}")
+```
+
+### Password Strength Checker
+
+```{python}
+def check_password_strength(password):
+    """Check password strength"""
+    strength = 0
+    feedback = []
+
+    if len(password) >= 8:
+        strength += 1
+    else:
+        feedback.append("Password should be at least 8 characters")
+
+    if any(char.isdigit() for char in password):
+        strength += 1
+    else:
+        feedback.append("Add numbers to your password")
+
+    if any(char.isupper() for char in password):
+        strength += 1
+    else:
+        feedback.append("Add uppercase letters")
+
+    if any(char.islower() for char in password):
+        strength += 1
+    else:
+        feedback.append("Add lowercase letters")
+
+    levels = ["Weak", "Fair", "Good", "Strong", "Very Strong"]
+    return levels[strength], feedback
+
+# Test passwords
+passwords = ["pass", "Password1", "MyP@ssw0rd!", "12345678"]
+for pwd in passwords:
+    level, tips = check_password_strength(pwd)
+    print(f"\nPassword: {pwd}")
+    print(f"Strength: {level}")
+    if tips:
+        print("Tips:", ", ".join(tips))
+```
+
+### Text Formatter
+
+```{python}
+def format_title(text, width=50):
+    """Format text as a centered title with decorations"""
+    text = text.strip().title()
+    decoration = "=" * width
+    return f"{decoration}\n{text.center(width)}\n{decoration}"
+
+print(format_title("python string methods"))
+print(format_title("welcome to programming", 40))
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **String basics**: Creating strings with quotes, concatenation, and repetition
+- **Indexing and slicing**: Accessing characters and substrings
+- **Escape characters and raw strings**: Handling special characters
+- **String formatting**: F-strings, format method, and alignment
+- **Essential methods**:
+  - Case conversion: `upper()`, `lower()`, `title()`, `capitalize()`
+  - Searching: `find()`, `rfind()`, `count()`, `in`, `startswith()`, `endswith()`
+  - Modification: `replace()`, `strip()`, `lstrip()`, `rstrip()`
+  - Splitting and joining: `split()`, `join()`, `splitlines()`
+  - Content checking: `isalpha()`, `isdigit()`, `isalnum()`, `isspace()`
+- **String immutability**: Strings cannot be changed in place
+- **Practical applications**: Email validation, password checking, text formatting
+
+::: {.callout-important}
+## Key Takeaways
+1. Always use f-strings for string formatting (modern and readable)
+2. Remember that strings are immutable
+3. Use raw strings for paths and regex patterns
+4. Master `split()` and `join()` for text processing
+5. String methods return new strings; they don't modify the original
+:::
+
+## Practice Exercises
+
+### Exercise 1: String Reverser
+Write a function that reverses each word in a sentence while keeping the word order.
+
+```{python}
+# Example: "Hello World" -> "olleH dlroW"
+
+def reverse_words(sentence):
+    """Your code here"""
+    words = sentence.split()
+    reversed_words = [word[::-1] for word in words]
+    return " ".join(reversed_words)
+
+# Test
+print(reverse_words("Hello World"))
+print(reverse_words("Python is awesome"))
+```
+
+### Exercise 2: Count Vowels and Consonants
+Write a function that counts vowels and consonants in a string.
+
+```{python}
+def count_vowels_consonants(text):
+    """Your code here"""
+    text = text.lower()
+    vowels = "aeiou"
+    vowel_count = sum(1 for char in text if char in vowels)
+    consonant_count = sum(1 for char in text if char.isalpha() and char not in vowels)
+    return vowel_count, consonant_count
+
+# Test
+text = "Hello World"
+v, c = count_vowels_consonants(text)
+print(f"Vowels: {v}, Consonants: {c}")
+```
+
+### Exercise 3: Title Case Converter
+Write a function that converts a string to title case, but keeps certain words lowercase (like "and", "or", "the").
+
+```{python}
+def smart_title_case(text):
+    """Your code here"""
+    lowercase_words = {"and", "or", "the", "a", "an", "in", "on", "at", "to", "for"}
+    words = text.lower().split()
+
+    result = []
+    for i, word in enumerate(words):
+        if i == 0 or word not in lowercase_words:
+            result.append(word.capitalize())
+        else:
+            result.append(word)
+
+    return " ".join(result)
+
+# Test
+print(smart_title_case("the lord of the rings"))
+print(smart_title_case("python and the art of programming"))
+```
+
+### Exercise 4: Username Generator
+Write a function that generates a username from a full name by taking the first letter of the first name and the complete last name, all lowercase.
+
+```{python}
+def generate_username(full_name):
+    """Your code here"""
+    parts = full_name.strip().split()
+    if len(parts) < 2:
+        return full_name.lower()
+    first_initial = parts[0][0].lower()
+    last_name = parts[-1].lower()
+    return first_initial + last_name
+
+# Test
+print(generate_username("John Doe"))
+print(generate_username("Ada Lovelace"))
+print(generate_username("Grace Murray Hopper"))
+```
+
+### Exercise 5: Pig Latin Converter
+Write a function that converts a word to Pig Latin. Rules:
+- If word starts with vowel, add "way" to the end
+- If word starts with consonant, move consonants before first vowel to end and add "ay"
+
+```{python}
+def pig_latin(word):
+    """Your code here"""
+    word = word.lower()
+    vowels = "aeiou"
+
+    if word[0] in vowels:
+        return word + "way"
+
+    for i, char in enumerate(word):
+        if char in vowels:
+            return word[i:] + word[:i] + "ay"
+
+    return word + "ay"
+
+# Test
+print(pig_latin("apple"))    # appleway
+print(pig_latin("banana"))   # ananabay
+print(pig_latin("cherry"))   # errychay
+print(pig_latin("string"))   #ingstray
+```
+
+::: {.callout-tip}
+## Challenge Yourself!
+Try combining multiple string methods to solve problems. The more you practice, the more natural string manipulation will become!
+:::
+
+---
+
+Congratulations! You've mastered Python strings. In the next chapter, we'll learn about input and output operations.
