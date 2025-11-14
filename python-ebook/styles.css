@@ -1,0 +1,330 @@
+/* Custom styles for Python Programming Ebook */
+
+/* Color scheme */
+:root {
+  --primary-color: #3776ab;  /* Python blue */
+  --secondary-color: #ffd43b; /* Python yellow */
+  --accent-color: #646464;
+  --bg-light: #f8f9fa;
+  --code-bg: #f5f5f5;
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --info: #17a2b8;
+}
+
+/* Body and typography */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.7;
+  color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  border-bottom: 3px solid var(--secondary-color);
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  border-bottom: 2px solid var(--bg-light);
+  padding-bottom: 0.3rem;
+}
+
+/* Links */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom 0.2s;
+}
+
+a:hover {
+  border-bottom: 1px solid var(--primary-color);
+}
+
+/* Code blocks */
+pre {
+  background-color: var(--code-bg);
+  border-left: 4px solid var(--primary-color);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+code {
+  background-color: var(--code-bg);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.9em;
+  color: #d63384;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+
+.callout-note {
+  background-color: #e7f3ff;
+  border-left-color: var(--info);
+}
+
+.callout-tip {
+  background-color: #d4edda;
+  border-left-color: var(--success);
+}
+
+.callout-warning {
+  background-color: #fff3cd;
+  border-left-color: var(--warning);
+}
+
+.callout-important {
+  background-color: #f8d7da;
+  border-left-color: var(--danger);
+}
+
+.callout-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+tr:hover {
+  background-color: var(--bg-light);
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid var(--secondary-color);
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-light);
+  font-style: italic;
+}
+
+/* Lists */
+ul, ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+li {
+  margin: 0.5rem 0;
+}
+
+/* Sidebar (TOC) */
+#TOC {
+  background-color: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+}
+
+#TOC ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+#TOC li {
+  margin: 0.3rem 0;
+}
+
+#TOC a {
+  color: var(--accent-color);
+  border-bottom: none;
+}
+
+#TOC a:hover {
+  color: var(--primary-color);
+}
+
+/* Navigation buttons */
+.nav-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--bg-light);
+}
+
+/* Figures */
+figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+figcaption {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: var(--accent-color);
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Exercise sections */
+.exercise {
+  background-color: #f0f8ff;
+  border: 2px solid var(--info);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.exercise-title {
+  color: var(--info);
+  font-weight: 600;
+  font-size: 1.2em;
+  margin-bottom: 1rem;
+}
+
+/* Summary boxes */
+.summary {
+  background-color: #fff9e6;
+  border: 2px solid var(--secondary-color);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+/* Print styles */
+@media print {
+  .nav-footer,
+  #TOC {
+    display: none;
+  }
+
+  pre {
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-light: #2d2d2d;
+    --code-bg: #1e1e1e;
+  }
+
+  body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #6ab0de;
+  }
+
+  code {
+    background-color: var(--code-bg);
+    color: #f92672;
+  }
+
+  a {
+    color: #6ab0de;
+  }
+
+  table th {
+    background-color: #2d5a7b;
+  }
+
+  table td {
+    border-bottom-color: #444;
+  }
+
+  tr:hover {
+    background-color: #2a2a2a;
+  }
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* Success/Error indicators */
+.success {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* Inline code highlighting */
+.python {
+  color: var(--primary-color);
+}
+
+/* Footer */
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--bg-light);
+  text-align: center;
+  color: var(--accent-color);
+  font-size: 0.9em;
+}

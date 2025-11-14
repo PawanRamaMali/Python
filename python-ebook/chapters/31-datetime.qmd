@@ -1,0 +1,726 @@
+# Working with Dates and Times {#sec-datetime}
+
+## Introduction
+
+Time waits for no one, but Python can help you manage it! Whether you're calculating how many days until your birthday, recording timestamps, or dealing with time zones, Python's `datetime` module has you covered.
+
+In this chapter, we'll explore everything about working with dates and times in Python, from simple date arithmetic to complex timezone handling.
+
+::: {.callout-note}
+## What You'll Learn
+
+- The `datetime` module components
+- Creating and manipulating dates and times
+- Time arithmetic with `timedelta`
+- Formatting and parsing dates
+- Working with timezones
+- Practical datetime applications
+:::
+
+## The `datetime` Module
+
+The `datetime` module provides classes for working with dates and times:
+
+```python
+import datetime
+
+# Main classes
+# - date: Date (year, month, day)
+# - time: Time (hour, minute, second, microsecond)
+# - datetime: Date and time combined
+# - timedelta: Duration between two dates/times
+# - timezone: Time zone information
+```
+
+## Working with `date` Objects
+
+### Creating Dates
+
+```python
+from datetime import date
+
+# Today's date
+today = date.today()
+print(today)  # 2025-11-04
+
+# Specific date
+birthday = date(2000, 5, 15)
+print(birthday)  # 2000-05-15
+
+# From timestamp
+timestamp_date = date.fromtimestamp(1609459200)
+print(timestamp_date)  # 2021-01-01
+```
+
+### Date Attributes
+
+```python
+d = date(2025, 11, 4)
+
+print(d.year)   # 2025
+print(d.month)  # 11
+print(d.day)    # 4
+
+# Day of week (0=Monday, 6=Sunday)
+print(d.weekday())    # 1 (Tuesday)
+print(d.isoweekday()) # 2 (Tuesday, 1=Monday, 7=Sunday)
+
+# Day name
+print(d.strftime('%A'))  # Tuesday
+```
+
+### Date Arithmetic
+
+```python
+from datetime import date, timedelta
+
+today = date.today()
+
+# Add days
+tomorrow = today + timedelta(days=1)
+print(tomorrow)
+
+# Subtract days
+yesterday = today - timedelta(days=1)
+print(yesterday)
+
+# Days until event
+christmas = date(2025, 12, 25)
+days_until = christmas - today
+print(f"Days until Christmas: {days_until.days}")
+
+# Weeks and years
+next_week = today + timedelta(weeks=1)
+next_year = date(today.year + 1, today.month, today.day)
+```
+
+## Working with `time` Objects
+
+### Creating Times
+
+```python
+from datetime import time
+
+# Specific time
+morning = time(9, 30, 0)  # 09:30:00
+print(morning)
+
+# With microseconds
+precise = time(14, 30, 45, 123456)
+print(precise)  # 14:30:45.123456
+
+# Time attributes
+print(morning.hour)        # 9
+print(morning.minute)      # 30
+print(morning.second)      # 0
+print(morning.microsecond) # 0
+```
+
+### Time Comparisons
+
+```python
+time1 = time(9, 30)
+time2 = time(14, 45)
+
+print(time1 < time2)   # True
+print(time1 == time2)  # False
+print(time1 != time2)  # True
+
+# Min and max times
+print(time.min)  # 00:00:00
+print(time.max)  # 23:59:59.999999
+```
+
+## Working with `datetime` Objects
+
+### Creating Datetimes
+
+```python
+from datetime import datetime
+
+# Current datetime
+now = datetime.now()
+print(now)  # 2025-11-04 14:30:45.123456
+
+# UTC datetime
+utc_now = datetime.utcnow()
+print(utc_now)
+
+# Specific datetime
+dt = datetime(2025, 11, 4, 14, 30, 45)
+print(dt)  # 2025-11-04 14:30:45
+
+# From date and time
+from datetime import date, time
+d = date(2025, 11, 4)
+t = time(14, 30)
+dt = datetime.combine(d, t)
+print(dt)  # 2025-11-04 14:30:00
+```
+
+### Datetime Attributes
+
+```python
+dt = datetime(2025, 11, 4, 14, 30, 45, 123456)
+
+# Date components
+print(dt.year)   # 2025
+print(dt.month)  # 11
+print(dt.day)    # 4
+
+# Time components
+print(dt.hour)        # 14
+print(dt.minute)      # 30
+print(dt.second)      # 45
+print(dt.microsecond) # 123456
+
+# Extract date and time
+print(dt.date())  # 2025-11-04
+print(dt.time())  # 14:30:45.123456
+```
+
+### Datetime Arithmetic
+
+```python
+from datetime import datetime, timedelta
+
+now = datetime.now()
+
+# Add time
+future = now + timedelta(days=7, hours=2, minutes=30)
+print(f"In a week: {future}")
+
+# Subtract time
+past = now - timedelta(days=30)
+print(f"30 days ago: {past}")
+
+# Time difference
+dt1 = datetime(2025, 1, 1)
+dt2 = datetime(2025, 12, 31)
+difference = dt2 - dt1
+print(f"Difference: {difference.days} days")
+```
+
+## The `timedelta` Class
+
+`timedelta` represents a duration or difference between dates/times.
+
+### Creating Timedeltas
+
+```python
+from datetime import timedelta
+
+# Different ways to create timedelta
+one_day = timedelta(days=1)
+one_week = timedelta(weeks=1)
+one_hour = timedelta(hours=1)
+mixed = timedelta(days=7, hours=2, minutes=30, seconds=45)
+
+print(one_day)   # 1 day, 0:00:00
+print(one_week)  # 7 days, 0:00:00
+print(mixed)     # 7 days, 2:30:45
+```
+
+### Timedelta Arithmetic
+
+```python
+# Add timedeltas
+td1 = timedelta(days=2, hours=3)
+td2 = timedelta(days=1, hours=1)
+total = td1 + td2
+print(total)  # 3 days, 4:00:00
+
+# Multiply timedelta
+double = td1 * 2
+print(double)  # 4 days, 6:00:00
+
+# Divide timedelta
+half = td1 / 2
+print(half)  # 1 day, 1:30:00
+
+# Absolute value
+negative = timedelta(days=-5)
+print(abs(negative))  # 5 days, 0:00:00
+```
+
+### Timedelta Components
+
+```python
+td = timedelta(days=7, hours=2, minutes=30, seconds=45)
+
+print(td.days)         # 7
+print(td.seconds)      # 9045 (2*3600 + 30*60 + 45)
+print(td.microseconds) # 0
+
+# Total seconds
+print(td.total_seconds())  # 612045.0
+```
+
+## Formatting Dates and Times
+
+### `strftime()` - Format to String
+
+```python
+from datetime import datetime
+
+now = datetime.now()
+
+# Common formats
+print(now.strftime('%Y-%m-%d'))           # 2025-11-04
+print(now.strftime('%H:%M:%S'))           # 14:30:45
+print(now.strftime('%Y-%m-%d %H:%M:%S'))  # 2025-11-04 14:30:45
+
+# Readable formats
+print(now.strftime('%B %d, %Y'))          # November 04, 2025
+print(now.strftime('%A, %B %d, %Y'))      # Tuesday, November 04, 2025
+print(now.strftime('%I:%M %p'))           # 02:30 PM
+
+# Custom formats
+print(now.strftime('%d/%m/%Y'))           # 04/11/2025
+print(now.strftime('%m-%d-%Y'))           # 11-04-2025
+```
+
+### Format Codes Reference
+
+```python
+from datetime import datetime
+
+dt = datetime(2025, 11, 4, 14, 30, 45)
+
+# Date formats
+print(dt.strftime('%Y'))  # 2025 - Year with century
+print(dt.strftime('%y'))  # 25 - Year without century
+print(dt.strftime('%m'))  # 11 - Month as number
+print(dt.strftime('%B'))  # November - Full month name
+print(dt.strftime('%b'))  # Nov - Abbreviated month name
+print(dt.strftime('%d'))  # 04 - Day of month
+print(dt.strftime('%A'))  # Tuesday - Full weekday name
+print(dt.strftime('%a'))  # Tue - Abbreviated weekday name
+
+# Time formats
+print(dt.strftime('%H'))  # 14 - Hour (24-hour)
+print(dt.strftime('%I'))  # 02 - Hour (12-hour)
+print(dt.strftime('%M'))  # 30 - Minute
+print(dt.strftime('%S'))  # 45 - Second
+print(dt.strftime('%p'))  # PM - AM/PM
+```
+
+### `strptime()` - Parse from String
+
+```python
+from datetime import datetime
+
+# Parse date string
+date_string = "2025-11-04"
+dt = datetime.strptime(date_string, '%Y-%m-%d')
+print(dt)  # 2025-11-04 00:00:00
+
+# Parse datetime string
+datetime_string = "2025-11-04 14:30:45"
+dt = datetime.strptime(datetime_string, '%Y-%m-%d %H:%M:%S')
+print(dt)  # 2025-11-04 14:30:45
+
+# Different formats
+us_date = "11/04/2025"
+dt = datetime.strptime(us_date, '%m/%d/%Y')
+print(dt)  # 2025-11-04 00:00:00
+
+readable = "November 04, 2025"
+dt = datetime.strptime(readable, '%B %d, %Y')
+print(dt)  # 2025-11-04 00:00:00
+```
+
+## ISO Format
+
+### ISO 8601 Standard
+
+```python
+from datetime import datetime
+
+dt = datetime(2025, 11, 4, 14, 30, 45)
+
+# ISO format
+print(dt.isoformat())  # 2025-11-04T14:30:45
+
+# ISO format with separator
+print(dt.isoformat(sep=' '))  # 2025-11-04 14:30:45
+
+# Parse ISO format
+iso_string = "2025-11-04T14:30:45"
+dt = datetime.fromisoformat(iso_string)
+print(dt)  # 2025-11-04 14:30:45
+
+# Date only
+from datetime import date
+d = date(2025, 11, 4)
+print(d.isoformat())  # 2025-11-04
+```
+
+## Timestamps
+
+### Unix Timestamps
+
+```python
+from datetime import datetime
+import time
+
+# Current timestamp
+timestamp = time.time()
+print(timestamp)  # 1730730645.123456
+
+# Datetime to timestamp
+dt = datetime(2025, 11, 4, 14, 30, 45)
+timestamp = dt.timestamp()
+print(timestamp)  # 1730730645.0
+
+# Timestamp to datetime
+dt = datetime.fromtimestamp(timestamp)
+print(dt)  # 2025-11-04 14:30:45
+
+# UTC timestamp
+dt_utc = datetime.utcfromtimestamp(timestamp)
+print(dt_utc)
+```
+
+## Working with Timezones
+
+### Timezone-Aware Datetimes
+
+```python
+from datetime import datetime, timezone, timedelta
+
+# UTC timezone
+utc = timezone.utc
+dt_utc = datetime.now(utc)
+print(dt_utc)  # 2025-11-04 14:30:45+00:00
+
+# Custom timezone (UTC+5:30)
+ist = timezone(timedelta(hours=5, minutes=30))
+dt_ist = datetime.now(ist)
+print(dt_ist)  # 2025-11-04 20:00:45+05:30
+
+# Check if timezone-aware
+print(dt_utc.tzinfo)   # UTC
+print(datetime.now().tzinfo)  # None (naive)
+```
+
+### Using `pytz` (Third-party)
+
+```python
+# Install: pip install pytz
+import pytz
+from datetime import datetime
+
+# Create timezone-aware datetime
+eastern = pytz.timezone('America/New_York')
+dt_eastern = eastern.localize(datetime(2025, 11, 4, 14, 30))
+print(dt_eastern)
+
+# Convert between timezones
+pacific = pytz.timezone('America/Los_Angeles')
+dt_pacific = dt_eastern.astimezone(pacific)
+print(dt_pacific)
+
+# All timezones
+print(len(pytz.all_timezones))  # 500+
+print(pytz.all_timezones[:5])   # First 5
+```
+
+### Using `zoneinfo` (Python 3.9+)
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+# Create timezone-aware datetime
+eastern = ZoneInfo('America/New_York')
+dt = datetime(2025, 11, 4, 14, 30, tzinfo=eastern)
+print(dt)
+
+# Convert timezone
+pacific = ZoneInfo('America/Los_Angeles')
+dt_pacific = dt.astimezone(pacific)
+print(dt_pacific)
+
+# Current time in timezone
+tokyo = ZoneInfo('Asia/Tokyo')
+now_tokyo = datetime.now(tokyo)
+print(now_tokyo)
+```
+
+## Practical Examples
+
+### Age Calculator
+
+```python
+from datetime import date
+
+def calculate_age(birth_date):
+    """Calculate age from birth date"""
+    today = date.today()
+    age = today.year - birth_date.year
+
+    # Adjust if birthday hasn't occurred this year
+    if (today.month, today.day) < (birth_date.month, birth_date.day):
+        age -= 1
+
+    return age
+
+# Using it
+birthday = date(2000, 5, 15)
+age = calculate_age(birthday)
+print(f"Age: {age} years old")
+```
+
+### Business Days Calculator
+
+```python
+from datetime import date, timedelta
+
+def add_business_days(start_date, days):
+    """Add business days (excluding weekends)"""
+    current = start_date
+    added = 0
+
+    while added < days:
+        current += timedelta(days=1)
+        # Skip Saturday (5) and Sunday (6)
+        if current.weekday() < 5:
+            added += 1
+
+    return current
+
+# Using it
+today = date.today()
+future = add_business_days(today, 10)
+print(f"10 business days from now: {future}")
+```
+
+### Time Until Event
+
+```python
+from datetime import datetime, timedelta
+
+def time_until_event(event_datetime):
+    """Calculate time remaining until event"""
+    now = datetime.now()
+    remaining = event_datetime - now
+
+    if remaining.total_seconds() < 0:
+        return "Event has passed"
+
+    days = remaining.days
+    hours, remainder = divmod(remaining.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    return f"{days}d {hours}h {minutes}m {seconds}s"
+
+# Using it
+new_year = datetime(2026, 1, 1, 0, 0, 0)
+print(f"Time until New Year: {time_until_event(new_year)}")
+```
+
+### Meeting Scheduler
+
+```python
+from datetime import datetime, timedelta
+
+class Meeting:
+    def __init__(self, title, start_time, duration_minutes):
+        self.title = title
+        self.start_time = start_time
+        self.duration = timedelta(minutes=duration_minutes)
+        self.end_time = start_time + self.duration
+
+    def conflicts_with(self, other):
+        """Check if this meeting conflicts with another"""
+        return (self.start_time < other.end_time and
+                self.end_time > other.start_time)
+
+    def __str__(self):
+        return f"{self.title}: {self.start_time.strftime('%I:%M %p')} - {self.end_time.strftime('%I:%M %p')}"
+
+# Using it
+meeting1 = Meeting("Team Standup", datetime(2025, 11, 4, 9, 0), 30)
+meeting2 = Meeting("Client Call", datetime(2025, 11, 4, 9, 15), 60)
+
+print(meeting1)
+print(meeting2)
+print(f"Conflict: {meeting1.conflicts_with(meeting2)}")
+```
+
+### Log Timestamp Generator
+
+```python
+from datetime import datetime
+
+def log_message(message, level="INFO"):
+    """Add timestamp to log message"""
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return f"[{timestamp}] [{level}] {message}"
+
+# Using it
+print(log_message("Application started"))
+print(log_message("Database connection failed", "ERROR"))
+print(log_message("Request processed successfully"))
+```
+
+### Date Range Generator
+
+```python
+from datetime import date, timedelta
+
+def date_range(start_date, end_date):
+    """Generate all dates in range"""
+    current = start_date
+    while current <= end_date:
+        yield current
+        current += timedelta(days=1)
+
+# Using it
+start = date(2025, 11, 1)
+end = date(2025, 11, 7)
+
+for d in date_range(start, end):
+    print(d.strftime('%A, %B %d'))
+```
+
+### Relative Time Formatter
+
+```python
+from datetime import datetime, timedelta
+
+def relative_time(dt):
+    """Format time relative to now (e.g., '2 hours ago')"""
+    now = datetime.now()
+    diff = now - dt
+
+    seconds = diff.total_seconds()
+
+    if seconds < 60:
+        return "just now"
+    elif seconds < 3600:
+        minutes = int(seconds / 60)
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    elif seconds < 86400:
+        hours = int(seconds / 3600)
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    else:
+        days = diff.days
+        return f"{days} day{'s' if days != 1 else ''} ago"
+
+# Using it
+now = datetime.now()
+print(relative_time(now - timedelta(seconds=30)))   # just now
+print(relative_time(now - timedelta(minutes=15)))   # 15 minutes ago
+print(relative_time(now - timedelta(hours=3)))      # 3 hours ago
+print(relative_time(now - timedelta(days=2)))       # 2 days ago
+```
+
+## Common Pitfalls
+
+### Naive vs Aware Datetimes
+
+```python
+from datetime import datetime, timezone
+
+# Naive datetime (no timezone)
+naive = datetime.now()
+print(naive.tzinfo)  # None
+
+# Aware datetime (has timezone)
+aware = datetime.now(timezone.utc)
+print(aware.tzinfo)  # UTC
+
+# Cannot compare naive and aware!
+# This raises TypeError:
+# print(naive < aware)
+```
+
+### Mutable Date Objects
+
+```python
+from datetime import datetime
+
+# datetime objects are immutable
+dt = datetime(2025, 11, 4)
+# dt.year = 2026  # AttributeError!
+
+# Create new datetime instead
+new_dt = dt.replace(year=2026)
+print(new_dt)  # 2026-11-04
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **`date`, `time`, and `datetime`** classes for temporal data
+- **`timedelta`** for durations and date arithmetic
+- **Formatting** dates with `strftime()` and parsing with `strptime()`
+- **Timezones** and timezone-aware datetimes
+- **Practical applications** like age calculation and scheduling
+
+Working with dates and times is essential for many applications, and Python's `datetime` module provides all the tools you need!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Use `datetime.now()` for current date and time
+- Use `timedelta` for date arithmetic
+- Format dates with `strftime()`, parse with `strptime()`
+- Always use timezone-aware datetimes for production
+- Remember that datetime objects are immutable
+:::
+
+## Practice Exercises
+
+### Exercise 1: Days Until Birthday
+Calculate how many days until your next birthday:
+
+```python
+def days_until_birthday(month, day):
+    # Your code here
+    pass
+```
+
+### Exercise 2: Week Number
+Write a function that returns the week number of the year:
+
+```python
+def get_week_number(date):
+    # Your code here
+    pass
+```
+
+### Exercise 3: Valid Date Checker
+Check if a string represents a valid date:
+
+```python
+def is_valid_date(date_string, format='%Y-%m-%d'):
+    # Your code here
+    pass
+```
+
+### Exercise 4: Month Name
+Get the full month name from a month number:
+
+```python
+def get_month_name(month_number):
+    # Your code here
+    pass
+```
+
+### Exercise 5: Time Formatter
+Format seconds into hours, minutes, seconds:
+
+```python
+def format_seconds(seconds):
+    # Your code here
+    # format_seconds(3665) -> "1h 1m 5s"
+    pass
+```
+
+## Next Steps
+
+In the next chapter, we'll explore the **collections module**, learning about specialized data structures like `namedtuple`, `Counter`, `defaultdict`, and more. Get ready to level up your data structures!

@@ -1,0 +1,512 @@
+# Your First Python Program
+
+## The Classic "Hello, World!"
+
+Every programmer's journey begins with "Hello, World!" - a tradition dating back to 1974. Let's start yours!
+
+```{python}
+print("Hello, World!")
+```
+
+Congratulations! You're now a Python programmer! 🎉
+
+## Understanding Your First Program
+
+Let's break down what just happened:
+
+```python
+print("Hello, World!")
+```
+
+- `print` is a **function** that displays output
+- `()` are **parentheses** that contain the function's arguments
+- `"Hello, World!"` is a **string** (text) we want to display
+- The string is wrapped in **quotes** (can use `"` or `'`)
+
+## Making It More Interesting
+
+Let's expand our program:
+
+```{python}
+print("Hello, World!")
+print("My name is Python")
+print("I was created in 1991")
+print("I'm here to help you learn programming!")
+```
+
+:::{.callout-note}
+## Key Insight
+
+Each `print()` statement outputs on a new line automatically.
+:::
+
+## Working with Different Quotes
+
+Python accepts both single and double quotes for strings:
+
+```{python}
+print("Double quotes work")
+print('Single quotes work too')
+print("It doesn't matter which you choose")
+print('But be consistent!')
+```
+
+When do you need one over the other?
+
+```{python}
+# Use double quotes when your string contains single quotes
+print("It's a beautiful day!")
+
+# Use single quotes when your string contains double quotes
+print('She said, "Hello!"')
+
+# Or use triple quotes for multi-line strings
+print("""This is a
+multi-line
+string!""")
+```
+
+## Comments: Talking to Humans
+
+Comments are notes in your code that Python ignores. They're for humans reading your code (including future you!).
+
+```{python}
+# This is a single-line comment
+print("Hello!")  # You can also comment at the end of a line
+
+# Comments are great for explaining WHY you're doing something
+# Use them liberally!
+
+"""
+This is a multi-line comment
+(technically a multi-line string that's not assigned to anything)
+You can write as much as you want here
+"""
+print("Comments help make code readable")
+```
+
+:::{.callout-tip}
+## Comment Best Practices
+
+- Explain **why**, not **what** (code shows what)
+- Keep comments up-to-date with code changes
+- Don't over-comment obvious things
+- Use comments to mark TODO items or explain complex logic
+:::
+
+## Printing Multiple Items
+
+You can print multiple things at once:
+
+```{python}
+print("Hello", "World", "from", "Python")
+```
+
+Notice the automatic spaces between items.
+
+You can change the separator:
+
+```{python}
+print("Hello", "World", sep="-")
+print("2025", "01", "15", sep="/")
+print("Python", "is", "fun", sep="")
+```
+
+And control the ending:
+
+```{python}
+print("Hello", end=" ")
+print("World")  # Continues on same line
+
+print("Line 1", end="***")
+print("Line 2")
+```
+
+## Doing Math in Python
+
+Python is also a powerful calculator:
+
+```{python}
+# Basic arithmetic
+print(2 + 2)        # Addition
+print(10 - 3)       # Subtraction
+print(4 * 5)        # Multiplication
+print(20 / 4)       # Division (always gives float)
+print(20 // 4)      # Floor division (integer result)
+print(17 % 5)       # Modulo (remainder)
+print(2 ** 8)       # Exponentiation (power)
+```
+
+You can combine operations:
+
+```{python}
+print(2 + 3 * 4)          # Multiplication first
+print((2 + 3) * 4)        # Parentheses change order
+print(10 + 5 * 2 - 3)     # Multiple operations
+```
+
+:::{.callout-note}
+## Order of Operations
+
+Python follows PEMDAS:
+- **P**arentheses
+- **E**xponents
+- **M**ultiplication/**D**ivision (left to right)
+- **A**ddition/**S**ubtraction (left to right)
+:::
+
+## Mixing Text and Numbers
+
+You can't directly mix strings and numbers:
+
+```{python}
+#| error: true
+# This causes an error:
+print("I have " + 5 + " apples")
+```
+
+But there are several solutions:
+
+### Solution 1: Convert to String
+
+```{python}
+print("I have " + str(5) + " apples")
+```
+
+### Solution 2: Use Commas
+
+```{python}
+print("I have", 5, "apples")
+```
+
+### Solution 3: F-strings (Best! Introduced in Python 3.6)
+
+```{python}
+apples = 5
+print(f"I have {apples} apples")
+print(f"2 + 2 = {2 + 2}")
+print(f"Python is {2025 - 1991} years old in 2025")
+```
+
+F-strings are powerful! You can put any expression inside `{}`:
+
+```{python}
+name = "Alice"
+age = 25
+print(f"My name is {name} and I'm {age} years old")
+print(f"Next year I'll be {age + 1}")
+print(f"{name.upper()} likes Python")
+```
+
+## Creating a Complete Program
+
+Let's combine everything to create a more substantial program:
+
+```{python}
+# My First Python Program
+# Author: Your Name
+# Date: 2025
+
+print("=" * 40)  # Print 40 equals signs
+print("Welcome to My First Python Program!")
+print("=" * 40)
+
+# Personal Information
+name = "Alice"
+age = 25
+city = "New York"
+
+# Display information
+print(f"\nHello! My name is {name}.")
+print(f"I am {age} years old.")
+print(f"I live in {city}.")
+
+# Some calculations
+print(f"\nIn 5 years, I'll be {age + 5} years old.")
+print(f"I was born in {2025 - age}.")
+
+# Fun fact
+print(f"\n{name} loves Python programming!")
+print("\n" + "=" * 40)
+print("Thanks for running my program!")
+print("=" * 40)
+```
+
+## Special Characters in Strings
+
+Python has special character sequences that start with backslash `\`:
+
+```{python}
+# Newline
+print("First line\nSecond line")
+
+# Tab
+print("Name:\tAlice")
+print("Age:\t25")
+
+# Backslash itself
+print("This is a backslash: \\")
+
+# Quote inside quote
+print("She said, \"Hello!\"")
+```
+
+## Raw Strings
+
+Use `r` prefix for raw strings (backslashes treated literally):
+
+```{python}
+# Regular string
+print("C:\new\test")  # \n and \t are special characters
+
+# Raw string
+print(r"C:\new\test")  # Exactly as typed
+```
+
+Raw strings are useful for file paths and regular expressions!
+
+## Making Programs Interactive (Preview)
+
+We can make programs interactive with `input()`:
+
+```{python}
+#| eval: false
+name = input("What's your name? ")
+print(f"Hello, {name}! Nice to meet you!")
+
+age = input("How old are you? ")
+print(f"Wow, {age} is a great age!")
+```
+
+We'll learn more about `input()` in the next chapter!
+
+## Code Structure and Style
+
+Good Python code follows conventions:
+
+### Naming Conventions
+
+```{python}
+# Variables: lowercase with underscores
+user_name = "Alice"
+user_age = 25
+
+# Constants: UPPERCASE
+PI = 3.14159
+MAX_SIZE = 100
+
+# We'll learn about functions and classes later
+```
+
+### Indentation
+
+Python uses indentation to define code blocks (more on this later):
+
+```python
+# Correct
+if True:
+    print("Indented")
+    print("Still indented")
+
+# Wrong - will cause error
+if True:
+print("Not indented")  # IndentationError!
+```
+
+:::{.callout-important}
+## Indentation Rules
+
+- Use 4 spaces per indentation level
+- Don't mix tabs and spaces
+- Be consistent throughout your code
+- Most editors can be set to insert 4 spaces when you press Tab
+:::
+
+### Line Length
+
+Try to keep lines under 79-80 characters:
+
+```python
+# Too long
+result = some_function(argument1, argument2, argument3, argument4, argument5, argument6)
+
+# Better - break into multiple lines
+result = some_function(
+    argument1, argument2, argument3,
+    argument4, argument5, argument6
+)
+```
+
+## Common Beginner Mistakes
+
+### 1. Forgetting Quotes
+
+```python
+# Wrong
+print(Hello)  # NameError: name 'Hello' is not defined
+
+# Correct
+print("Hello")
+```
+
+### 2. Mismatched Quotes
+
+```python
+# Wrong
+print("Hello')  # SyntaxError
+
+# Correct
+print("Hello")
+```
+
+### 3. Missing Parentheses
+
+```python
+# Wrong in Python 3
+print "Hello"  # SyntaxError
+
+# Correct
+print("Hello")
+```
+
+### 4. Case Sensitivity
+
+```python
+# Wrong
+Print("Hello")  # NameError: name 'Print' is not defined
+
+# Correct
+print("Hello")  # Python is case-sensitive!
+```
+
+## Running Python Programs
+
+### From Command Line
+
+```bash
+# Save your code in a file: hello.py
+# Then run it:
+python hello.py
+# or
+python3 hello.py
+```
+
+### From VS Code
+
+1. Open your `.py` file
+2. Click the Run button (▶️) in the top-right
+3. Or press F5 for debug mode
+4. Or right-click and select "Run Python File in Terminal"
+
+### From IDLE
+
+1. File → New File
+2. Write your code
+3. File → Save (save as `.py`)
+4. Run → Run Module (or press F5)
+
+## Your First Project: Personal Introduction
+
+Let's create a complete program that introduces you:
+
+```{python}
+# Personal Introduction Program
+
+# Header
+print("*" * 50)
+print("PERSONAL INTRODUCTION".center(50))
+print("*" * 50)
+
+# Information
+name = "Your Name"
+age = 25
+hobby = "Python programming"
+favorite_color = "blue"
+favorite_number = 7
+
+# Introduction
+print(f"\nHello! My name is {name}.")
+print(f"I am {age} years old.")
+print(f"I love {hobby}!")
+print(f"My favorite color is {favorite_color}.")
+print(f"My favorite number is {favorite_number}.")
+
+# Fun calculations
+print(f"\nFun Facts:")
+print(f"- In dog years, I'd be {age * 7} years old!")
+print(f"- My age times my favorite number is {age * favorite_number}")
+print(f"- The sum of my age digits is {sum(int(d) for d in str(age))}")
+
+# Closing
+print("\n" + "*" * 50)
+print("Thanks for getting to know me!".center(50))
+print("*" * 50)
+```
+
+## Summary
+
+In this chapter, you learned:
+
+- ✅ How to write and run your first Python program
+- ✅ Using `print()` to display output
+- ✅ Writing comments to document code
+- ✅ Basic arithmetic operations
+- ✅ Working with strings and f-strings
+- ✅ Special characters and raw strings
+- ✅ Python code style conventions
+- ✅ Common beginner mistakes to avoid
+
+:::{.callout-tip}
+## Next Steps
+
+Now that you can write basic programs, let's dive deeper into variables and data types in the next chapter!
+:::
+
+## Practice Exercises
+
+Try these exercises to reinforce what you learned:
+
+1. **Hello You**: Write a program that prints your name, age, and city.
+
+2. **Math Practice**: Create a program that prints the results of these calculations:
+   - 15 + 27
+   - 100 - 63
+   - 12 * 8
+   - 144 / 12
+   - 2 to the power of 10
+
+3. **Story Time**: Write a program that tells a short story using multiple print statements.
+
+4. **Calculator**: Write a program that calculates and displays:
+   - The area of a rectangle (length × width)
+   - Use length = 10 and width = 5
+
+5. **Personal Card**: Create a business card style output with your information nicely formatted.
+
+:::{.callout-note collapse="true"}
+## Exercise Solutions
+
+**Exercise 1:**
+```python
+print("Name: Alice Johnson")
+print("Age: 25")
+print("City: San Francisco")
+```
+
+**Exercise 2:**
+```python
+print("15 + 27 =", 15 + 27)
+print("100 - 63 =", 100 - 63)
+print("12 * 8 =", 12 * 8)
+print("144 / 12 =", 144 / 12)
+print("2 ** 10 =", 2 ** 10)
+```
+
+**Exercise 4:**
+```python
+length = 10
+width = 5
+area = length * width
+print(f"Rectangle area: {area}")
+```
+:::

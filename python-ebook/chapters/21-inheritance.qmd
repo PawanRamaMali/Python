@@ -1,0 +1,1169 @@
+# Inheritance: Reusing and Extending Classes {#sec-inheritance}
+
+Inheritance is one of the most powerful features of object-oriented programming. It lets you create new classes based on existing ones, inheriting their attributes and methods while adding new functionality. Think of it like genetics - children inherit traits from parents but can also have their own unique characteristics!
+
+## What is Inheritance?
+
+**Inheritance** allows a class (child/subclass) to inherit attributes and methods from another class (parent/superclass).
+
+### Real-World Analogy
+
+```{python}
+# Vehicle (parent) - general concept
+#   ├── Car (child) - specific type
+#   ├── Motorcycle (child) - specific type
+#   └── Truck (child) - specific type
+
+# All vehicles have wheels and can move
+# But each type has unique features
+
+print("Inheritance: Child classes inherit from parent classes")
+print("Just like biological inheritance!")
+```
+
+::: {.callout-note}
+## Key Inheritance Terms
+- **Parent/Base/Super class**: The class being inherited from
+- **Child/Derived/Sub class**: The class that inherits
+- **Override**: Replace parent method with child version
+- **Extend**: Add new functionality to child
+- **super()**: Access parent class methods
+:::
+
+## Basic Inheritance
+
+### Simple Example
+
+```{python}
+# Parent class
+class Animal:
+    """Base class for animals"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        return "Some sound"
+
+    def info(self):
+        return f"I am {self.name}"
+
+# Child class inherits from Animal
+class Dog(Animal):
+    """Dog is an Animal"""
+
+    def speak(self):
+        """Override parent method"""
+        return "Woof!"
+
+class Cat(Animal):
+    """Cat is an Animal"""
+
+    def speak(self):
+        """Override parent method"""
+        return "Meow!"
+
+# Create objects
+dog = Dog("Buddy")
+cat = Cat("Whiskers")
+
+# Both have inherited methods
+print(dog.info())      # Inherited from Animal
+print(dog.speak())     # Overridden in Dog
+
+print(cat.info())      # Inherited from Animal
+print(cat.speak())     # Overridden in Cat
+
+# Check inheritance
+print(f"\nIs dog an Animal? {isinstance(dog, Animal)}")
+print(f"Is dog a Dog? {isinstance(dog, Dog)}")
+print(f"Is dog a Cat? {isinstance(dog, Cat)}")
+```
+
+### Inheritance Syntax
+
+```python
+class ChildClass(ParentClass):
+    """Child inherits from Parent"""
+    pass
+```
+
+::: {.callout-important}
+## Inheritance Benefits
+1. **Code Reuse**: Don't repeat yourself (DRY)
+2. **Logical Hierarchy**: Model real-world relationships
+3. **Easy Maintenance**: Fix bugs in one place
+4. **Extensibility**: Add features without modifying base class
+5. **Polymorphism**: Use child objects where parent is expected
+:::
+
+## The super() Function
+
+`super()` lets you call methods from the parent class.
+
+### Using super() in __init__
+
+```{python}
+class Person:
+    """Base Person class"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        print(f"Person.__init__ called for {name}")
+
+    def introduce(self):
+        return f"Hi, I'm {self.name}, {self.age} years old"
+
+class Student(Person):
+    """Student is a Person with additional attributes"""
+
+    def __init__(self, name, age, student_id, major):
+        # Call parent __init__
+        super().__init__(name, age)
+        # Add student-specific attributes
+        self.student_id = student_id
+        self.major = major
+        print(f"Student.__init__ called for {name}")
+
+    def introduce(self):
+        # Call parent method and extend it
+        parent_intro = super().introduce()
+        return f"{parent_intro}. I study {self.major}"
+
+# Create student
+student = Student("Alice", 20, "S12345", "Computer Science")
+print(student.introduce())
+print(f"Student ID: {student.student_id}")
+```
+
+### super() with Methods
+
+```{python}
+class Rectangle:
+    """Base rectangle class"""
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+
+class ColoredRectangle(Rectangle):
+    """Rectangle with color"""
+
+    def __init__(self, width, height, color):
+        super().__init__(width, height)  # Initialize parent
+        self.color = color
+
+    def describe(self):
+        return f"{self.color} rectangle: {self.width}x{self.height}"
+
+    def area(self):
+        """Can still call parent's area method"""
+        return super().area()
+
+# Create colored rectangle
+rect = ColoredRectangle(10, 5, "blue")
+print(rect.describe())
+print(f"Area: {rect.area()}")
+print(f"Perimeter: {rect.perimeter()}")  # Inherited
+```
+
+::: {.callout-tip}
+## When to Use super()
+1. **Always use** in `__init__` to initialize parent
+2. **Use when** you want to extend (not replace) parent method
+3. **Use in** method overriding to access parent version
+4. **Cleaner** than calling `ParentClass.__init__(self, ...)`
+5. **Required** for multiple inheritance (covered later)
+:::
+
+## Method Overriding
+
+Child classes can override (replace) parent methods.
+
+### Complete Override
+
+```{python}
+class Vehicle:
+    """Base vehicle class"""
+
+    def __init__(self, brand):
+        self.brand = brand
+
+    def start(self):
+        return "Vehicle starting..."
+
+    def stop(self):
+        return "Vehicle stopping..."
+
+class ElectricCar(Vehicle):
+    """Electric car overrides start method"""
+
+    def __init__(self, brand, battery_capacity):
+        super().__init__(brand)
+        self.battery_capacity = battery_capacity
+
+    def start(self):
+        """Complete override - no call to super()"""
+        return f"{self.brand} electric motor starting silently..."
+
+    # stop() is inherited without changes
+
+# Compare
+regular = Vehicle("Toyota")
+electric = ElectricCar("Tesla", 100)
+
+print(regular.start())
+print(electric.start())
+print(electric.stop())  # Inherited
+```
+
+### Extending Parent Method
+
+```{python}
+class BankAccount:
+    """Base bank account"""
+
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+        return f"Deposited ${amount}"
+
+class SavingsAccount(BankAccount):
+    """Savings account with interest"""
+
+    def __init__(self, owner, balance=0, interest_rate=0.02):
+        super().__init__(owner, balance)
+        self.interest_rate = interest_rate
+
+    def deposit(self, amount):
+        """Extend parent's deposit"""
+        result = super().deposit(amount)  # Call parent method
+        # Add interest
+        interest = amount * self.interest_rate
+        self.balance += interest
+        return f"{result} (with ${interest:.2f} interest bonus)"
+
+# Test
+savings = SavingsAccount("Alice", 1000, 0.05)
+print(savings.deposit(100))
+print(f"New balance: ${savings.balance:.2f}")
+```
+
+### Override Special Methods
+
+```{python}
+class Person:
+    """Base person"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return f"Person: {self.name}"
+
+class Employee(Person):
+    """Employee extends person"""
+
+    def __init__(self, name, employee_id, department):
+        super().__init__(name)
+        self.employee_id = employee_id
+        self.department = department
+
+    def __str__(self):
+        """Override string representation"""
+        return f"Employee: {self.name} (ID: {self.employee_id}, Dept: {self.department})"
+
+    def __repr__(self):
+        return f"Employee(name='{self.name}', id='{self.employee_id}')"
+
+# Test
+person = Person("Alice")
+employee = Employee("Bob", "E001", "Engineering")
+
+print(person)
+print(employee)
+print(repr(employee))
+```
+
+## Multiple Inheritance
+
+Python supports inheriting from multiple parent classes.
+
+### Basic Multiple Inheritance
+
+```{python}
+class Flyer:
+    """Can fly"""
+
+    def fly(self):
+        return "Flying in the air"
+
+class Swimmer:
+    """Can swim"""
+
+    def swim(self):
+        return "Swimming in water"
+
+class Duck(Flyer, Swimmer):
+    """Duck can both fly and swim"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def quack(self):
+        return "Quack!"
+
+# Duck has methods from both parents
+duck = Duck("Donald")
+print(duck.fly())    # From Flyer
+print(duck.swim())   # From Swimmer
+print(duck.quack())  # Own method
+```
+
+### Multiple Inheritance with super()
+
+```{python}
+class A:
+    def __init__(self):
+        print("A.__init__")
+        self.a = "A"
+
+class B:
+    def __init__(self):
+        print("B.__init__")
+        self.b = "B"
+
+class C(A, B):
+    def __init__(self):
+        print("C.__init__")
+        super().__init__()  # Calls A.__init__ (first parent)
+        self.c = "C"
+
+# Create C
+obj = C()
+print(f"Attributes: {obj.a}, {obj.c}")
+# Note: obj.b doesn't exist because B.__init__ wasn't called!
+```
+
+### Proper Multiple Inheritance
+
+```{python}
+class Person:
+    """Base person"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        super().__init__()  # Important for cooperative inheritance!
+
+    def introduce(self):
+        return f"I'm {self.name}"
+
+class Worker:
+    """Has a job"""
+
+    def __init__(self, job_title, salary):
+        self.job_title = job_title
+        self.salary = salary
+        super().__init__()
+
+    def work(self):
+        return f"Working as {self.job_title}"
+
+class Employee(Person, Worker):
+    """Person who works"""
+
+    def __init__(self, name, age, job_title, salary):
+        Person.__init__(self, name, age)
+        Worker.__init__(self, job_title, salary)
+
+    def full_info(self):
+        return f"{self.introduce()}. {self.work()}. Salary: ${self.salary}"
+
+# Create employee
+emp = Employee("Alice", 30, "Developer", 80000)
+print(emp.full_info())
+```
+
+::: {.callout-warning}
+## Multiple Inheritance Caution
+Multiple inheritance can be tricky:
+- **Name conflicts**: If both parents have same method
+- **Diamond problem**: Complex inheritance hierarchies
+- **Hard to debug**: Method resolution can be unclear
+
+**Alternatives**:
+- Use composition instead of inheritance
+- Use mixins (small, focused classes)
+- Prefer single inheritance when possible
+:::
+
+## Method Resolution Order (MRO)
+
+MRO determines the order Python searches for methods in inheritance hierarchies.
+
+### Viewing MRO
+
+```{python}
+class A:
+    def method(self):
+        return "A"
+
+class B(A):
+    def method(self):
+        return "B"
+
+class C(A):
+    def method(self):
+        return "C"
+
+class D(B, C):
+    pass
+
+# Check MRO
+print("Method Resolution Order for D:")
+print(D.__mro__)
+print("\nOr using mro():")
+for cls in D.mro():
+    print(f"  {cls.__name__}")
+
+# Create object
+obj = D()
+print(f"\nobj.method() returns: {obj.method()}")
+```
+
+### MRO in Action
+
+```{python}
+class Base:
+    def greet(self):
+        return "Base"
+
+class Left(Base):
+    def greet(self):
+        return "Left"
+
+class Right(Base):
+    def greet(self):
+        return "Right"
+
+class Child(Left, Right):
+    pass
+
+# MRO: Child -> Left -> Right -> Base -> object
+child = Child()
+print(f"MRO: {[cls.__name__ for cls in Child.mro()]}")
+print(f"child.greet() = {child.greet()}")  # Uses Left.greet()
+
+# Change inheritance order
+class Child2(Right, Left):
+    pass
+
+child2 = Child2()
+print(f"\nMRO: {[cls.__name__ for cls in Child2.mro()]}")
+print(f"child2.greet() = {child2.greet()}")  # Uses Right.greet()
+```
+
+### The Diamond Problem
+
+```{python}
+class A:
+    def method(self):
+        print("A.method")
+
+class B(A):
+    def method(self):
+        print("B.method")
+        super().method()
+
+class C(A):
+    def method(self):
+        print("C.method")
+        super().method()
+
+class D(B, C):
+    def method(self):
+        print("D.method")
+        super().method()
+
+# The diamond:
+#     A
+#    / \
+#   B   C
+#    \ /
+#     D
+
+print("MRO:", [cls.__name__ for cls in D.mro()])
+print("\nCalling D.method():")
+obj = D()
+obj.method()
+```
+
+::: {.callout-note}
+## Understanding MRO
+Python uses **C3 Linearization** algorithm:
+1. **Left-to-right**: Check parents from left to right
+2. **Depth-first**: Go deep before going wide
+3. **Preserve order**: Respect parent order in class definition
+4. **Only once**: Each class appears only once
+
+**Rule**: A class appears before its parents in MRO
+:::
+
+## Mixins
+
+Mixins are small classes that provide specific functionality.
+
+### Basic Mixin
+
+```{python}
+class JSONMixin:
+    """Mixin to add JSON export functionality"""
+
+    def to_json(self):
+        import json
+        # Get all non-private attributes
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        return json.dumps(data, indent=2)
+
+class Person:
+    """Base person class"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+class JSONPerson(JSONMixin, Person):
+    """Person with JSON export"""
+    pass
+
+# Use mixin functionality
+person = JSONPerson("Alice", 30)
+print(person.to_json())
+```
+
+### Multiple Mixins
+
+```{python}
+class JSONMixin:
+    """Add JSON functionality"""
+
+    def to_json(self):
+        import json
+        return json.dumps(self.__dict__)
+
+class CompareMixin:
+    """Add comparison functionality"""
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+class TimestampMixin:
+    """Add timestamp functionality"""
+
+    def __init__(self, *args, **kwargs):
+        from datetime import datetime
+        self.created_at = datetime.now()
+        super().__init__(*args, **kwargs)
+
+class User(TimestampMixin, JSONMixin, CompareMixin):
+    """User with all mixin features"""
+
+    def __init__(self, username, email):
+        super().__init__()
+        self.username = username
+        self.email = email
+
+# Create users
+user1 = User("alice", "alice@example.com")
+user2 = User("alice", "alice@example.com")
+
+print(f"Created at: {user1.created_at}")
+print(f"Same user? {user1 == user2}")
+print(f"JSON: {user1.to_json()}")
+```
+
+::: {.callout-tip}
+## Mixin Best Practices
+1. **Small and focused**: One responsibility per mixin
+2. **Name with Mixin suffix**: e.g., `JSONMixin`, `LoggingMixin`
+3. **Use super()**: Enable cooperative inheritance
+4. **No init conflicts**: Be careful with `__init__`
+5. **Document**: Make purpose clear
+6. **Test independently**: Ensure mixins work alone
+:::
+
+## Real-World Inheritance Examples
+
+### Shape Hierarchy
+
+```{python}
+import math
+
+class Shape:
+    """Base shape class"""
+
+    def __init__(self, color="black"):
+        self.color = color
+
+    def area(self):
+        raise NotImplementedError("Subclass must implement area()")
+
+    def perimeter(self):
+        raise NotImplementedError("Subclass must implement perimeter()")
+
+    def describe(self):
+        return f"{self.color} {self.__class__.__name__}"
+
+class Circle(Shape):
+    """Circle shape"""
+
+    def __init__(self, radius, color="black"):
+        super().__init__(color)
+        self.radius = radius
+
+    def area(self):
+        return math.pi * self.radius ** 2
+
+    def perimeter(self):
+        return 2 * math.pi * self.radius
+
+    def describe(self):
+        return f"{super().describe()} with radius {self.radius}"
+
+class Rectangle(Shape):
+    """Rectangle shape"""
+
+    def __init__(self, width, height, color="black"):
+        super().__init__(color)
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+
+    def describe(self):
+        return f"{super().describe()} {self.width}x{self.height}"
+
+class Square(Rectangle):
+    """Square is special rectangle"""
+
+    def __init__(self, side, color="black"):
+        super().__init__(side, side, color)
+        self.side = side
+
+    def describe(self):
+        return f"{self.color} Square {self.side}x{self.side}"
+
+# Create shapes
+shapes = [
+    Circle(5, "red"),
+    Rectangle(4, 6, "blue"),
+    Square(5, "green")
+]
+
+print("Shape Information:")
+for shape in shapes:
+    print(f"\n{shape.describe()}")
+    print(f"  Area: {shape.area():.2f}")
+    print(f"  Perimeter: {shape.perimeter():.2f}")
+```
+
+### Employee Hierarchy
+
+```{python}
+class Employee:
+    """Base employee class"""
+
+    employee_count = 0
+
+    def __init__(self, name, employee_id, salary):
+        self.name = name
+        self.employee_id = employee_id
+        self.salary = salary
+        Employee.employee_count += 1
+
+    def get_info(self):
+        return f"{self.name} (ID: {self.employee_id})"
+
+    def annual_salary(self):
+        return self.salary * 12
+
+class Manager(Employee):
+    """Manager with team"""
+
+    def __init__(self, name, employee_id, salary, team_size):
+        super().__init__(name, employee_id, salary)
+        self.team_size = team_size
+        self.team_members = []
+
+    def add_team_member(self, employee):
+        self.team_members.append(employee)
+
+    def get_info(self):
+        base_info = super().get_info()
+        return f"{base_info} - Manager of {self.team_size} people"
+
+    def annual_salary(self):
+        # Managers get 20% bonus
+        base_salary = super().annual_salary()
+        return base_salary * 1.2
+
+class Developer(Employee):
+    """Developer with programming languages"""
+
+    def __init__(self, name, employee_id, salary, languages):
+        super().__init__(name, employee_id, salary)
+        self.languages = languages
+
+    def get_info(self):
+        base_info = super().get_info()
+        langs = ", ".join(self.languages)
+        return f"{base_info} - Developer ({langs})"
+
+    def add_language(self, language):
+        if language not in self.languages:
+            self.languages.append(language)
+
+# Create employees
+manager = Manager("Alice", "M001", 8000, 5)
+dev1 = Developer("Bob", "D001", 6000, ["Python", "JavaScript"])
+dev2 = Developer("Charlie", "D002", 6500, ["Java", "Go"])
+
+# Build team
+manager.add_team_member(dev1)
+manager.add_team_member(dev2)
+
+# Display info
+employees = [manager, dev1, dev2]
+print("Employee Information:")
+for emp in employees:
+    print(f"\n{emp.get_info()}")
+    print(f"  Annual Salary: ${emp.annual_salary():,.2f}")
+
+print(f"\nTotal Employees: {Employee.employee_count}")
+```
+
+### Vehicle System
+
+```{python}
+class Vehicle:
+    """Base vehicle"""
+
+    def __init__(self, brand, model, year):
+        self.brand = brand
+        self.model = model
+        self.year = year
+        self.odometer = 0
+
+    def drive(self, distance):
+        self.odometer += distance
+        return f"Drove {distance} miles"
+
+    def __str__(self):
+        return f"{self.year} {self.brand} {self.model}"
+
+class Car(Vehicle):
+    """Car with passengers"""
+
+    def __init__(self, brand, model, year, num_seats):
+        super().__init__(brand, model, year)
+        self.num_seats = num_seats
+
+    def __str__(self):
+        return f"{super().__str__()} ({self.num_seats} seats)"
+
+class ElectricCar(Car):
+    """Electric car with battery"""
+
+    def __init__(self, brand, model, year, num_seats, battery_capacity):
+        super().__init__(brand, model, year, num_seats)
+        self.battery_capacity = battery_capacity
+        self.battery_charge = 100  # Percentage
+
+    def drive(self, distance):
+        # Electric cars consume battery
+        battery_needed = distance * 0.2  # 0.2% per mile
+        if battery_needed > self.battery_charge:
+            return "Not enough battery!"
+
+        result = super().drive(distance)
+        self.battery_charge -= battery_needed
+        return f"{result} (Battery: {self.battery_charge:.1f}%)"
+
+    def charge(self):
+        self.battery_charge = 100
+        return "Battery fully charged"
+
+    def __str__(self):
+        return f"{super().__str__()} - Electric ({self.battery_capacity}kWh)"
+
+# Create vehicles
+regular_car = Car("Toyota", "Camry", 2022, 5)
+electric_car = ElectricCar("Tesla", "Model 3", 2023, 5, 75)
+
+print(regular_car)
+print(regular_car.drive(100))
+
+print(f"\n{electric_car}")
+print(electric_car.drive(50))
+print(electric_car.drive(50))
+print(electric_car.charge())
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Inheritance basics**:
+  - Parent and child classes
+  - Inheriting attributes and methods
+  - `isinstance()` and `issubclass()`
+
+- **super() function**:
+  - Calling parent `__init__`
+  - Accessing parent methods
+  - Cooperative inheritance
+
+- **Method overriding**:
+  - Replacing parent methods
+  - Extending parent methods
+  - Overriding special methods
+
+- **Multiple inheritance**:
+  - Inheriting from multiple classes
+  - Potential problems
+  - When to use it
+
+- **Method Resolution Order (MRO)**:
+  - How Python finds methods
+  - C3 linearization
+  - Viewing MRO with `__mro__` and `mro()`
+
+- **Mixins**:
+  - Small, focused classes
+  - Adding functionality
+  - Best practices
+
+- **Real-world examples**:
+  - Shape hierarchies
+  - Employee systems
+  - Vehicle classification
+
+::: {.callout-important}
+## Key Takeaways
+1. **Inheritance** enables code reuse and hierarchy
+2. **super()** calls parent class methods
+3. **Override** methods to customize behavior
+4. **Extend** by calling `super()` then adding more
+5. **Multiple inheritance** is possible but complex
+6. **MRO** determines method lookup order
+7. **Mixins** add focused functionality
+8. **Prefer composition** over deep inheritance
+9. **Keep hierarchies shallow** (2-3 levels max)
+10. **Document relationships** clearly
+:::
+
+## Practice Exercises
+
+### Exercise 1: Animal Kingdom
+
+Create a comprehensive animal classification system.
+
+```{python}
+class Animal:
+    """
+    Solution: Base animal class
+    """
+
+    def __init__(self, name, species):
+        self.name = name
+        self.species = species
+
+    def eat(self):
+        return f"{self.name} is eating"
+
+    def sleep(self):
+        return f"{self.name} is sleeping"
+
+    def __str__(self):
+        return f"{self.name} the {self.species}"
+
+class Mammal(Animal):
+    """Mammal has fur and gives live birth"""
+
+    def __init__(self, name, species, fur_color):
+        super().__init__(name, species)
+        self.fur_color = fur_color
+
+    def nurse_young(self):
+        return f"{self.name} is nursing young"
+
+class Bird(Animal):
+    """Bird has feathers and can fly"""
+
+    def __init__(self, name, species, can_fly=True):
+        super().__init__(name, species)
+        self.can_fly = can_fly
+
+    def lay_eggs(self):
+        return f"{self.name} laid eggs"
+
+    def fly(self):
+        if self.can_fly:
+            return f"{self.name} is flying"
+        return f"{self.name} cannot fly"
+
+class Dog(Mammal):
+    """Specific dog implementation"""
+
+    def __init__(self, name, breed, fur_color):
+        super().__init__(name, "Dog", fur_color)
+        self.breed = breed
+
+    def bark(self):
+        return f"{self.name} says Woof!"
+
+class Penguin(Bird):
+    """Penguin cannot fly"""
+
+    def __init__(self, name):
+        super().__init__(name, "Penguin", can_fly=False)
+
+    def swim(self):
+        return f"{self.name} is swimming"
+
+# Test
+animals = [
+    Dog("Buddy", "Golden Retriever", "golden"),
+    Penguin("Pingu")
+]
+
+for animal in animals:
+    print(f"\n{animal}")
+    print(f"  {animal.eat()}")
+    if isinstance(animal, Dog):
+        print(f"  {animal.bark()}")
+    if isinstance(animal, Bird):
+        print(f"  {animal.fly()}")
+        if isinstance(animal, Penguin):
+            print(f"  {animal.swim()}")
+```
+
+### Exercise 2: University System
+
+Create a complete university system with inheritance.
+
+```{python}
+class Person:
+    """
+    Solution: Base person class
+    """
+
+    def __init__(self, name, age, person_id):
+        self.name = name
+        self.age = age
+        self.person_id = person_id
+
+    def __str__(self):
+        return f"{self.name} (ID: {self.person_id})"
+
+class Student(Person):
+    """Student with courses"""
+
+    def __init__(self, name, age, student_id, major):
+        super().__init__(name, age, student_id)
+        self.major = major
+        self.courses = []
+        self.gpa = 0.0
+
+    def enroll(self, course):
+        self.courses.append(course)
+        return f"Enrolled in {course}"
+
+    def calculate_gpa(self, grades):
+        """Calculate GPA from grades"""
+        if not grades:
+            return 0.0
+        self.gpa = sum(grades) / len(grades)
+        return self.gpa
+
+    def __str__(self):
+        return f"Student: {super().__str__()} - Major: {self.major}, GPA: {self.gpa:.2f}"
+
+class Professor(Person):
+    """Professor teaching courses"""
+
+    def __init__(self, name, age, employee_id, department):
+        super().__init__(name, age, employee_id)
+        self.department = department
+        self.courses_teaching = []
+
+    def assign_course(self, course):
+        self.courses_teaching.append(course)
+        return f"Assigned to teach {course}"
+
+    def __str__(self):
+        return f"Professor: {super().__str__()} - Dept: {self.department}"
+
+class GraduateStudent(Student):
+    """Graduate student with research"""
+
+    def __init__(self, name, age, student_id, major, advisor):
+        super().__init__(name, age, student_id, major)
+        self.advisor = advisor
+        self.thesis_topic = None
+
+    def set_thesis(self, topic):
+        self.thesis_topic = topic
+        return f"Thesis topic set: {topic}"
+
+    def __str__(self):
+        base = super().__str__()
+        return f"Graduate {base}, Advisor: {self.advisor}"
+
+# Test
+student = Student("Alice", 20, "S001", "Computer Science")
+student.enroll("Python Programming")
+student.enroll("Data Structures")
+student.calculate_gpa([3.8, 3.9, 4.0])
+
+prof = Professor("Dr. Smith", 45, "P001", "Computer Science")
+prof.assign_course("Advanced Algorithms")
+
+grad = GraduateStudent("Bob", 25, "G001", "AI", "Dr. Smith")
+grad.set_thesis("Machine Learning in Healthcare")
+
+people = [student, prof, grad]
+for person in people:
+    print(person)
+```
+
+### Exercise 3: Game Character System
+
+Build a role-playing game character system.
+
+```{python}
+class Character:
+    """
+    Solution: Base game character
+    """
+
+    def __init__(self, name, health=100, level=1):
+        self.name = name
+        self.max_health = health
+        self.health = health
+        self.level = level
+
+    def take_damage(self, damage):
+        self.health = max(0, self.health - damage)
+        if self.health == 0:
+            return f"{self.name} was defeated!"
+        return f"{self.name} took {damage} damage. Health: {self.health}/{self.max_health}"
+
+    def heal(self, amount):
+        self.health = min(self.max_health, self.health + amount)
+        return f"{self.name} healed {amount}. Health: {self.health}/{self.max_health}"
+
+    def is_alive(self):
+        return self.health > 0
+
+    def __str__(self):
+        return f"{self.name} (Lv.{self.level}) HP:{self.health}/{self.max_health}"
+
+class Warrior(Character):
+    """Warrior with high defense"""
+
+    def __init__(self, name, health=150, level=1):
+        super().__init__(name, health, level)
+        self.armor = 20
+
+    def take_damage(self, damage):
+        # Reduce damage by armor
+        reduced_damage = max(1, damage - self.armor)
+        return super().take_damage(reduced_damage)
+
+    def shield_bash(self, target):
+        damage = 30 + (self.level * 5)
+        return f"{self.name} shield bashed {target.name}! {target.take_damage(damage)}"
+
+class Mage(Character):
+    """Mage with magic"""
+
+    def __init__(self, name, health=80, level=1):
+        super().__init__(name, health, level)
+        self.mana = 100
+        self.max_mana = 100
+
+    def cast_fireball(self, target):
+        cost = 20
+        if self.mana < cost:
+            return f"{self.name} doesn't have enough mana!"
+
+        self.mana -= cost
+        damage = 50 + (self.level * 10)
+        return f"{self.name} cast Fireball! {target.take_damage(damage)}"
+
+    def restore_mana(self, amount):
+        self.mana = min(self.max_mana, self.mana + amount)
+        return f"{self.name} restored {amount} mana"
+
+class Healer(Character):
+    """Healer who supports team"""
+
+    def __init__(self, name, health=90, level=1):
+        super().__init__(name, health, level)
+        self.healing_power = 30
+
+    def heal_target(self, target):
+        heal_amount = self.healing_power + (self.level * 5)
+        return target.heal(heal_amount)
+
+# Battle simulation
+warrior = Warrior("Conan", level=5)
+mage = Mage("Gandalf", level=5)
+healer = Healer("Elara", level=5)
+
+print("=== Battle Start ===\n")
+print(mage.cast_fireball(warrior))
+print(warrior.shield_bash(mage))
+print(healer.heal_target(warrior))
+
+print("\n=== Status ===")
+for char in [warrior, mage, healer]:
+    print(char)
+```
+
+::: {.callout-tip}
+## Keep Exploring!
+Inheritance is powerful but use it wisely:
+- **Prefer composition** for "has-a" relationships
+- **Use inheritance** for "is-a" relationships
+- **Keep hierarchies shallow** (2-3 levels)
+- **Use abstract base classes** for interfaces (advanced topic)
+- **Consider mixins** for cross-cutting concerns
+
+Practice with different domains: games, business systems, scientific models!
+:::
+
+---
+
+Congratulations! You've mastered inheritance in Python. You can now create class hierarchies, reuse code effectively, and model complex systems using object-oriented principles. This is a powerful tool in your programming arsenal!

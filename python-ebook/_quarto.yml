@@ -1,0 +1,123 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Python Programming: From Zero to Hero"
+  subtitle: "A Fun and Comprehensive Guide for Beginners to Advanced Programmers"
+  author: "Python Learning Community"
+  date: today
+  chapters:
+    - index.qmd
+    - part: "Getting Started"
+      chapters:
+        - chapters/01-introduction.qmd
+        - chapters/02-installation.qmd
+        - chapters/03-first-program.qmd
+    - part: "Python Fundamentals"
+      chapters:
+        - chapters/04-variables-types.qmd
+        - chapters/05-operators.qmd
+        - chapters/06-strings.qmd
+        - chapters/07-input-output.qmd
+    - part: "Control Flow"
+      chapters:
+        - chapters/08-conditionals.qmd
+        - chapters/09-loops.qmd
+        - chapters/10-break-continue.qmd
+    - part: "Data Structures"
+      chapters:
+        - chapters/11-lists.qmd
+        - chapters/12-tuples.qmd
+        - chapters/13-dictionaries.qmd
+        - chapters/14-sets.qmd
+    - part: "Functions and Modules"
+      chapters:
+        - chapters/15-functions.qmd
+        - chapters/16-scope.qmd
+        - chapters/17-lambda.qmd
+        - chapters/18-modules.qmd
+        - chapters/19-packages.qmd
+    - part: "Object-Oriented Programming"
+      chapters:
+        - chapters/20-classes-objects.qmd
+        - chapters/21-inheritance.qmd
+        - chapters/22-polymorphism.qmd
+        - chapters/23-encapsulation.qmd
+    - part: "File Handling and Exceptions"
+      chapters:
+        - chapters/24-file-io.qmd
+        - chapters/25-exceptions.qmd
+        - chapters/26-context-managers.qmd
+    - part: "Advanced Topics"
+      chapters:
+        - chapters/27-decorators.qmd
+        - chapters/28-generators.qmd
+        - chapters/29-iterators.qmd
+        - chapters/30-comprehensions.qmd
+    - part: "Standard Library Essentials"
+      chapters:
+        - chapters/31-datetime.qmd
+        - chapters/32-collections.qmd
+        - chapters/33-itertools.qmd
+        - chapters/34-pathlib.qmd
+    - part: "Best Practices and Beyond"
+      chapters:
+        - chapters/35-testing.qmd
+        - chapters/36-debugging.qmd
+        - chapters/37-best-practices.qmd
+        - chapters/38-next-steps.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    code-copy: true
+    code-fold: false
+    code-tools: true
+    code-link: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    smooth-scroll: true
+    fig-width: 8
+    fig-height: 6
+    fig-responsive: true
+    link-external-newwindow: true
+    link-external-icon: true
+    citation-location: margin
+    reference-location: margin
+    footnote-location: margin
+    cap-location: margin
+    crossref:
+      fig-title: Figure
+      tbl-title: Table
+      eq-title: Equation
+    css: styles.css
+
+  pdf:
+    documentclass: scrbook
+    classoption: [oneside, open=any]
+    keep-tex: true
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    colorlinks: true
+    code-block-bg: true
+    code-block-border-left: "#31BAE9"
+
+execute:
+  freeze: auto
+  cache: true
+  echo: true
+  warning: false
+  error: false

@@ -1,0 +1,1040 @@
+# Packages: Organizing Modules {#sec-packages}
+
+When your project grows to have many modules, you need packages to organize them. A package is simply a directory containing modules and a special `__init__.py` file. Think of packages as folders that organize your tool boxes (modules) into a neat storage system!
+
+## What Are Packages?
+
+A **package** is a directory containing Python modules and an `__init__.py` file. Packages help you organize related modules into a hierarchical structure.
+
+### Package Structure
+
+```python
+my_package/
+    __init__.py          # Makes this a package
+    module1.py           # Module in package
+    module2.py           # Another module
+    subpackage/          # Nested package
+        __init__.py
+        module3.py
+```
+
+::: {.callout-note}
+## Package vs Module
+- **Module**: A single `.py` file
+- **Package**: A directory with modules and `__init__.py`
+- **Sub-package**: A package inside another package
+
+Think: Module = book, Package = bookshelf!
+:::
+
+## Creating Your First Package
+
+Let's create a simple calculator package.
+
+### Step 1: Create Directory Structure
+
+```bash
+calculator/
+    __init__.py
+    basic.py
+    advanced.py
+```
+
+### Step 2: Create Modules
+
+```python
+# calculator/basic.py
+"""Basic calculator operations"""
+
+def add(x, y):
+    """Add two numbers"""
+    return x + y
+
+def subtract(x, y):
+    """Subtract y from x"""
+    return x - y
+
+def multiply(x, y):
+    """Multiply two numbers"""
+    return x * y
+
+def divide(x, y):
+    """Divide x by y"""
+    if y == 0:
+        raise ValueError("Cannot divide by zero")
+    return x / y
+```
+
+```python
+# calculator/advanced.py
+"""Advanced calculator operations"""
+
+import math
+
+def power(x, y):
+    """Raise x to power y"""
+    return x ** y
+
+def sqrt(x):
+    """Square root of x"""
+    if x < 0:
+        raise ValueError("Cannot take square root of negative number")
+    return math.sqrt(x)
+
+def factorial(n):
+    """Factorial of n"""
+    if n < 0:
+        raise ValueError("Factorial not defined for negative numbers")
+    return math.factorial(n)
+
+def logarithm(x, base=math.e):
+    """Logarithm of x with given base"""
+    if x <= 0:
+        raise ValueError("Logarithm undefined for non-positive numbers")
+    return math.log(x, base)
+```
+
+### Step 3: Create __init__.py
+
+```python
+# calculator/__init__.py
+"""
+Calculator Package
+==================
+
+A simple calculator package with basic and advanced operations.
+"""
+
+__version__ = "1.0.0"
+__author__ = "Your Name"
+
+# Import commonly used functions
+from .basic import add, subtract, multiply, divide
+from .advanced import power, sqrt
+
+# Define what's available with 'from calculator import *'
+__all__ = ['add', 'subtract', 'multiply', 'divide', 'power', 'sqrt']
+
+print(f"Calculator package v{__version__} loaded")
+```
+
+### Step 4: Use the Package
+
+```python
+# main.py
+import calculator
+
+# Functions imported in __init__.py are available directly
+print(calculator.add(5, 3))
+print(calculator.sqrt(16))
+
+# Access specific modules
+from calculator import basic, advanced
+
+print(basic.multiply(4, 7))
+print(advanced.factorial(5))
+
+# Import specific functions
+from calculator.advanced import logarithm
+print(logarithm(10, 10))
+```
+
+::: {.callout-important}
+## The __init__.py File
+- **Required**: Makes directory a package (Python 3.3+: optional but recommended)
+- **Initialization**: Runs when package is imported
+- **Imports**: Can import and expose modules/functions
+- **Metadata**: Can define `__version__`, `__author__`, etc.
+- **__all__**: Controls what `import *` imports
+:::
+
+## Package Import Methods
+
+### Method 1: Import Package
+
+```python
+import calculator
+
+# Use with package prefix
+result = calculator.add(10, 5)
+```
+
+### Method 2: Import Module from Package
+
+```python
+from calculator import basic
+
+# Use with module prefix
+result = basic.add(10, 5)
+```
+
+### Method 3: Import Function from Module
+
+```python
+from calculator.basic import add
+
+# Use directly
+result = add(10, 5)
+```
+
+### Method 4: Import Everything (Not Recommended)
+
+```python
+from calculator import *
+
+# Uses __all__ from __init__.py
+result = add(10, 5)  # Works if 'add' is in __all__
+```
+
+::: {.callout-tip}
+## Import Best Practices
+1. **Be explicit**: `from package.module import function`
+2. **Use __all__**: Control what `import *` exposes
+3. **Avoid deep nesting**: Keep package structure simple
+4. **Document imports**: Comment complex import chains
+5. **Group imports**: Standard lib, third-party, local
+:::
+
+## Sub-packages
+
+Packages can contain other packages, creating a hierarchy.
+
+### Example Structure
+
+```python
+myapp/
+    __init__.py
+    utils/
+        __init__.py
+        string_utils.py
+        math_utils.py
+    models/
+        __init__.py
+        user.py
+        product.py
+    views/
+        __init__.py
+        dashboard.py
+        reports.py
+```
+
+### Creating Sub-packages
+
+```python
+# myapp/utils/__init__.py
+"""Utility functions"""
+
+from .string_utils import clean_text, truncate
+from .math_utils import average, median
+
+__all__ = ['clean_text', 'truncate', 'average', 'median']
+```
+
+```python
+# myapp/utils/string_utils.py
+"""String utility functions"""
+
+def clean_text(text):
+    """Remove extra whitespace"""
+    return " ".join(text.split())
+
+def truncate(text, length):
+    """Truncate text to length"""
+    if len(text) <= length:
+        return text
+    return text[:length-3] + "..."
+```
+
+### Using Sub-packages
+
+```python
+# Import from sub-package
+from myapp.utils import clean_text
+
+# Or import sub-package
+from myapp import utils
+result = utils.clean_text("  hello  world  ")
+
+# Or import specific module
+from myapp.utils import string_utils
+result = string_utils.clean_text("  text  ")
+```
+
+## Relative Imports
+
+Inside a package, you can use relative imports to reference other modules.
+
+### Relative Import Syntax
+
+```python
+# In myapp/utils/math_utils.py
+
+# Import from same package
+from . import string_utils  # Same directory
+
+# Import from parent package
+from .. import config  # Parent directory
+
+# Import from sibling package
+from ..models import user  # Parent, then models
+
+# Import specific item
+from .string_utils import clean_text
+```
+
+### Example Package with Relative Imports
+
+```python
+# geometry/__init__.py
+"""Geometry package"""
+
+from .shapes import Circle, Rectangle
+from .utils import calculate_area, calculate_perimeter
+
+__all__ = ['Circle', 'Rectangle', 'calculate_area', 'calculate_perimeter']
+```
+
+```python
+# geometry/shapes.py
+"""Geometric shapes"""
+
+import math
+
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return math.pi * self.radius ** 2
+
+    def perimeter(self):
+        return 2 * math.pi * self.radius
+
+class Rectangle:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+```
+
+```python
+# geometry/utils.py
+"""Geometry utilities"""
+
+from .shapes import Circle, Rectangle  # Relative import
+
+def calculate_area(shape):
+    """Calculate area of any shape"""
+    return shape.area()
+
+def calculate_perimeter(shape):
+    """Calculate perimeter of any shape"""
+    return shape.perimeter()
+
+def compare_areas(shape1, shape2):
+    """Compare areas of two shapes"""
+    area1 = calculate_area(shape1)
+    area2 = calculate_area(shape2)
+    return area1 - area2
+```
+
+::: {.callout-warning}
+## Relative Import Rules
+- **Only in packages**: Can't use relative imports in scripts
+- **Dot syntax**: `.` = current, `..` = parent
+- **Be careful**: Deep relative imports get confusing
+- **Explicit is better**: Sometimes absolute imports are clearer
+
+```python
+# Relative (inside package)
+from .module import function
+
+# Absolute (from anywhere)
+from package.module import function
+```
+:::
+
+## Package Metadata
+
+Add useful information to your package.
+
+### Complete __init__.py Example
+
+```python
+# mypackage/__init__.py
+"""
+My Package
+==========
+
+A comprehensive example package showing best practices.
+
+Example:
+    >>> from mypackage import process_data
+    >>> process_data([1, 2, 3])
+    [2, 4, 6]
+"""
+
+# Package metadata
+__version__ = "2.1.0"
+__author__ = "Your Name"
+__email__ = "you@example.com"
+__license__ = "MIT"
+__url__ = "https://github.com/yourusername/mypackage"
+
+# Import main functionality
+from .core import process_data, analyze
+from .utils import helper_function
+
+# Define public API
+__all__ = [
+    'process_data',
+    'analyze',
+    'helper_function',
+]
+
+# Package initialization
+def _init():
+    """Initialize package"""
+    print(f"Loading {__name__} v{__version__}")
+
+_init()
+```
+
+### Accessing Metadata
+
+```python
+import mypackage
+
+print(f"Version: {mypackage.__version__}")
+print(f"Author: {mypackage.__author__}")
+print(f"License: {mypackage.__license__}")
+```
+
+::: {.callout-note}
+## Common Metadata Attributes
+- `__version__`: Package version (use semantic versioning)
+- `__author__`: Author name
+- `__email__`: Contact email
+- `__license__`: License type (MIT, GPL, etc.)
+- `__url__`: Project homepage
+- `__all__`: Public API list
+- `__doc__`: Package documentation
+:::
+
+## Installing Packages with pip
+
+Python packages can be installed using `pip`, Python's package manager.
+
+### Using pip
+
+```bash
+# Install package
+pip install requests
+
+# Install specific version
+pip install requests==2.28.0
+
+# Install with minimum version
+pip install requests>=2.28.0
+
+# Install from requirements file
+pip install -r requirements.txt
+
+# Uninstall package
+pip uninstall requests
+
+# List installed packages
+pip list
+
+# Show package info
+pip show requests
+
+# Search for packages
+pip search keyword
+```
+
+### requirements.txt
+
+```text
+# requirements.txt
+# List your project dependencies
+
+requests>=2.28.0
+numpy>=1.20.0
+pandas>=1.3.0
+matplotlib>=3.4.0
+
+# Development dependencies
+pytest>=7.0.0
+black>=22.0.0
+```
+
+### Installing in Development Mode
+
+```bash
+# Install your own package in editable mode
+pip install -e .
+
+# Changes to code take effect immediately
+# No need to reinstall after every change
+```
+
+::: {.callout-tip}
+## pip Best Practices
+1. **Use virtual environments**: Isolate project dependencies
+2. **Pin versions**: Ensure reproducibility
+3. **requirements.txt**: Document dependencies
+4. **Regular updates**: Keep packages up to date
+5. **Check security**: Use `pip audit` for vulnerabilities
+:::
+
+## Creating Installable Packages
+
+Make your package installable with pip.
+
+### Project Structure
+
+```
+myproject/
+    mypackage/
+        __init__.py
+        core.py
+        utils.py
+    tests/
+        test_core.py
+    setup.py
+    README.md
+    LICENSE
+    requirements.txt
+```
+
+### setup.py
+
+```python
+# setup.py
+from setuptools import setup, find_packages
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+setup(
+    name="mypackage",
+    version="1.0.0",
+    author="Your Name",
+    author_email="you@example.com",
+    description="A short description",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/yourusername/mypackage",
+    packages=find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires=">=3.8",
+    install_requires=[
+        "requests>=2.28.0",
+        "numpy>=1.20.0",
+    ],
+    extras_require={
+        "dev": ["pytest>=7.0.0", "black>=22.0.0"],
+    },
+)
+```
+
+### pyproject.toml (Modern Alternative)
+
+```toml
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mypackage"
+version = "1.0.0"
+description = "A short description"
+readme = "README.md"
+authors = [{name = "Your Name", email = "you@example.com"}]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "requests>=2.28.0",
+    "numpy>=1.20.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0", "black>=22.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/mypackage"
+```
+
+### Building and Installing
+
+```bash
+# Build distribution
+python -m build
+
+# Install locally
+pip install .
+
+# Install in development mode
+pip install -e .
+
+# Upload to PyPI
+python -m twine upload dist/*
+```
+
+::: {.callout-important}
+## Package Distribution
+1. **setup.py or pyproject.toml**: Package configuration
+2. **README.md**: Package documentation
+3. **LICENSE**: Legal terms
+4. **tests/**: Test suite
+5. **Build**: Create distribution files
+6. **Upload**: Publish to PyPI
+:::
+
+## Real-World Package Examples
+
+### Web Scraping Package
+
+```python
+# webscraper/
+#     __init__.py
+#     scraper.py
+#     parser.py
+#     utils.py
+
+# webscraper/__init__.py
+"""Web scraping utilities"""
+
+__version__ = "1.0.0"
+
+from .scraper import fetch_page, fetch_multiple
+from .parser import parse_html, extract_links
+
+__all__ = ['fetch_page', 'fetch_multiple', 'parse_html', 'extract_links']
+
+# webscraper/scraper.py
+"""Fetching web pages"""
+
+import requests
+
+def fetch_page(url, timeout=10):
+    """Fetch a single page"""
+    response = requests.get(url, timeout=timeout)
+    response.raise_for_status()
+    return response.text
+
+def fetch_multiple(urls, timeout=10):
+    """Fetch multiple pages"""
+    results = {}
+    for url in urls:
+        try:
+            results[url] = fetch_page(url, timeout)
+        except Exception as e:
+            results[url] = f"Error: {e}"
+    return results
+
+# webscraper/parser.py
+"""Parsing HTML content"""
+
+from html.parser import HTMLParser
+
+def parse_html(html):
+    """Parse HTML and extract text"""
+    # Implementation here
+    pass
+
+def extract_links(html):
+    """Extract all links from HTML"""
+    # Implementation here
+    pass
+```
+
+### Data Analysis Package
+
+```python
+# datatools/
+#     __init__.py
+#     stats.py
+#     visualization.py
+#     cleaning.py
+
+# datatools/__init__.py
+"""Data analysis tools"""
+
+__version__ = "2.0.0"
+
+from .stats import mean, median, std_dev
+from .cleaning import remove_nulls, normalize
+
+__all__ = ['mean', 'median', 'std_dev', 'remove_nulls', 'normalize']
+
+# datatools/stats.py
+"""Statistical functions"""
+
+def mean(data):
+    """Calculate mean"""
+    return sum(data) / len(data)
+
+def median(data):
+    """Calculate median"""
+    sorted_data = sorted(data)
+    n = len(sorted_data)
+    mid = n // 2
+    if n % 2 == 0:
+        return (sorted_data[mid-1] + sorted_data[mid]) / 2
+    return sorted_data[mid]
+
+def std_dev(data):
+    """Calculate standard deviation"""
+    avg = mean(data)
+    variance = sum((x - avg) ** 2 for x in data) / len(data)
+    return variance ** 0.5
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Package basics**:
+  - What packages are
+  - Directory structure
+  - `__init__.py` file
+
+- **Creating packages**:
+  - Organizing modules
+  - Package hierarchy
+  - Sub-packages
+
+- **Imports**:
+  - Absolute imports
+  - Relative imports
+  - Import best practices
+
+- **Package metadata**:
+  - Version information
+  - Author details
+  - Public API definition
+
+- **Package installation**:
+  - Using pip
+  - requirements.txt
+  - Virtual environments
+
+- **Distribution**:
+  - setup.py / pyproject.toml
+  - Building packages
+  - Publishing to PyPI
+
+::: {.callout-important}
+## Key Takeaways
+1. **Packages organize** related modules
+2. **__init__.py** makes directory a package
+3. **Sub-packages** create hierarchies
+4. **Relative imports** use dot notation
+5. **pip** manages package installation
+6. **setup.py** configures distribution
+7. **Virtual environments** isolate dependencies
+8. **Document** your package well
+:::
+
+## Practice Exercises
+
+### Exercise 1: Create a Math Package
+
+Create a comprehensive math package.
+
+```python
+# mathtools/
+#     __init__.py
+#     basic.py
+#     geometry.py
+#     statistics.py
+
+# mathtools/__init__.py
+"""
+Solution: Math tools package
+"""
+
+__version__ = "1.0.0"
+__author__ = "Student"
+
+from .basic import add, subtract, multiply, divide
+from .geometry import area_circle, area_rectangle
+from .statistics import mean, median
+
+__all__ = [
+    'add', 'subtract', 'multiply', 'divide',
+    'area_circle', 'area_rectangle',
+    'mean', 'median'
+]
+
+# mathtools/basic.py
+"""Basic math operations"""
+
+def add(x, y):
+    return x + y
+
+def subtract(x, y):
+    return x - y
+
+def multiply(x, y):
+    return x * y
+
+def divide(x, y):
+    if y == 0:
+        raise ValueError("Division by zero")
+    return x / y
+
+# mathtools/geometry.py
+"""Geometric calculations"""
+
+import math
+
+def area_circle(radius):
+    """Calculate circle area"""
+    return math.pi * radius ** 2
+
+def area_rectangle(width, height):
+    """Calculate rectangle area"""
+    return width * height
+
+def area_triangle(base, height):
+    """Calculate triangle area"""
+    return 0.5 * base * height
+
+# mathtools/statistics.py
+"""Statistical functions"""
+
+def mean(data):
+    """Calculate mean"""
+    return sum(data) / len(data)
+
+def median(data):
+    """Calculate median"""
+    sorted_data = sorted(data)
+    n = len(sorted_data)
+    mid = n // 2
+    if n % 2 == 0:
+        return (sorted_data[mid-1] + sorted_data[mid]) / 2
+    return sorted_data[mid]
+
+def mode(data):
+    """Calculate mode"""
+    from collections import Counter
+    counts = Counter(data)
+    max_count = max(counts.values())
+    return [k for k, v in counts.items() if v == max_count]
+
+# Usage
+# from mathtools import add, area_circle, mean
+# print(add(5, 3))
+# print(area_circle(5))
+# print(mean([1, 2, 3, 4, 5]))
+```
+
+### Exercise 2: Create a Text Processing Package
+
+Build a complete text processing package.
+
+```python
+# texttools/
+#     __init__.py
+#     formatting.py
+#     analysis.py
+#     validation.py
+
+# texttools/__init__.py
+"""
+Solution: Text processing package
+"""
+
+__version__ = "1.0.0"
+
+from .formatting import clean, capitalize, truncate
+from .analysis import word_count, char_count
+from .validation import is_email, is_url
+
+__all__ = [
+    'clean', 'capitalize', 'truncate',
+    'word_count', 'char_count',
+    'is_email', 'is_url'
+]
+
+# texttools/formatting.py
+"""Text formatting functions"""
+
+def clean(text):
+    """Remove extra whitespace"""
+    return " ".join(text.split())
+
+def capitalize(text):
+    """Capitalize first letter of each word"""
+    return " ".join(word.capitalize() for word in text.split())
+
+def truncate(text, length, suffix="..."):
+    """Truncate text to length"""
+    if len(text) <= length:
+        return text
+    return text[:length - len(suffix)] + suffix
+
+def remove_punctuation(text):
+    """Remove punctuation"""
+    import string
+    return text.translate(str.maketrans("", "", string.punctuation))
+
+# texttools/analysis.py
+"""Text analysis functions"""
+
+def word_count(text):
+    """Count words"""
+    return len(text.split())
+
+def char_count(text, include_spaces=True):
+    """Count characters"""
+    if include_spaces:
+        return len(text)
+    return len(text.replace(" ", ""))
+
+def sentence_count(text):
+    """Count sentences"""
+    import re
+    sentences = re.split(r'[.!?]+', text)
+    return len([s for s in sentences if s.strip()])
+
+def word_frequency(text):
+    """Calculate word frequency"""
+    words = text.lower().split()
+    freq = {}
+    for word in words:
+        freq[word] = freq.get(word, 0) + 1
+    return freq
+
+# texttools/validation.py
+"""Text validation functions"""
+
+import re
+
+def is_email(text):
+    """Check if text is valid email"""
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return bool(re.match(pattern, text))
+
+def is_url(text):
+    """Check if text is valid URL"""
+    pattern = r'^https?://[\w\.-]+\.\w+(/.*)?$'
+    return bool(re.match(pattern, text))
+
+def is_phone(text):
+    """Check if text is valid phone (US format)"""
+    pattern = r'^\+?1?\d{10}$'
+    clean = re.sub(r'[\s\-\(\)]', '', text)
+    return bool(re.match(pattern, clean))
+```
+
+### Exercise 3: Create Web Utilities Package with Sub-packages
+
+```python
+# webutils/
+#     __init__.py
+#     http/
+#         __init__.py
+#         client.py
+#         headers.py
+#     parsing/
+#         __init__.py
+#         html.py
+#         json.py
+
+# webutils/__init__.py
+"""
+Solution: Web utilities package
+"""
+
+__version__ = "1.0.0"
+
+from .http import get, post
+from .parsing import parse_json, parse_html
+
+__all__ = ['get', 'post', 'parse_json', 'parse_html']
+
+# webutils/http/__init__.py
+"""HTTP utilities"""
+
+from .client import get, post, put, delete
+from .headers import build_headers, add_auth
+
+__all__ = ['get', 'post', 'put', 'delete', 'build_headers', 'add_auth']
+
+# webutils/http/client.py
+"""HTTP client functions"""
+
+def get(url, **kwargs):
+    """GET request"""
+    print(f"GET {url}")
+    return {"status": 200, "data": "response"}
+
+def post(url, data, **kwargs):
+    """POST request"""
+    print(f"POST {url}")
+    return {"status": 201, "data": "created"}
+
+def put(url, data, **kwargs):
+    """PUT request"""
+    print(f"PUT {url}")
+    return {"status": 200, "data": "updated"}
+
+def delete(url, **kwargs):
+    """DELETE request"""
+    print(f"DELETE {url}")
+    return {"status": 204}
+
+# webutils/parsing/__init__.py
+"""Parsing utilities"""
+
+from .html import parse_html, extract_text
+from .json import parse_json, to_json
+
+__all__ = ['parse_html', 'extract_text', 'parse_json', 'to_json']
+
+# webutils/parsing/json.py
+"""JSON parsing"""
+
+import json
+
+def parse_json(text):
+    """Parse JSON string"""
+    return json.loads(text)
+
+def to_json(obj, indent=2):
+    """Convert to JSON string"""
+    return json.dumps(obj, indent=indent)
+```
+
+::: {.callout-tip}
+## Keep Building!
+Packages are essential for organizing larger Python projects. Practice creating:
+- **Utility packages**: Reusable tools
+- **Domain packages**: Business logic
+- **Application packages**: Complete applications
+
+Good package structure makes projects scalable and maintainable!
+:::
+
+---
+
+Congratulations! You've mastered Python packages. You can now organize modules into packages, create sub-packages, and even distribute your own packages. This skill is crucial for building professional Python applications!

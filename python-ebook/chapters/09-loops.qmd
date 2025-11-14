@@ -1,0 +1,874 @@
+# Loops: The Power of Repetition {#sec-loops}
+
+Imagine having to write `print("Hello!")` a hundred times. Exhausting, right? That's where loops come in! Loops let you repeat actions efficiently, making your code shorter, cleaner, and more powerful.
+
+## Introduction to Loops
+
+A **loop** is a programming construct that repeats a block of code multiple times. Python has two main types of loops:
+
+- **for loops**: Iterate over sequences (lists, strings, ranges, etc.)
+- **while loops**: Repeat while a condition is true
+
+## The for Loop
+
+The `for` loop is used to iterate over a sequence of elements.
+
+### Basic for Loop
+
+```{python}
+# Iterating over a list
+fruits = ["apple", "banana", "orange", "grape"]
+
+for fruit in fruits:
+    print(f"I like {fruit}")
+
+print("All done!")
+```
+
+### How for Loops Work
+
+```{python}
+# Each iteration assigns the next value to the variable
+numbers = [1, 2, 3, 4, 5]
+
+for num in numbers:
+    print(f"Number: {num}, Square: {num ** 2}")
+```
+
+::: {.callout-note}
+## for Loop Syntax
+```python
+for variable in sequence:
+    # code to execute
+    # this block is indented
+```
+- `variable` takes each value from `sequence` one at a time
+- The code block runs once for each value
+:::
+
+## The range() Function
+
+`range()` generates a sequence of numbers, perfect for loops!
+
+### Basic Range
+
+```{python}
+# range(stop) - counts from 0 to stop-1
+for i in range(5):
+    print(i)
+```
+
+### Range with Start and Stop
+
+```{python}
+# range(start, stop) - counts from start to stop-1
+for i in range(1, 6):
+    print(i)
+```
+
+### Range with Step
+
+```{python}
+# range(start, stop, step)
+# Count by 2s
+for i in range(0, 10, 2):
+    print(i)
+
+print("\nCountdown:")
+# Count backwards
+for i in range(10, 0, -1):
+    print(i)
+print("Blast off!")
+```
+
+::: {.callout-tip}
+## Range Quick Reference
+- `range(5)` → 0, 1, 2, 3, 4
+- `range(1, 6)` → 1, 2, 3, 4, 5
+- `range(0, 10, 2)` → 0, 2, 4, 6, 8
+- `range(10, 0, -1)` → 10, 9, 8, ..., 1
+:::
+
+### Practical Range Examples
+
+```{python}
+# Print multiplication table
+number = 7
+print(f"Multiplication table for {number}:")
+for i in range(1, 11):
+    print(f"{number} × {i} = {number * i}")
+```
+
+```{python}
+# Sum of numbers
+total = 0
+for i in range(1, 101):
+    total += i
+print(f"Sum of 1 to 100: {total}")
+```
+
+## Iterating Over Strings
+
+Strings are sequences, so you can loop over each character:
+
+```{python}
+# Loop through characters
+word = "Python"
+
+for char in word:
+    print(char)
+```
+
+```{python}
+# Count vowels
+text = "Hello, World!"
+vowels = "aeiouAEIOU"
+vowel_count = 0
+
+for char in text:
+    if char in vowels:
+        vowel_count += 1
+
+print(f"Vowels in '{text}': {vowel_count}")
+```
+
+```{python}
+# Create acronym
+phrase = "Python Artificial Intelligence"
+acronym = ""
+
+for word in phrase.split():
+    acronym += word[0].upper()
+
+print(f"Acronym: {acronym}")
+```
+
+## Iterating Over Lists
+
+Lists are one of the most common things to iterate over:
+
+```{python}
+# Simple iteration
+scores = [85, 92, 78, 90, 88]
+
+for score in scores:
+    print(f"Score: {score}")
+```
+
+```{python}
+# Processing list items
+prices = [19.99, 29.99, 15.50, 42.00]
+total = 0
+
+print("Shopping Cart:")
+for price in prices:
+    print(f"  ${price:.2f}")
+    total += price
+
+print(f"Total: ${total:.2f}")
+```
+
+### Using enumerate()
+
+Get both index and value while iterating:
+
+```{python}
+# enumerate() provides index and value
+students = ["Alice", "Bob", "Charlie", "Diana"]
+
+for index, student in enumerate(students):
+    print(f"{index + 1}. {student}")
+```
+
+```{python}
+# Starting enumerate at different number
+for position, student in enumerate(students, start=1):
+    print(f"#{position}: {student}")
+```
+
+::: {.callout-tip}
+## When to Use enumerate()
+Use `enumerate()` when you need both the index and the value. It's more Pythonic than using `range(len(list))`!
+
+```python
+# Less Pythonic
+for i in range(len(students)):
+    print(f"{i}: {students[i]}")
+
+# More Pythonic
+for i, student in enumerate(students):
+    print(f"{i}: {student}")
+```
+:::
+
+### Using zip()
+
+Iterate over multiple sequences simultaneously:
+
+```{python}
+# zip() combines multiple sequences
+names = ["Alice", "Bob", "Charlie"]
+ages = [25, 30, 35]
+cities = ["New York", "London", "Paris"]
+
+for name, age, city in zip(names, ages, cities):
+    print(f"{name} is {age} years old and lives in {city}")
+```
+
+```{python}
+# Creating a dictionary with zip
+keys = ["name", "age", "city"]
+values = ["Alice", 25, "New York"]
+
+person = dict(zip(keys, values))
+print(person)
+```
+
+## Iterating Over Dictionaries
+
+Dictionaries can be iterated in several ways:
+
+```{python}
+# Iterating over keys (default)
+person = {"name": "Alice", "age": 25, "city": "New York"}
+
+print("Keys:")
+for key in person:
+    print(key)
+
+print("\nKey-value pairs:")
+for key in person:
+    print(f"{key}: {person[key]}")
+```
+
+```{python}
+# Better: using items()
+person = {"name": "Alice", "age": 25, "city": "New York"}
+
+for key, value in person.items():
+    print(f"{key}: {value}")
+```
+
+```{python}
+# Iterating over values only
+scores = {"Alice": 95, "Bob": 87, "Charlie": 92}
+
+print("Scores:")
+for score in scores.values():
+    print(score)
+
+average = sum(scores.values()) / len(scores)
+print(f"Average: {average:.2f}")
+```
+
+## The while Loop
+
+A `while` loop repeats as long as a condition is true:
+
+```{python}
+# Basic while loop
+count = 0
+
+while count < 5:
+    print(f"Count: {count}")
+    count += 1
+
+print("Loop ended")
+```
+
+### While vs For
+
+```{python}
+# Same result, different approaches
+# Using for loop
+print("For loop:")
+for i in range(5):
+    print(i)
+
+# Using while loop
+print("\nWhile loop:")
+i = 0
+while i < 5:
+    print(i)
+    i += 1
+```
+
+::: {.callout-note}
+## When to Use Which Loop?
+- Use **for loops** when you know how many iterations you need
+- Use **while loops** when you repeat until a condition changes
+:::
+
+### Practical While Loop Examples
+
+```{python}
+# User input validation (simulated)
+attempts = 0
+max_attempts = 3
+correct_password = "secret123"
+
+# Simulate user inputs
+user_inputs = ["wrong", "also_wrong", "secret123"]
+
+while attempts < max_attempts:
+    password = user_inputs[attempts]
+    attempts += 1
+
+    if password == correct_password:
+        print("Access granted!")
+        break
+    else:
+        remaining = max_attempts - attempts
+        print(f"Wrong password. {remaining} attempts remaining.")
+else:
+    print("Account locked!")
+```
+
+```{python}
+# Countdown timer
+import time
+
+seconds = 5
+print("Starting countdown...")
+
+while seconds > 0:
+    print(f"{seconds}...")
+    time.sleep(1)
+    seconds -= 1
+
+print("Time's up!")
+```
+
+```{python}
+# Number guessing game (simplified)
+secret_number = 7
+guess = 0
+attempts = 0
+
+# Simulate guesses
+guesses = [3, 9, 7]
+
+while guess != secret_number and attempts < len(guesses):
+    guess = guesses[attempts]
+    attempts += 1
+
+    if guess < secret_number:
+        print(f"{guess} is too low!")
+    elif guess > secret_number:
+        print(f"{guess} is too high!")
+    else:
+        print(f"Correct! You got it in {attempts} attempts!")
+```
+
+## Nested Loops
+
+Loops inside loops are called nested loops:
+
+```{python}
+# Simple nested loop
+for i in range(1, 4):
+    for j in range(1, 4):
+        print(f"i={i}, j={j}")
+    print()  # Blank line after each outer loop
+```
+
+### Multiplication Table
+
+```{python}
+# Create a multiplication table
+print("Multiplication Table (1-5):")
+print("   ", end="")
+
+# Header row
+for i in range(1, 6):
+    print(f"{i:4}", end="")
+print()
+print("   " + "----" * 5)
+
+# Table rows
+for i in range(1, 6):
+    print(f"{i:2} |", end="")
+    for j in range(1, 6):
+        print(f"{i*j:4}", end="")
+    print()
+```
+
+### Pattern Printing
+
+```{python}
+# Right triangle
+rows = 5
+for i in range(1, rows + 1):
+    print("*" * i)
+```
+
+```{python}
+# Number pyramid
+rows = 5
+for i in range(1, rows + 1):
+    # Print spaces
+    print(" " * (rows - i), end="")
+    # Print numbers
+    for j in range(1, i + 1):
+        print(j, end=" ")
+    print()
+```
+
+```{python}
+# Diamond pattern
+n = 5
+
+# Upper half
+for i in range(1, n + 1):
+    print(" " * (n - i) + "*" * (2 * i - 1))
+
+# Lower half
+for i in range(n - 1, 0, -1):
+    print(" " * (n - i) + "*" * (2 * i - 1))
+```
+
+### Nested Loop with Lists
+
+```{python}
+# Matrix operations
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+print("Matrix:")
+for row in matrix:
+    for element in row:
+        print(f"{element:3}", end="")
+    print()
+
+# Sum all elements
+total = 0
+for row in matrix:
+    for element in row:
+        total += element
+
+print(f"\nSum of all elements: {total}")
+```
+
+## Loop Control: A Preview
+
+We'll cover these in detail in the next chapter, but here's a quick preview:
+
+### break Statement
+
+Exit a loop early:
+
+```{python}
+# Find first even number
+numbers = [1, 3, 5, 8, 9, 11, 14]
+
+for num in numbers:
+    if num % 2 == 0:
+        print(f"First even number: {num}")
+        break
+```
+
+### continue Statement
+
+Skip to the next iteration:
+
+```{python}
+# Print only positive numbers
+numbers = [-2, 3, -1, 5, -4, 7]
+
+for num in numbers:
+    if num < 0:
+        continue
+    print(num)
+```
+
+::: {.callout-note}
+## Coming Up Next
+We'll explore `break`, `continue`, and the `else` clause in loops in detail in the next chapter!
+:::
+
+## Practical Examples
+
+Let's build some useful programs using loops:
+
+### Statistics Calculator
+
+```{python}
+def calculate_statistics(numbers):
+    """Calculate mean, min, max of numbers"""
+    if not numbers:
+        return None
+
+    total = 0
+    minimum = numbers[0]
+    maximum = numbers[0]
+
+    for num in numbers:
+        total += num
+        if num < minimum:
+            minimum = num
+        if num > maximum:
+            maximum = num
+
+    mean = total / len(numbers)
+
+    return {
+        "mean": mean,
+        "min": minimum,
+        "max": maximum,
+        "sum": total,
+        "count": len(numbers)
+    }
+
+# Test
+data = [85, 92, 78, 95, 88, 76, 90]
+stats = calculate_statistics(data)
+
+print("Statistics:")
+for key, value in stats.items():
+    print(f"{key.capitalize()}: {value:.2f}" if isinstance(value, float) else f"{key.capitalize()}: {value}")
+```
+
+### Prime Number Finder
+
+```{python}
+def is_prime(n):
+    """Check if n is a prime number"""
+    if n < 2:
+        return False
+
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+
+    return True
+
+# Find all primes up to 50
+print("Prime numbers up to 50:")
+primes = []
+for num in range(2, 51):
+    if is_prime(num):
+        primes.append(num)
+
+print(primes)
+print(f"Total: {len(primes)} prime numbers")
+```
+
+### Fibonacci Sequence
+
+```{python}
+# Generate Fibonacci sequence
+def fibonacci(n):
+    """Generate first n Fibonacci numbers"""
+    sequence = []
+    a, b = 0, 1
+
+    for _ in range(n):
+        sequence.append(a)
+        a, b = b, a + b
+
+    return sequence
+
+# Generate and display
+fib_numbers = fibonacci(15)
+print("First 15 Fibonacci numbers:")
+for i, num in enumerate(fib_numbers, 1):
+    print(f"F({i}) = {num}")
+```
+
+### Histogram Generator
+
+```{python}
+def print_histogram(data):
+    """Print a text-based histogram"""
+    # Find max value for scaling
+    max_value = max(data.values())
+
+    print("\nHistogram:")
+    for label, value in data.items():
+        bar_length = int((value / max_value) * 40)
+        bar = "█" * bar_length
+        print(f"{label:10} | {bar} {value}")
+
+# Test data
+grades = {
+    "A": 15,
+    "B": 25,
+    "C": 30,
+    "D": 12,
+    "F": 5
+}
+
+print_histogram(grades)
+```
+
+### Password Generator
+
+```{python}
+import random
+import string
+
+def generate_password(length=12):
+    """Generate a random password"""
+    # Character pools
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    special = "!@#$%^&*"
+
+    # Ensure at least one of each type
+    password = [
+        random.choice(lowercase),
+        random.choice(uppercase),
+        random.choice(digits),
+        random.choice(special)
+    ]
+
+    # Fill the rest randomly
+    all_chars = lowercase + uppercase + digits + special
+    for _ in range(length - 4):
+        password.append(random.choice(all_chars))
+
+    # Shuffle the password
+    random.shuffle(password)
+
+    return ''.join(password)
+
+# Generate multiple passwords
+print("Generated passwords:")
+for i in range(5):
+    print(f"{i + 1}. {generate_password()}")
+```
+
+### Shopping Cart Total
+
+```{python}
+def calculate_cart_total():
+    """Calculate shopping cart with discounts"""
+    cart = [
+        {"name": "Laptop", "price": 999.99, "quantity": 1},
+        {"name": "Mouse", "price": 29.99, "quantity": 2},
+        {"name": "Keyboard", "price": 79.99, "quantity": 1},
+        {"name": "Monitor", "price": 299.99, "quantity": 2}
+    ]
+
+    print("=" * 60)
+    print("SHOPPING CART".center(60))
+    print("=" * 60)
+    print(f"{'Item':<20} {'Price':>10} {'Qty':>5} {'Subtotal':>15}")
+    print("-" * 60)
+
+    total = 0
+    for item in cart:
+        subtotal = item["price"] * item["quantity"]
+        total += subtotal
+        print(f"{item['name']:<20} ${item['price']:>9.2f} {item['quantity']:>5} ${subtotal:>14.2f}")
+
+    print("-" * 60)
+    print(f"{'Subtotal:':>45} ${total:>12.2f}")
+
+    # Apply discount for large orders
+    if total > 1000:
+        discount = total * 0.1
+        print(f"{'Discount (10%):':>45} ${discount:>12.2f}")
+        total -= discount
+
+    tax = total * 0.08
+    print(f"{'Tax (8%):':>45} ${tax:>12.2f}")
+
+    final_total = total + tax
+    print("=" * 60)
+    print(f"{'TOTAL:':>45} ${final_total:>12.2f}")
+    print("=" * 60)
+
+calculate_cart_total()
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **For loops**:
+  - Iterating over lists, strings, and other sequences
+  - Using `range()` for numeric sequences
+  - `enumerate()` for index and value
+  - `zip()` for parallel iteration
+
+- **While loops**:
+  - Repeating while a condition is true
+  - When to use while vs for
+
+- **Nested loops**:
+  - Loops inside loops
+  - Creating patterns and tables
+  - Working with matrices
+
+- **Iterating over collections**:
+  - Lists: direct iteration
+  - Strings: character by character
+  - Dictionaries: keys, values, items
+  - Using helper functions like enumerate() and zip()
+
+- **Practical applications**:
+  - Statistics calculations
+  - Pattern generation
+  - Data processing
+  - Game logic
+
+::: {.callout-important}
+## Key Takeaways
+1. Use **for loops** for iterating over sequences
+2. Use **while loops** for conditional repetition
+3. `range()` is perfect for counting
+4. `enumerate()` gives you both index and value
+5. `zip()` combines multiple sequences
+6. Be careful with infinite loops in while statements
+7. Nested loops multiply iterations (use wisely!)
+:::
+
+## Practice Exercises
+
+### Exercise 1: FizzBuzz
+
+Write the classic FizzBuzz program: Print numbers 1-100, but:
+- For multiples of 3, print "Fizz"
+- For multiples of 5, print "Buzz"
+- For multiples of both, print "FizzBuzz"
+
+```{python}
+def fizzbuzz():
+    """Solution"""
+    for i in range(1, 101):
+        if i % 3 == 0 and i % 5 == 0:
+            print("FizzBuzz")
+        elif i % 3 == 0:
+            print("Fizz")
+        elif i % 5 == 0:
+            print("Buzz")
+        else:
+            print(i)
+
+# Test first 20
+for i in range(1, 21):
+    output = ""
+    if i % 3 == 0 and i % 5 == 0:
+        output = "FizzBuzz"
+    elif i % 3 == 0:
+        output = "Fizz"
+    elif i % 5 == 0:
+        output = "Buzz"
+    else:
+        output = str(i)
+    print(f"{i:3}: {output}")
+```
+
+### Exercise 2: Sum of Digits
+
+Write a function that calculates the sum of digits in a number.
+
+```{python}
+def sum_of_digits(n):
+    """Solution"""
+    total = 0
+    n = abs(n)  # Handle negative numbers
+
+    while n > 0:
+        digit = n % 10
+        total += digit
+        n //= 10
+
+    return total
+
+# Alternative using string conversion
+def sum_of_digits_v2(n):
+    return sum(int(digit) for digit in str(abs(n)))
+
+# Test
+numbers = [123, 456, 999, 1001]
+for num in numbers:
+    print(f"Sum of digits in {num}: {sum_of_digits(num)}")
+```
+
+### Exercise 3: Reverse a List
+
+Write a function that reverses a list without using built-in methods.
+
+```{python}
+def reverse_list(lst):
+    """Solution"""
+    reversed_lst = []
+    for i in range(len(lst) - 1, -1, -1):
+        reversed_lst.append(lst[i])
+    return reversed_lst
+
+# Test
+original = [1, 2, 3, 4, 5]
+reversed_result = reverse_list(original)
+print(f"Original: {original}")
+print(f"Reversed: {reversed_result}")
+```
+
+### Exercise 4: Find Common Elements
+
+Write a function that finds common elements between two lists.
+
+```{python}
+def find_common(list1, list2):
+    """Solution"""
+    common = []
+    for item in list1:
+        if item in list2 and item not in common:
+            common.append(item)
+    return common
+
+# Test
+list1 = [1, 2, 3, 4, 5]
+list2 = [4, 5, 6, 7, 8]
+common = find_common(list1, list2)
+print(f"Common elements: {common}")
+```
+
+### Exercise 5: Palindrome Checker
+
+Write a function that checks if a string is a palindrome (reads same forwards and backwards).
+
+```{python}
+def is_palindrome(text):
+    """Solution"""
+    # Clean the text: lowercase and remove non-alphanumeric
+    cleaned = ""
+    for char in text.lower():
+        if char.isalnum():
+            cleaned += char
+
+    # Check if it's the same forwards and backwards
+    length = len(cleaned)
+    for i in range(length // 2):
+        if cleaned[i] != cleaned[length - 1 - i]:
+            return False
+
+    return True
+
+# Test
+test_strings = [
+    "racecar",
+    "hello",
+    "A man a plan a canal Panama",
+    "Was it a car or a cat I saw"
+]
+
+for text in test_strings:
+    result = "is" if is_palindrome(text) else "is not"
+    print(f"'{text}' {result} a palindrome")
+```
+
+::: {.callout-tip}
+## Master Loops!
+Loops are fundamental to programming. Practice with different scenarios and challenges to build strong loop skills!
+:::
+
+---
+
+Fantastic! You've mastered loops. Next, we'll learn about loop control statements for even more power!

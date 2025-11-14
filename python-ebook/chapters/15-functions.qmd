@@ -1,0 +1,1006 @@
+# Functions: Building Reusable Code {#sec-functions}
+
+Functions are the building blocks of organized, reusable code. They let you package logic into named chunks that you can use again and again. Instead of copying and pasting code, you write it once as a function and call it whenever you need it. Let's master this essential programming concept!
+
+## What Are Functions?
+
+A **function** is a named block of reusable code that performs a specific task. Functions can take inputs (parameters), process them, and return outputs (return values).
+
+### Why Use Functions?
+
+```{python}
+# Without functions - repetitive code
+print("=" * 40)
+print("Welcome to Python!".center(40))
+print("=" * 40)
+
+print("=" * 40)
+print("Hello World!".center(40))
+print("=" * 40)
+
+# With functions - DRY (Don't Repeat Yourself)
+def print_banner(text, width=40):
+    """Print text in a banner"""
+    print("=" * width)
+    print(text.center(width))
+    print("=" * width)
+
+print_banner("Welcome to Python!")
+print_banner("Hello World!")
+```
+
+::: {.callout-note}
+## Benefits of Functions
+- **Reusability**: Write once, use many times
+- **Organization**: Break complex problems into smaller pieces
+- **Maintainability**: Fix bugs in one place
+- **Testing**: Test small pieces independently
+- **Abstraction**: Hide implementation details
+:::
+
+## Defining Functions
+
+### Basic Function Syntax
+
+```{python}
+# Simple function with no parameters
+def greet():
+    """Say hello"""
+    print("Hello, World!")
+
+# Call the function
+greet()
+greet()
+```
+
+### Functions with Parameters
+
+```{python}
+# Function with one parameter
+def greet_person(name):
+    """Greet a specific person"""
+    print(f"Hello, {name}!")
+
+greet_person("Alice")
+greet_person("Bob")
+
+# Function with multiple parameters
+def greet_full(first_name, last_name):
+    """Greet with full name"""
+    print(f"Hello, {first_name} {last_name}!")
+
+greet_full("Alice", "Smith")
+greet_full("Bob", "Jones")
+```
+
+::: {.callout-important}
+## Function Definition Syntax
+```python
+def function_name(parameters):
+    """Docstring: describes what function does"""
+    # Function body (indented)
+    # Code to execute
+    return value  # optional
+```
+:::
+
+## Return Values
+
+Functions can return values using the `return` statement:
+
+### Basic Return
+
+```{python}
+def add(a, b):
+    """Add two numbers"""
+    return a + b
+
+result = add(5, 3)
+print(f"5 + 3 = {result}")
+
+# Use directly in expressions
+print(f"10 + 20 = {add(10, 20)}")
+```
+
+### Multiple Return Values
+
+```{python}
+def get_min_max(numbers):
+    """Return both min and max"""
+    return min(numbers), max(numbers)
+
+numbers = [3, 1, 4, 1, 5, 9, 2, 6]
+minimum, maximum = get_min_max(numbers)
+print(f"Min: {minimum}, Max: {maximum}")
+
+# As tuple
+result = get_min_max(numbers)
+print(f"Result tuple: {result}")
+```
+
+### Early Return
+
+```{python}
+def divide(a, b):
+    """Divide a by b"""
+    if b == 0:
+        return "Error: Division by zero"
+    return a / b
+
+print(divide(10, 2))
+print(divide(10, 0))
+```
+
+### Return None
+
+```{python}
+def greet(name):
+    """Greet someone (no return value)"""
+    print(f"Hello, {name}!")
+    # Implicitly returns None
+
+result = greet("Alice")
+print(f"Return value: {result}")
+
+# Explicit return None
+def do_nothing():
+    return None
+
+print(do_nothing())
+```
+
+::: {.callout-tip}
+## Return Best Practices
+- Functions without `return` implicitly return `None`
+- Use early returns to handle special cases
+- Return tuples for multiple values
+- Be consistent with return types
+:::
+
+## Function Parameters
+
+### Positional Parameters
+
+```{python}
+def describe_pet(animal, name):
+    """Display pet information"""
+    print(f"I have a {animal} named {name}")
+
+# Arguments must be in order
+describe_pet("dog", "Buddy")
+describe_pet("cat", "Whiskers")
+```
+
+### Keyword Arguments
+
+```{python}
+def describe_pet(animal, name):
+    """Display pet information"""
+    print(f"I have a {animal} named {name}")
+
+# Use parameter names - order doesn't matter
+describe_pet(animal="dog", name="Buddy")
+describe_pet(name="Whiskers", animal="cat")
+
+# Mix positional and keyword (positional first!)
+describe_pet("hamster", name="Fluffy")
+```
+
+### Default Parameters
+
+```{python}
+def greet(name, greeting="Hello"):
+    """Greet with customizable greeting"""
+    print(f"{greeting}, {name}!")
+
+# Use default
+greet("Alice")
+
+# Override default
+greet("Bob", "Hi")
+greet("Charlie", greeting="Hey")
+```
+
+```{python}
+# Multiple defaults
+def make_pizza(size, *toppings, crust="regular", delivery=False):
+    """Make a pizza with various options"""
+    print(f"\nMaking a {size}-inch {crust} crust pizza")
+    print(f"Toppings: {', '.join(toppings) if toppings else 'cheese only'}")
+    print(f"Delivery: {'Yes' if delivery else 'No'}")
+
+make_pizza(12, "pepperoni", "mushrooms")
+make_pizza(16, "olives", crust="thin", delivery=True)
+```
+
+::: {.callout-warning}
+## Mutable Default Arguments
+Avoid mutable defaults (lists, dicts)! They're created once and shared:
+
+```python
+# DON'T DO THIS
+def bad_function(items=[]):
+    items.append(1)
+    return items
+
+# DO THIS INSTEAD
+def good_function(items=None):
+    if items is None:
+        items = []
+    items.append(1)
+    return items
+```
+:::
+
+## Variable-Length Arguments
+
+### *args (Variable Positional Arguments)
+
+```{python}
+def sum_all(*numbers):
+    """Sum any number of arguments"""
+    total = 0
+    for num in numbers:
+        total += num
+    return total
+
+print(sum_all(1, 2, 3))
+print(sum_all(1, 2, 3, 4, 5))
+print(sum_all(10, 20))
+```
+
+```{python}
+# Mixing regular and *args
+def make_sandwich(bread, *fillings):
+    """Make a sandwich"""
+    print(f"Sandwich on {bread} bread with:")
+    for filling in fillings:
+        print(f"  - {filling}")
+
+make_sandwich("wheat", "turkey", "lettuce", "tomato")
+make_sandwich("white", "ham", "cheese")
+```
+
+### **kwargs (Variable Keyword Arguments)
+
+```{python}
+def build_profile(first, last, **user_info):
+    """Build a user profile"""
+    profile = {
+        "first_name": first,
+        "last_name": last
+    }
+    profile.update(user_info)
+    return profile
+
+user = build_profile("Albert", "Einstein",
+                     location="Princeton",
+                     field="Physics",
+                     age=76)
+
+print("User Profile:")
+for key, value in user.items():
+    print(f"  {key}: {value}")
+```
+
+### Combining *args and **kwargs
+
+```{python}
+def super_function(required, *args, default="test", **kwargs):
+    """Function with all parameter types"""
+    print(f"Required: {required}")
+    print(f"Args: {args}")
+    print(f"Default: {default}")
+    print(f"Kwargs: {kwargs}")
+
+super_function("Hello", 1, 2, 3, default="custom", x=10, y=20)
+```
+
+::: {.callout-note}
+## Parameter Order
+When defining functions with multiple parameter types, use this order:
+1. Regular positional parameters
+2. `*args`
+3. Keyword-only parameters (after `*args`)
+4. `**kwargs`
+
+```python
+def func(pos1, pos2, *args, kw1, kw2="default", **kwargs):
+    pass
+```
+:::
+
+## Unpacking Arguments
+
+### Unpacking with *
+
+```{python}
+def add_three(a, b, c):
+    """Add three numbers"""
+    return a + b + c
+
+numbers = [1, 2, 3]
+
+# Unpack list as arguments
+result = add_three(*numbers)
+print(f"Sum: {result}")
+
+# Unpack tuple
+coords = (10, 20, 30)
+print(f"Sum of coords: {add_three(*coords)}")
+```
+
+### Unpacking with **
+
+```{python}
+def create_user(name, age, city):
+    """Create a user"""
+    return f"User: {name}, {age} years old, from {city}"
+
+user_data = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York"
+}
+
+# Unpack dictionary as keyword arguments
+result = create_user(**user_data)
+print(result)
+```
+
+## Scope and Lifetime
+
+### Local Scope
+
+```{python}
+def my_function():
+    """Demonstrate local scope"""
+    local_var = "I'm local"
+    print(local_var)
+
+my_function()
+
+# local_var doesn't exist here
+try:
+    print(local_var)
+except NameError:
+    print("local_var is not defined outside function")
+```
+
+### Global Scope
+
+```{python}
+global_var = "I'm global"
+
+def access_global():
+    """Access global variable"""
+    print(global_var)
+
+access_global()
+print(global_var)
+```
+
+### Modifying Global Variables
+
+```{python}
+counter = 0
+
+def increment():
+    """Increment global counter"""
+    global counter
+    counter += 1
+
+print(f"Before: {counter}")
+increment()
+increment()
+print(f"After: {counter}")
+```
+
+::: {.callout-warning}
+## Avoid Global Variables
+Using global variables makes code harder to understand and test. Pass values as parameters and return results instead:
+
+```python
+# Better approach
+def increment(value):
+    return value + 1
+
+counter = 0
+counter = increment(counter)
+counter = increment(counter)
+```
+:::
+
+## Lambda Functions
+
+Anonymous, one-line functions:
+
+```{python}
+# Regular function
+def square(x):
+    return x ** 2
+
+# Lambda equivalent
+square_lambda = lambda x: x ** 2
+
+print(square(5))
+print(square_lambda(5))
+
+# Lambda with multiple parameters
+add = lambda x, y: x + y
+print(add(3, 7))
+
+# Common use: with map, filter, sorted
+numbers = [1, 2, 3, 4, 5]
+squared = list(map(lambda x: x ** 2, numbers))
+print(f"Squared: {squared}")
+
+# Filter even numbers
+evens = list(filter(lambda x: x % 2 == 0, numbers))
+print(f"Evens: {evens}")
+
+# Sort by second element
+pairs = [(1, 5), (2, 3), (3, 1), (4, 2)]
+sorted_pairs = sorted(pairs, key=lambda x: x[1])
+print(f"Sorted: {sorted_pairs}")
+```
+
+::: {.callout-tip}
+## When to Use Lambda?
+- Short, simple operations
+- With `map()`, `filter()`, `sorted()`, etc.
+- One-time use functions
+
+For complex logic, use regular functions with names!
+:::
+
+## Docstrings
+
+Document your functions with docstrings:
+
+```{python}
+def calculate_bmi(weight, height):
+    """
+    Calculate Body Mass Index.
+
+    Parameters:
+        weight (float): Weight in kilograms
+        height (float): Height in meters
+
+    Returns:
+        float: BMI value
+
+    Example:
+        >>> calculate_bmi(70, 1.75)
+        22.86
+    """
+    return weight / (height ** 2)
+
+# Access docstring
+print(calculate_bmi.__doc__)
+
+# Use help()
+help(calculate_bmi)
+```
+
+::: {.callout-note}
+## Docstring Formats
+Popular formats:
+- **Google Style** (readable)
+- **NumPy Style** (detailed)
+- **Sphinx/reStructuredText** (documentation generators)
+
+Choose one and be consistent!
+:::
+
+## Type Hints (Python 3.5+)
+
+Add type annotations for better code clarity:
+
+```{python}
+def greet(name: str) -> str:
+    """Greet with type hints"""
+    return f"Hello, {name}!"
+
+def add(a: int, b: int) -> int:
+    """Add two integers"""
+    return a + b
+
+def process_items(items: list[str]) -> dict[str, int]:
+    """Count string lengths"""
+    return {item: len(item) for item in items}
+
+# Type hints don't enforce types at runtime
+result = add(5, 3)  # Correct
+result2 = add(5.5, 3.2)  # Works, but not intended
+
+print(result)
+print(result2)
+```
+
+## Practical Examples
+
+Let's build useful functions:
+
+### Temperature Converter
+
+```{python}
+def celsius_to_fahrenheit(celsius: float) -> float:
+    """Convert Celsius to Fahrenheit"""
+    return (celsius * 9/5) + 32
+
+def fahrenheit_to_celsius(fahrenheit: float) -> float:
+    """Convert Fahrenheit to Celsius"""
+    return (fahrenheit - 32) * 5/9
+
+def convert_temperature(value: float, from_unit: str, to_unit: str) -> float:
+    """
+    Convert temperature between units.
+
+    Args:
+        value: Temperature value
+        from_unit: 'C' or 'F'
+        to_unit: 'C' or 'F'
+
+    Returns:
+        Converted temperature
+    """
+    if from_unit == to_unit:
+        return value
+
+    if from_unit == 'C' and to_unit == 'F':
+        return celsius_to_fahrenheit(value)
+    elif from_unit == 'F' and to_unit == 'C':
+        return fahrenheit_to_celsius(value)
+    else:
+        raise ValueError("Invalid units")
+
+# Test
+print(f"100°C = {convert_temperature(100, 'C', 'F'):.2f}°F")
+print(f"32°F = {convert_temperature(32, 'F', 'C'):.2f}°C")
+```
+
+### Validator Functions
+
+```{python}
+def is_valid_email(email: str) -> bool:
+    """Check if email is valid (simple check)"""
+    return '@' in email and '.' in email.split('@')[-1]
+
+def is_valid_password(password: str) -> tuple[bool, list[str]]:
+    """
+    Validate password strength.
+
+    Returns:
+        Tuple of (is_valid, error_messages)
+    """
+    errors = []
+
+    if len(password) < 8:
+        errors.append("Password must be at least 8 characters")
+
+    if not any(c.isupper() for c in password):
+        errors.append("Password must contain uppercase letter")
+
+    if not any(c.islower() for c in password):
+        errors.append("Password must contain lowercase letter")
+
+    if not any(c.isdigit() for c in password):
+        errors.append("Password must contain digit")
+
+    return len(errors) == 0, errors
+
+def validate_user_input(email: str, password: str) -> dict:
+    """Validate user registration input"""
+    result = {
+        "email": {"valid": is_valid_email(email), "errors": []},
+        "password": {"valid": False, "errors": []}
+    }
+
+    if not result["email"]["valid"]:
+        result["email"]["errors"].append("Invalid email format")
+
+    is_valid, errors = is_valid_password(password)
+    result["password"]["valid"] = is_valid
+    result["password"]["errors"] = errors
+
+    return result
+
+# Test
+validation = validate_user_input("test@example.com", "Weak")
+print("Validation Results:")
+for field, info in validation.items():
+    print(f"\n{field.capitalize()}:")
+    print(f"  Valid: {info['valid']}")
+    if info['errors']:
+        print("  Errors:")
+        for error in info['errors']:
+            print(f"    - {error}")
+```
+
+### Statistics Functions
+
+```{python}
+def calculate_statistics(numbers: list[float]) -> dict:
+    """
+    Calculate various statistics for a list of numbers.
+
+    Args:
+        numbers: List of numeric values
+
+    Returns:
+        Dictionary with statistics
+    """
+    if not numbers:
+        return None
+
+    sorted_numbers = sorted(numbers)
+    n = len(numbers)
+
+    # Mean
+    mean = sum(numbers) / n
+
+    # Median
+    if n % 2 == 0:
+        median = (sorted_numbers[n//2 - 1] + sorted_numbers[n//2]) / 2
+    else:
+        median = sorted_numbers[n//2]
+
+    # Mode (most common)
+    from collections import Counter
+    count = Counter(numbers)
+    mode = count.most_common(1)[0][0] if count else None
+
+    # Standard deviation
+    variance = sum((x - mean) ** 2 for x in numbers) / n
+    std_dev = variance ** 0.5
+
+    return {
+        "count": n,
+        "sum": sum(numbers),
+        "mean": mean,
+        "median": median,
+        "mode": mode,
+        "min": min(numbers),
+        "max": max(numbers),
+        "range": max(numbers) - min(numbers),
+        "variance": variance,
+        "std_dev": std_dev
+    }
+
+# Test
+data = [85, 90, 78, 92, 88, 85, 95, 87, 85]
+stats = calculate_statistics(data)
+
+print("Statistics:")
+for key, value in stats.items():
+    if isinstance(value, float):
+        print(f"{key:12}: {value:.2f}")
+    else:
+        print(f"{key:12}: {value}")
+```
+
+### Text Processing Functions
+
+```{python}
+def word_count(text: str) -> dict[str, int]:
+    """Count word frequencies"""
+    words = text.lower().split()
+    counts = {}
+    for word in words:
+        # Remove punctuation
+        word = ''.join(c for c in word if c.isalnum())
+        if word:
+            counts[word] = counts.get(word, 0) + 1
+    return counts
+
+def find_longest_word(text: str) -> str:
+    """Find the longest word in text"""
+    words = text.split()
+    return max(words, key=len) if words else ""
+
+def reverse_words(text: str) -> str:
+    """Reverse the order of words"""
+    return ' '.join(text.split()[::-1])
+
+def capitalize_sentences(text: str) -> str:
+    """Capitalize first letter of each sentence"""
+    sentences = text.split('. ')
+    capitalized = [s.capitalize() for s in sentences]
+    return '. '.join(capitalized)
+
+# Test
+sample = "the quick brown fox jumps over the lazy dog. the dog was very lazy."
+
+print(f"Word count: {word_count(sample)}")
+print(f"Longest word: {find_longest_word(sample)}")
+print(f"Reversed: {reverse_words(sample)}")
+print(f"Capitalized: {capitalize_sentences(sample)}")
+```
+
+### Recursive Functions
+
+```{python}
+def factorial(n: int) -> int:
+    """Calculate factorial using recursion"""
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+def fibonacci(n: int) -> int:
+    """Calculate nth Fibonacci number"""
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+def sum_digits(n: int) -> int:
+    """Sum digits of a number recursively"""
+    if n < 10:
+        return n
+    return (n % 10) + sum_digits(n // 10)
+
+# Test
+print(f"5! = {factorial(5)}")
+print(f"Fibonacci(8) = {fibonacci(8)}")
+print(f"Sum of digits in 12345: {sum_digits(12345)}")
+```
+
+### Higher-Order Functions
+
+```{python}
+def apply_operation(numbers: list, operation) -> list:
+    """Apply operation to each number"""
+    return [operation(num) for num in numbers]
+
+def filter_values(items: list, predicate) -> list:
+    """Filter items based on predicate function"""
+    return [item for item in items if predicate(item)]
+
+def compose(f, g):
+    """Compose two functions: (f ∘ g)(x) = f(g(x))"""
+    return lambda x: f(g(x))
+
+# Test
+numbers = [1, 2, 3, 4, 5]
+
+# Apply operations
+squared = apply_operation(numbers, lambda x: x ** 2)
+print(f"Squared: {squared}")
+
+# Filter
+evens = filter_values(numbers, lambda x: x % 2 == 0)
+print(f"Even numbers: {evens}")
+
+# Compose functions
+add_one = lambda x: x + 1
+multiply_two = lambda x: x * 2
+add_then_multiply = compose(multiply_two, add_one)
+
+result = add_then_multiply(5)  # (5 + 1) * 2 = 12
+print(f"Add 1 then multiply by 2: {result}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Function basics**:
+  - Defining functions with `def`
+  - Parameters and return values
+  - Calling functions
+
+- **Parameters**:
+  - Positional and keyword arguments
+  - Default parameters
+  - `*args` for variable positional arguments
+  - `**kwargs` for variable keyword arguments
+
+- **Advanced concepts**:
+  - Scope (local vs global)
+  - Lambda functions
+  - Docstrings
+  - Type hints
+  - Unpacking arguments
+  - Recursive functions
+  - Higher-order functions
+
+- **Best practices**:
+  - Write focused, single-purpose functions
+  - Use descriptive names
+  - Document with docstrings
+  - Avoid global variables
+  - Return early for special cases
+  - Use type hints for clarity
+
+::: {.callout-important}
+## Key Takeaways
+1. Functions make code **reusable** and **organized**
+2. Use **descriptive names** and **docstrings**
+3. **Parameters** pass data in, **return** sends data out
+4. `*args` for variable positional, `**kwargs` for variable keyword
+5. Keep functions **focused** on one task
+6. **Document** your functions well
+7. **Test** functions independently
+8. Avoid **side effects** and **global variables**
+:::
+
+## Practice Exercises
+
+### Exercise 1: Palindrome Checker
+
+Write a function that checks if a string is a palindrome.
+
+```{python}
+def is_palindrome(text: str) -> bool:
+    """
+    Solution
+
+    Check if text is a palindrome (reads same forwards and backwards)
+    """
+    # Clean text: lowercase, alphanumeric only
+    cleaned = ''.join(c.lower() for c in text if c.isalnum())
+
+    # Check if same as reversed
+    return cleaned == cleaned[::-1]
+
+# Test
+test_cases = [
+    "racecar",
+    "hello",
+    "A man a plan a canal Panama",
+    "Was it a car or a cat I saw?"
+]
+
+for test in test_cases:
+    result = "is" if is_palindrome(test) else "is not"
+    print(f"'{test}' {result} a palindrome")
+```
+
+### Exercise 2: Prime Number Functions
+
+Write functions to check primality and find prime numbers.
+
+```{python}
+def is_prime(n: int) -> bool:
+    """Solution: Check if n is prime"""
+    if n < 2:
+        return False
+
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+
+    return True
+
+def get_primes(limit: int) -> list[int]:
+    """Solution: Get all primes up to limit"""
+    return [n for n in range(2, limit + 1) if is_prime(n)]
+
+def nth_prime(n: int) -> int:
+    """Solution: Get the nth prime number"""
+    count = 0
+    num = 2
+
+    while count < n:
+        if is_prime(num):
+            count += 1
+            if count == n:
+                return num
+        num += 1
+
+# Test
+print(f"Is 17 prime? {is_prime(17)}")
+print(f"Primes up to 30: {get_primes(30)}")
+print(f"10th prime: {nth_prime(10)}")
+```
+
+### Exercise 3: Function Decorator
+
+Write a timing decorator to measure function execution time.
+
+```{python}
+import time
+
+def timing_decorator(func):
+    """Solution: Decorator to measure execution time"""
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"{func.__name__} took {end - start:.4f} seconds")
+        return result
+    return wrapper
+
+@timing_decorator
+def slow_function():
+    """A slow function for testing"""
+    time.sleep(0.1)
+    return "Done"
+
+# Test
+result = slow_function()
+```
+
+### Exercise 4: Calculator Functions
+
+Build a calculator with multiple operations.
+
+```{python}
+def calculate(operation: str, a: float, b: float) -> float:
+    """
+    Solution: Perform calculation based on operation
+
+    Args:
+        operation: '+', '-', '*', '/', '%', '**'
+        a, b: Numbers to operate on
+
+    Returns:
+        Result of operation
+    """
+    operations = {
+        '+': lambda x, y: x + y,
+        '-': lambda x, y: x - y,
+        '*': lambda x, y: x * y,
+        '/': lambda x, y: x / y if y != 0 else "Error: Division by zero",
+        '%': lambda x, y: x % y,
+        '**': lambda x, y: x ** y
+    }
+
+    if operation in operations:
+        return operations[operation](a, b)
+    else:
+        return "Error: Invalid operation"
+
+# Test
+print(f"10 + 5 = {calculate('+', 10, 5)}")
+print(f"10 - 5 = {calculate('-', 10, 5)}")
+print(f"10 * 5 = {calculate('*', 10, 5)}")
+print(f"10 / 5 = {calculate('/', 10, 5)}")
+print(f"10 ** 2 = {calculate('**', 10, 2)}")
+```
+
+### Exercise 5: List Processing Functions
+
+Write functions to process lists in various ways.
+
+```{python}
+def chunk_list(lst: list, size: int) -> list[list]:
+    """Solution: Split list into chunks of given size"""
+    return [lst[i:i + size] for i in range(0, len(lst), size)]
+
+def flatten_list(nested: list) -> list:
+    """Solution: Flatten a nested list"""
+    result = []
+    for item in nested:
+        if isinstance(item, list):
+            result.extend(flatten_list(item))
+        else:
+            result.append(item)
+    return result
+
+def rotate_list(lst: list, positions: int) -> list:
+    """Solution: Rotate list by n positions"""
+    if not lst:
+        return lst
+
+    positions = positions % len(lst)
+    return lst[positions:] + lst[:positions]
+
+# Test
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+print(f"Chunked: {chunk_list(numbers, 3)}")
+
+nested = [1, [2, 3, [4, 5]], 6, [7, [8, 9]]]
+print(f"Flattened: {flatten_list(nested)}")
+
+print(f"Rotated by 2: {rotate_list(numbers, 2)}")
+```
+
+::: {.callout-tip}
+## Keep Building!
+Functions are fundamental to Python. Practice writing clean, well-documented functions. Break complex problems into smaller functions that work together!
+:::
+
+---
+
+Congratulations! You've completed this comprehensive introduction to Python functions. You now have the tools to write organized, reusable, and maintainable code. Keep practicing and building!

@@ -1,0 +1,859 @@
+# Loop Control: break, continue, and More {#sec-loop-control}
+
+Sometimes you need more control over your loops. Maybe you want to exit early when you find what you're looking for, or skip certain iterations. Python provides powerful statements for fine-tuning loop behavior: `break`, `continue`, `pass`, and the loop `else` clause.
+
+## The break Statement
+
+The `break` statement immediately exits the loop, no matter where you are in the iteration.
+
+### Basic break Usage
+
+```{python}
+# Exit loop when condition is met
+for i in range(10):
+    if i == 5:
+        print("Found 5! Breaking out...")
+        break
+    print(i)
+
+print("Loop ended")
+```
+
+### Finding a Value
+
+```{python}
+# Search for a specific item
+fruits = ["apple", "banana", "orange", "grape", "mango"]
+target = "orange"
+
+for fruit in fruits:
+    if fruit == target:
+        print(f"Found {target}!")
+        break
+    print(f"Checking {fruit}...")
+else:
+    print(f"{target} not found")
+```
+
+::: {.callout-note}
+## How break Works
+- Exits the innermost loop immediately
+- Skips all remaining iterations
+- Continues execution after the loop
+:::
+
+### Practical break Examples
+
+```{python}
+# Find first number divisible by 7 and 3
+for num in range(1, 100):
+    if num % 7 == 0 and num % 3 == 0:
+        print(f"First number divisible by both 7 and 3: {num}")
+        break
+```
+
+```{python}
+# User authentication (simulated)
+max_attempts = 3
+correct_password = "secret123"
+attempts = 0
+
+# Simulate password attempts
+passwords = ["wrong1", "wrong2", "secret123"]
+
+for password in passwords:
+    attempts += 1
+    print(f"Attempt {attempts}: {password}")
+
+    if password == correct_password:
+        print("Access granted!")
+        break
+
+    if attempts >= max_attempts:
+        print("Too many failed attempts!")
+        break
+else:
+    print("Please try again later")
+```
+
+```{python}
+# Find prime factors
+def find_first_prime_factor(n):
+    """Find the first prime factor of n"""
+    for i in range(2, n):
+        if n % i == 0:
+            return i
+    return n
+
+number = 84
+factor = find_first_prime_factor(number)
+print(f"First prime factor of {number}: {factor}")
+```
+
+## The continue Statement
+
+The `continue` statement skips the rest of the current iteration and moves to the next one.
+
+### Basic continue Usage
+
+```{python}
+# Skip even numbers
+for i in range(10):
+    if i % 2 == 0:
+        continue
+    print(i)
+```
+
+### Filtering with continue
+
+```{python}
+# Print only positive numbers
+numbers = [-2, 5, -1, 8, -4, 3, -7, 9]
+
+print("Positive numbers:")
+for num in numbers:
+    if num <= 0:
+        continue
+    print(num)
+```
+
+::: {.callout-note}
+## How continue Works
+- Skips the rest of the current iteration
+- Immediately starts the next iteration
+- Does not exit the loop
+:::
+
+### Practical continue Examples
+
+```{python}
+# Skip invalid data
+data = [10, 0, 15, 0, 20, 0, 25]
+
+print("Processing data (skipping zeros):")
+for value in data:
+    if value == 0:
+        print("  Skipping invalid data")
+        continue
+
+    result = 100 / value
+    print(f"  100 / {value} = {result:.2f}")
+```
+
+```{python}
+# Filter words by length
+words = ["hi", "hello", "a", "wonderful", "day", "to", "code"]
+
+print("Words with 4+ characters:")
+for word in words:
+    if len(word) < 4:
+        continue
+    print(f"  {word}")
+```
+
+```{python}
+# Skip weekends
+days = ["Monday", "Tuesday", "Saturday", "Wednesday", "Sunday", "Thursday"]
+
+print("Workdays:")
+for day in days:
+    if day in ["Saturday", "Sunday"]:
+        continue
+    print(f"  Working on {day}")
+```
+
+## break vs continue
+
+Let's see them side by side:
+
+```{python}
+# Using break - exits the loop
+print("Using break:")
+for i in range(10):
+    if i == 5:
+        break
+    print(i, end=" ")
+print("\nLoop exited at 5\n")
+
+# Using continue - skips to next iteration
+print("Using continue:")
+for i in range(10):
+    if i == 5:
+        continue
+    print(i, end=" ")
+print("\nSkipped 5, continued loop")
+```
+
+::: {.callout-important}
+## Key Difference
+- **break**: "Stop the loop completely"
+- **continue**: "Skip this iteration, move to the next"
+:::
+
+## The else Clause in Loops
+
+Python loops can have an `else` clause that executes when the loop completes normally (without break).
+
+### for-else
+
+```{python}
+# else executes if loop completes normally
+for i in range(5):
+    print(i)
+else:
+    print("Loop completed normally!")
+```
+
+### When else is Skipped
+
+```{python}
+# else is skipped if break is used
+for i in range(5):
+    if i == 3:
+        print("Breaking at 3")
+        break
+    print(i)
+else:
+    print("This won't print!")
+```
+
+### Practical for-else Examples
+
+```{python}
+# Search with notification
+def search_item(items, target):
+    """Search for an item and report result"""
+    for item in items:
+        if item == target:
+            print(f"Found {target}!")
+            break
+    else:
+        print(f"{target} not found in the list")
+
+# Test
+fruits = ["apple", "banana", "orange"]
+search_item(fruits, "banana")
+search_item(fruits, "grape")
+```
+
+```{python}
+# Check if number is prime
+def is_prime(n):
+    """Check if n is prime using for-else"""
+    if n < 2:
+        return False
+
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    else:
+        return True
+
+# Test
+numbers = [2, 7, 15, 23, 30]
+for num in numbers:
+    result = "prime" if is_prime(num) else "not prime"
+    print(f"{num} is {result}")
+```
+
+### while-else
+
+The `else` clause works with `while` loops too:
+
+```{python}
+# Countdown with completion message
+count = 5
+
+while count > 0:
+    print(count)
+    count -= 1
+else:
+    print("Blast off!")
+```
+
+```{python}
+# Password validation with else
+max_attempts = 3
+attempts = 0
+correct_password = "secret"
+
+# Simulate attempts
+passwords = ["wrong1", "wrong2", "wrong3"]
+
+while attempts < max_attempts:
+    password = passwords[attempts]
+    attempts += 1
+
+    if password == correct_password:
+        print("Login successful!")
+        break
+    print(f"Wrong password. Attempt {attempts}/{max_attempts}")
+else:
+    print("Account locked due to too many failed attempts")
+```
+
+::: {.callout-tip}
+## When to Use Loop else
+The loop `else` clause is perfect for search operations where you want to know if the search completed without finding anything.
+:::
+
+## The pass Statement
+
+The `pass` statement does nothing. It's a placeholder when you need a statement syntactically but don't want to execute anything.
+
+### Basic pass Usage
+
+```{python}
+# pass as a placeholder
+for i in range(5):
+    if i == 3:
+        pass  # TODO: implement later
+    else:
+        print(i)
+```
+
+### Practical pass Examples
+
+```{python}
+# Placeholder for future code
+def process_data(data):
+    """Process data - to be implemented"""
+    pass  # Implementation coming soon
+
+# Empty exception handler
+try:
+    value = int("abc")
+except ValueError:
+    pass  # Silently ignore the error
+```
+
+```{python}
+# Filtering with pass
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+for num in numbers:
+    if num % 2 == 0:
+        pass  # Even numbers - do nothing for now
+    else:
+        print(f"{num} is odd")
+```
+
+::: {.callout-note}
+## pass vs continue
+- **pass**: Do nothing, continue in the current iteration
+- **continue**: Skip to the next iteration
+
+`pass` is typically used as a placeholder, while `continue` is for flow control.
+:::
+
+## Nested Loops with break and continue
+
+Control statements work with nested loops, but only affect the innermost loop:
+
+### break in Nested Loops
+
+```{python}
+# break only exits the inner loop
+for i in range(3):
+    print(f"\nOuter loop: {i}")
+    for j in range(3):
+        if j == 2:
+            print("  Breaking inner loop")
+            break
+        print(f"  Inner loop: {j}")
+    print("Back in outer loop")
+```
+
+### continue in Nested Loops
+
+```{python}
+# continue skips to next iteration of inner loop
+for i in range(3):
+    print(f"\nOuter loop: {i}")
+    for j in range(3):
+        if j == 1:
+            print("  Skipping j=1")
+            continue
+        print(f"  Inner loop: {j}")
+```
+
+### Using Flags to Break Outer Loops
+
+```{python}
+# Use a flag to break out of nested loops
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+target = 5
+found = False
+
+for i, row in enumerate(matrix):
+    for j, value in enumerate(row):
+        if value == target:
+            print(f"Found {target} at position ({i}, {j})")
+            found = True
+            break
+    if found:
+        break
+```
+
+### Alternative: Using Functions
+
+```{python}
+# Better: use a function with return
+def find_in_matrix(matrix, target):
+    """Find target in matrix"""
+    for i, row in enumerate(matrix):
+        for j, value in enumerate(row):
+            if value == target:
+                return (i, j)
+    return None
+
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+position = find_in_matrix(matrix, 5)
+
+if position:
+    print(f"Found at position {position}")
+else:
+    print("Not found")
+```
+
+## Practical Examples
+
+Let's put these concepts together in real-world scenarios:
+
+### Input Validation Loop
+
+```{python}
+#| eval: false
+
+def get_valid_age():
+    """Get valid age from user"""
+    while True:
+        try:
+            age = int(input("Enter your age: "))
+
+            if age < 0:
+                print("Age cannot be negative!")
+                continue
+
+            if age > 150:
+                print("Please enter a realistic age!")
+                continue
+
+            # Valid age
+            return age
+
+        except ValueError:
+            print("Please enter a valid number!")
+            continue
+
+# Usage (commented out for non-interactive environment)
+# age = get_valid_age()
+# print(f"Your age: {age}")
+```
+
+### Menu System
+
+```{python}
+#| eval: false
+
+def show_menu():
+    """Display menu and process choice"""
+    while True:
+        print("\n" + "=" * 30)
+        print("MAIN MENU")
+        print("=" * 30)
+        print("1. Option 1")
+        print("2. Option 2")
+        print("3. Option 3")
+        print("4. Exit")
+
+        choice = input("\nEnter choice (1-4): ")
+
+        if choice == '1':
+            print("You selected Option 1")
+        elif choice == '2':
+            print("You selected Option 2")
+        elif choice == '3':
+            print("You selected Option 3")
+        elif choice == '4':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice! Please try again.")
+            continue
+
+        # Ask if user wants to continue
+        if input("\nContinue? (y/n): ").lower() != 'y':
+            break
+
+# show_menu()
+```
+
+### Data Cleaner
+
+```{python}
+def clean_data(data):
+    """Clean and validate data"""
+    cleaned = []
+
+    for item in data:
+        # Skip None values
+        if item is None:
+            print(f"Skipping None value")
+            continue
+
+        # Skip negative numbers
+        if isinstance(item, (int, float)) and item < 0:
+            print(f"Skipping negative value: {item}")
+            continue
+
+        # Skip empty strings
+        if isinstance(item, str) and not item.strip():
+            print(f"Skipping empty string")
+            continue
+
+        # Add valid item
+        cleaned.append(item)
+
+        # Stop if we have enough data
+        if len(cleaned) >= 10:
+            print("Reached maximum capacity")
+            break
+
+    return cleaned
+
+# Test
+data = [5, None, -3, "hello", "", 10, -1, "world", 15, 20, 25, 30]
+result = clean_data(data)
+print(f"\nCleaned data: {result}")
+```
+
+### Prime Number Generator
+
+```{python}
+def generate_primes(limit):
+    """Generate prime numbers up to limit"""
+    primes = []
+
+    for num in range(2, limit + 1):
+        # Check if num is prime
+        for i in range(2, int(num ** 0.5) + 1):
+            if num % i == 0:
+                # Not prime, skip to next number
+                break
+        else:
+            # Loop completed without break = prime
+            primes.append(num)
+
+    return primes
+
+# Generate primes up to 50
+primes = generate_primes(50)
+print(f"Prime numbers up to 50: {primes}")
+print(f"Total: {len(primes)} primes")
+```
+
+### Password Cracker Simulator
+
+```{python}
+def crack_password(target_password, max_attempts=1000):
+    """Simulate password cracking with random attempts"""
+    import random
+    import string
+
+    attempts = 0
+    characters = string.ascii_lowercase + string.digits
+
+    while attempts < max_attempts:
+        attempts += 1
+
+        # Generate random password attempt
+        guess = ''.join(random.choice(characters) for _ in range(len(target_password)))
+
+        # Skip if we've tried this before (simplified)
+        if attempts % 100 == 0:
+            print(f"Attempt {attempts}: {guess}")
+
+        # Check if we found it
+        if guess == target_password:
+            print(f"\nPassword cracked: {guess}")
+            print(f"Attempts: {attempts}")
+            return True
+
+    else:
+        # Loop completed without break
+        print(f"\nFailed to crack password after {max_attempts} attempts")
+        return False
+
+# Simulate (with easy password for demonstration)
+crack_password("abc", max_attempts=10000)
+```
+
+### Shopping Cart with Budget
+
+```{python}
+def build_shopping_cart(items, budget):
+    """Build shopping cart within budget"""
+    cart = []
+    total = 0
+
+    print(f"Budget: ${budget:.2f}\n")
+    print("Adding items to cart:")
+
+    for item in items:
+        name, price = item
+
+        # Check if item is affordable
+        if total + price > budget:
+            print(f"  ❌ {name}: ${price:.2f} - Exceeds budget!")
+            continue
+
+        # Check if item is free (skip)
+        if price <= 0:
+            print(f"  ⚠️  {name}: Invalid price")
+            continue
+
+        # Add item to cart
+        cart.append(item)
+        total += price
+        print(f"  ✓ {name}: ${price:.2f}")
+
+        # Check if budget is exhausted
+        if total >= budget * 0.95:  # 95% of budget
+            print(f"\n  Budget almost exhausted (${total:.2f})")
+            break
+
+    print(f"\nTotal: ${total:.2f}")
+    print(f"Remaining budget: ${budget - total:.2f}")
+
+    return cart
+
+# Test
+items = [
+    ("Laptop", 500),
+    ("Mouse", 25),
+    ("Keyboard", 75),
+    ("Monitor", 300),
+    ("Headphones", 100),
+    ("Webcam", 80)
+]
+
+cart = build_shopping_cart(items, 700)
+print(f"\nItems in cart: {len(cart)}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **break statement**:
+  - Exits the loop immediately
+  - Useful for early termination
+  - Works with both for and while loops
+
+- **continue statement**:
+  - Skips the current iteration
+  - Moves to the next iteration
+  - Useful for filtering
+
+- **Loop else clause**:
+  - Executes when loop completes normally
+  - Skipped when break is used
+  - Perfect for search operations
+
+- **pass statement**:
+  - Does nothing (placeholder)
+  - Required for empty code blocks
+  - Different from continue
+
+- **Nested loop control**:
+  - Control statements affect innermost loop only
+  - Use flags or functions to break outer loops
+
+::: {.callout-important}
+## Key Takeaways
+1. Use **break** to exit loops early
+2. Use **continue** to skip iterations
+3. Loop **else** runs only if no break occurred
+4. **pass** is a placeholder that does nothing
+5. In nested loops, control statements affect only the innermost loop
+6. Consider using functions instead of complex nested breaks
+:::
+
+## Practice Exercises
+
+### Exercise 1: Find First Duplicate
+
+Write a function that finds the first duplicate in a list.
+
+```{python}
+def find_first_duplicate(lst):
+    """Solution"""
+    seen = []
+
+    for item in lst:
+        if item in seen:
+            return item
+        seen.append(item)
+    else:
+        return None
+
+# Test
+numbers = [1, 2, 3, 4, 2, 5, 6]
+duplicate = find_first_duplicate(numbers)
+print(f"First duplicate: {duplicate}")
+```
+
+### Exercise 2: Skip Multiples
+
+Write a function that prints numbers from 1 to n, skipping multiples of 3 and 5.
+
+```{python}
+def skip_multiples(n):
+    """Solution"""
+    for i in range(1, n + 1):
+        if i % 3 == 0 or i % 5 == 0:
+            continue
+        print(i, end=" ")
+    print()
+
+# Test
+skip_multiples(20)
+```
+
+### Exercise 3: Valid Parentheses
+
+Write a function that checks if parentheses are balanced.
+
+```{python}
+def are_parentheses_balanced(text):
+    """Solution"""
+    count = 0
+
+    for char in text:
+        if char == '(':
+            count += 1
+        elif char == ')':
+            count -= 1
+
+        # If count goes negative, unbalanced
+        if count < 0:
+            return False
+
+    # Check if all opened parentheses are closed
+    return count == 0
+
+# Test
+test_cases = [
+    "(hello)",
+    "((hello))",
+    "(hello))",
+    "((hello)",
+    "(a(b)c)"
+]
+
+for test in test_cases:
+    result = "balanced" if are_parentheses_balanced(test) else "unbalanced"
+    print(f"'{test}': {result}")
+```
+
+### Exercise 4: Stop at Sentinel
+
+Write a function that processes a list until it encounters a sentinel value.
+
+```{python}
+def process_until_sentinel(data, sentinel):
+    """Solution"""
+    result = []
+
+    for item in data:
+        if item == sentinel:
+            print(f"Encountered sentinel: {sentinel}")
+            break
+
+        result.append(item * 2)
+
+    return result
+
+# Test
+data = [1, 2, 3, 'STOP', 4, 5]
+processed = process_until_sentinel(data, 'STOP')
+print(f"Processed: {processed}")
+```
+
+### Exercise 5: Password Validator with Retries
+
+Write a function that validates passwords with maximum retry attempts.
+
+```{python}
+#| eval: false
+
+def validate_password_with_retries(max_retries=3):
+    """Solution"""
+    correct_password = "secret123"
+    attempts = 0
+
+    while attempts < max_retries:
+        password = input(f"Enter password (Attempt {attempts + 1}/{max_retries}): ")
+        attempts += 1
+
+        # Skip empty passwords
+        if not password:
+            print("Password cannot be empty!")
+            continue
+
+        # Check password
+        if password == correct_password:
+            print("Access granted!")
+            return True
+
+        print("Incorrect password!")
+
+    else:
+        print("Maximum attempts exceeded. Access denied.")
+        return False
+
+# validate_password_with_retries()
+```
+
+### Exercise 6: Matrix Search
+
+Write a function that searches for a value in a 2D matrix and stops when found.
+
+```{python}
+def search_matrix(matrix, target):
+    """Solution"""
+    for i, row in enumerate(matrix):
+        for j, value in enumerate(row):
+            if value == target:
+                return (i, j)
+
+    return None
+
+# Test
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+position = search_matrix(matrix, 5)
+if position:
+    print(f"Found at row {position[0]}, column {position[1]}")
+else:
+    print("Not found")
+```
+
+::: {.callout-tip}
+## Practice Makes Perfect!
+Loop control statements are powerful tools. Practice using them in different scenarios to master their behavior!
+:::
+
+---
+
+Excellent! You've mastered loop control. Next, we'll dive into lists, one of Python's most versatile data structures!

@@ -1,0 +1,612 @@
+# Operators in Python
+
+## What are Operators?
+
+Operators are special symbols that perform operations on values and variables. Think of them as the verbs of programming—they make things happen!
+
+```{python}
+# Operators in action
+x = 10 + 5    # + is an operator
+y = x * 2     # * is an operator
+z = y > 20    # > is an operator
+print(f"x={x}, y={y}, z={z}")
+```
+
+## Types of Operators
+
+Python has several categories of operators:
+
+1. Arithmetic Operators
+2. Comparison Operators
+3. Logical Operators
+4. Assignment Operators
+5. Bitwise Operators
+6. Membership Operators
+7. Identity Operators
+
+Let's explore each category!
+
+## 1. Arithmetic Operators
+
+Perform mathematical operations:
+
+```{python}
+a = 15
+b = 4
+
+print(f"a = {a}, b = {b}\n")
+
+print(f"Addition: a + b = {a + b}")
+print(f"Subtraction: a - b = {a - b}")
+print(f"Multiplication: a * b = {a * b}")
+print(f"Division: a / b = {a / b}")
+print(f"Floor Division: a // b = {a // b}")
+print(f"Modulo: a % b = {a % b}")
+print(f"Exponentiation: a ** b = {a ** b}")
+```
+
+### Division Deep Dive
+
+```{python}
+# Regular division: always returns float
+print(f"10 / 3 = {10 / 3}")       # 3.3333...
+print(f"10 / 2 = {10 / 2}")       # 5.0 (float, not int!)
+
+# Floor division: returns integer (rounds down)
+print(f"10 // 3 = {10 // 3}")     # 3
+print(f"10 // 2 = {10 // 2}")     # 5
+print(f"-10 // 3 = {-10 // 3}")   # -4 (rounds toward negative infinity)
+```
+
+### Modulo (Remainder) Operator
+
+```{python}
+# Modulo gives remainder after division
+print(f"10 % 3 = {10 % 3}")       # 1 (10 ÷ 3 = 3 remainder 1)
+print(f"15 % 4 = {15 % 4}")       # 3
+print(f"20 % 5 = {20 % 5}")       # 0 (divides evenly)
+
+# Practical use: check if number is even or odd
+num = 17
+if num % 2 == 0:
+    print(f"{num} is even")
+else:
+    print(f"{num} is odd")
+```
+
+### Exponentiation
+
+```{python}
+# Power operator
+print(f"2 ** 3 = {2 ** 3}")       # 2³ = 8
+print(f"5 ** 2 = {5 ** 2}")       # 5² = 25
+print(f"10 ** 0 = {10 ** 0}")     # Anything⁰ = 1
+
+# Square roots and fractional exponents
+print(f"9 ** 0.5 = {9 ** 0.5}")   # √9 = 3.0
+print(f"27 ** (1/3) = {27 ** (1/3)}")  # ³√27 = 3.0
+```
+
+## 2. Comparison Operators
+
+Compare values and return True or False:
+
+```{python}
+x = 10
+y = 5
+
+print(f"x = {x}, y = {y}\n")
+
+print(f"Equal: x == y is {x == y}")
+print(f"Not equal: x != y is {x != y}")
+print(f"Greater than: x > y is {x > y}")
+print(f"Less than: x < y is {x < y}")
+print(f"Greater or equal: x >= y is {x >= y}")
+print(f"Less or equal: x <= y is {x <= y}")
+```
+
+### Chaining Comparisons
+
+Python allows beautiful comparison chains:
+
+```{python}
+x = 15
+
+# Instead of: x >= 10 and x <= 20
+print(f"10 <= x <= 20: {10 <= x <= 20}")
+
+# Works with any comparisons
+a = 1
+b = 2
+c = 3
+print(f"a < b < c: {a < b < c}")
+```
+
+### Comparing Strings
+
+```{python}
+# Strings are compared lexicographically (alphabetically)
+print(f"'apple' < 'banana': {'apple' < 'banana'}")
+print(f"'cat' > 'dog': {'cat' > 'dog'}")
+print(f"'A' < 'a': {'A' < 'a'}")  # Uppercase comes before lowercase
+
+# Case-insensitive comparison
+name1 = "Alice"
+name2 = "alice"
+print(f"Case-sensitive: {name1 == name2}")
+print(f"Case-insensitive: {name1.lower() == name2.lower()}")
+```
+
+## 3. Logical Operators
+
+Combine boolean expressions:
+
+```{python}
+# AND: Both must be True
+print(f"True and True: {True and True}")
+print(f"True and False: {True and False}")
+print(f"False and False: {False and False}")
+
+# OR: At least one must be True
+print(f"True or False: {True or False}")
+print(f"False or False: {False or False}")
+
+# NOT: Inverts the boolean
+print(f"not True: {not True}")
+print(f"not False: {not False}")
+```
+
+### Practical Examples
+
+```{python}
+age = 25
+has_license = True
+has_insurance = True
+
+# AND: All conditions must be true
+can_drive = has_license and has_insurance
+print(f"Can drive: {can_drive}")
+
+# OR: At least one condition must be true
+has_id = has_license or age >= 18
+print(f"Has ID: {has_id}")
+
+# Combining conditions
+is_eligible = (age >= 18) and (has_license or has_insurance)
+print(f"Is eligible: {is_eligible}")
+```
+
+### Short-Circuit Evaluation
+
+```{python}
+# Python stops evaluating as soon as result is determined
+
+# AND: If first is False, doesn't check second
+x = False
+y = True
+result = x and print("This won't print") or y
+print(f"Result: {result}")
+
+# OR: If first is True, doesn't check second
+a = True
+b = False
+result = a or print("This won't print either")
+print(f"Result: {result}")
+```
+
+## 4. Assignment Operators
+
+Assign and modify values:
+
+```{python}
+# Basic assignment
+x = 10
+print(f"x = {x}")
+
+# Add and assign
+x += 5  # Same as: x = x + 5
+print(f"x += 5: x = {x}")
+
+# Subtract and assign
+x -= 3  # Same as: x = x - 3
+print(f"x -= 3: x = {x}")
+
+# Multiply and assign
+x *= 2  # Same as: x = x * 2
+print(f"x *= 2: x = {x}")
+
+# Divide and assign
+x /= 4  # Same as: x = x / 4
+print(f"x /= 4: x = {x}")
+```
+
+### All Assignment Operators
+
+```{python}
+x = 10
+
+# Arithmetic assignments
+x += 5   # x = x + 5
+x -= 2   # x = x - 2
+x *= 3   # x = x * 3
+x /= 4   # x = x / 4
+x //= 2  # x = x // 2 (floor division)
+x %= 3   # x = x % 3 (modulo)
+x **= 2  # x = x ** 2 (power)
+
+print(f"Final x: {x}")
+
+# Example with real use
+count = 0
+count += 1  # Increment
+count += 1
+count += 1
+print(f"Count: {count}")
+
+# Score accumulation
+score = 100
+score -= 10  # Lost points
+score += 50  # Gained points
+print(f"Final score: {score}")
+```
+
+## 5. Bitwise Operators
+
+Operate on binary representations (advanced topic):
+
+```{python}
+a = 10  # Binary: 1010
+b = 4   # Binary: 0100
+
+print(f"a = {a} (binary: {bin(a)})")
+print(f"b = {b} (binary: {bin(b)})")
+print()
+
+print(f"AND (a & b): {a & b} (binary: {bin(a & b)})")
+print(f"OR (a | b): {a | b} (binary: {bin(a | b)})")
+print(f"XOR (a ^ b): {a ^ b} (binary: {bin(a ^ b)})")
+print(f"NOT (~a): {~a} (binary: {bin(~a)})")
+print(f"Left shift (a << 1): {a << 1} (binary: {bin(a << 1)})")
+print(f"Right shift (a >> 1): {a >> 1} (binary: {bin(a >> 1)})")
+```
+
+:::{.callout-note}
+## When to Use Bitwise Operators
+
+- Low-level programming
+- Embedded systems
+- Performance-critical code
+- Flags and permissions
+- Encryption/hashing algorithms
+
+Most Python programmers rarely use bitwise operators!
+:::
+
+## 6. Membership Operators
+
+Check if value exists in sequence:
+
+```{python}
+# 'in' operator
+fruits = ["apple", "banana", "cherry"]
+print(f"'apple' in fruits: {'apple' in fruits}")
+print(f"'orange' in fruits: {'orange' in fruits}")
+
+# 'not in' operator
+print(f"'orange' not in fruits: {'orange' not in fruits}")
+
+# Works with strings
+text = "Hello, World!"
+print(f"'World' in text: {'World' in text}")
+print(f"'Python' in text: {'Python' in text}")
+
+# Works with dictionaries (checks keys)
+person = {"name": "Alice", "age": 25}
+print(f"'name' in person: {'name' in person}")
+print(f"'address' in person: {'address' in person}")
+```
+
+## 7. Identity Operators
+
+Check if objects are the same (not just equal):
+
+```{python}
+# 'is' checks if same object in memory
+x = [1, 2, 3]
+y = [1, 2, 3]
+z = x
+
+print(f"x == y: {x == y}")  # Same values
+print(f"x is y: {x is y}")  # Different objects!
+print(f"x is z: {x is z}")  # Same object
+
+# Practical use: checking for None
+value = None
+print(f"value is None: {value is None}")  # Correct way
+print(f"value == None: {value == None}")  # Works but not Pythonic
+
+# Small integers and strings are cached
+a = 256
+b = 256
+print(f"a is b (256): {a is b}")  # True (cached)
+
+a = 257
+b = 257
+print(f"a is b (257): {a is b}")  # False (not cached)
+```
+
+:::{.callout-important}
+## == vs is
+
+- Use `==` to check if values are equal
+- Use `is` to check if they're the same object
+- Always use `is` when checking for `None`
+:::
+
+## Operator Precedence
+
+When multiple operators are in one expression, Python follows precedence rules:
+
+```{python}
+# Example: What does this evaluate to?
+result = 10 + 5 * 2
+print(f"10 + 5 * 2 = {result}")  # 20, not 30 (multiplication first)
+
+# Use parentheses for clarity
+result = (10 + 5) * 2
+print(f"(10 + 5) * 2 = {result}")  # 30
+```
+
+### Precedence Table (Highest to Lowest)
+
+1. `**` (Exponentiation)
+2. `+x`, `-x`, `~x` (Unary plus, minus, bitwise NOT)
+3. `*`, `/`, `//`, `%` (Multiplication, Division, Floor Division, Modulo)
+4. `+`, `-` (Addition, Subtraction)
+5. `<<`, `>>` (Bitwise shifts)
+6. `&` (Bitwise AND)
+7. `^` (Bitwise XOR)
+8. `|` (Bitwise OR)
+9. `==`, `!=`, `>`, `>=`, `<`, `<=`, `is`, `is not`, `in`, `not in` (Comparisons)
+10. `not` (Logical NOT)
+11. `and` (Logical AND)
+12. `or` (Logical OR)
+
+```{python}
+# Complex example
+result = 2 + 3 * 4 ** 2 > 50 and not False
+print(f"Result: {result}")
+# Steps:
+# 1. 4 ** 2 = 16
+# 2. 3 * 16 = 48
+# 3. 2 + 48 = 50
+# 4. 50 > 50 = False
+# 5. not False = True
+# 6. False and True = False
+```
+
+:::{.callout-tip}
+## Best Practice
+
+When in doubt, use parentheses! They make code clearer:
+
+```python
+# Unclear
+result = a + b * c / d
+
+# Clear
+result = a + ((b * c) / d)
+```
+:::
+
+## Practical Examples
+
+### 1. Temperature Converter
+
+```{python}
+# Fahrenheit to Celsius
+fahrenheit = 98.6
+celsius = (fahrenheit - 32) * 5 / 9
+print(f"{fahrenheit}°F = {celsius:.2f}°C")
+
+# Celsius to Fahrenheit
+celsius = 37
+fahrenheit = (celsius * 9 / 5) + 32
+print(f"{celsius}°C = {fahrenheit:.2f}°F")
+```
+
+### 2. Even or Odd Checker
+
+```{python}
+number = 42
+is_even = (number % 2 == 0)
+print(f"{number} is {'even' if is_even else 'odd'}")
+```
+
+### 3. Age Validator
+
+```{python}
+age = 25
+can_vote = age >= 18
+can_drink = age >= 21
+is_senior = age >= 65
+
+print(f"Age: {age}")
+print(f"Can vote: {can_vote}")
+print(f"Can drink (USA): {can_drink}")
+print(f"Senior citizen: {is_senior}")
+```
+
+### 4. Password Strength Checker
+
+```{python}
+password = "MyP@ssw0rd"
+length = len(password)
+
+has_length = length >= 8
+has_upper = any(c.isupper() for c in password)
+has_lower = any(c.islower() for c in password)
+has_digit = any(c.isdigit() for c in password)
+
+is_strong = has_length and has_upper and has_lower and has_digit
+
+print(f"Password: {password}")
+print(f"Length >= 8: {has_length}")
+print(f"Has uppercase: {has_upper}")
+print(f"Has lowercase: {has_lower}")
+print(f"Has digit: {has_digit}")
+print(f"Strong password: {is_strong}")
+```
+
+### 5. Discount Calculator
+
+```{python}
+original_price = 100
+discount_percent = 20
+
+discount_amount = original_price * (discount_percent / 100)
+final_price = original_price - discount_amount
+
+print(f"Original Price: ${original_price:.2f}")
+print(f"Discount: {discount_percent}%")
+print(f"Discount Amount: ${discount_amount:.2f}")
+print(f"Final Price: ${final_price:.2f}")
+```
+
+## Common Mistakes and Pitfalls
+
+### 1. Assignment vs. Equality
+
+```{python}
+# WRONG: using = instead of ==
+x = 10
+# if x = 5:  # SyntaxError!
+#     print("This won't work")
+
+# CORRECT:
+if x == 10:
+    print("x is 10")
+```
+
+### 2. Floating Point Comparison
+
+```{python}
+# WRONG: direct floating point comparison
+result = 0.1 + 0.2
+print(f"0.1 + 0.2 = {result}")
+print(f"result == 0.3: {result == 0.3}")  # False!
+
+# CORRECT: use rounding or tolerance
+print(f"round(result, 10) == 0.3: {round(result, 10) == 0.3}")
+# or
+tolerance = 1e-9
+print(f"abs(result - 0.3) < {tolerance}: {abs(result - 0.3) < tolerance}")
+```
+
+### 3. Modifying List While Iterating
+
+```{python}
+# This can cause issues (we'll learn more about lists later)
+numbers = [1, 2, 3, 4, 5]
+for num in numbers[:]:  # Use slice copy to avoid issues
+    if num % 2 == 0:
+        numbers.remove(num)
+print(numbers)
+```
+
+## Summary
+
+In this chapter, you learned:
+
+- ✅ Arithmetic operators: +, -, *, /, //, %, **
+- ✅ Comparison operators: ==, !=, >, <, >=, <=
+- ✅ Logical operators: and, or, not
+- ✅ Assignment operators: =, +=, -=, *=, etc.
+- ✅ Membership operators: in, not in
+- ✅ Identity operators: is, is not
+- ✅ Operator precedence and how to use parentheses
+- ✅ Practical applications of operators
+
+:::{.callout-tip}
+## Next Steps
+
+Now that you master operators, let's dive deep into strings in the next chapter!
+:::
+
+## Practice Exercises
+
+1. Write expressions to:
+   - Calculate area of a circle (πr²) with radius 5
+   - Check if a number is divisible by both 3 and 5
+   - Calculate compound interest
+
+2. What's the output of:
+```python
+x = 10
+x += 5
+x *= 2
+print(x)
+```
+
+3. Check if a year is a leap year (divisible by 4, but not by 100 unless also by 400)
+
+4. Create a simple calculator that takes two numbers and prints:
+   - Sum, difference, product, quotient
+
+5. Fix this code:
+```python
+age = 25
+if age = 18:
+    print("Adult")
+```
+
+:::{.callout-note collapse="true"}
+## Exercise Solutions
+
+**Exercise 1:**
+```python
+import math
+# Circle area
+radius = 5
+area = math.pi * radius ** 2
+print(f"Area: {area:.2f}")
+
+# Divisible by 3 and 5
+num = 15
+print((num % 3 == 0) and (num % 5 == 0))
+
+# Compound interest: A = P(1 + r)^t
+principal = 1000
+rate = 0.05
+time = 10
+amount = principal * (1 + rate) ** time
+print(f"Amount: ${amount:.2f}")
+```
+
+**Exercise 2:**
+```python
+# Answer: 30
+# x = 10
+# x += 5  # x = 15
+# x *= 2  # x = 30
+```
+
+**Exercise 3:**
+```python
+year = 2024
+is_leap = (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
+print(f"{year} is {'a leap' if is_leap else 'not a leap'} year")
+```
+
+**Exercise 5:**
+```python
+# Problem: using = instead of ==
+# Fixed:
+age = 25
+if age == 18:
+    print("Adult")
+# Or better:
+if age >= 18:
+    print("Adult")
+```
+:::

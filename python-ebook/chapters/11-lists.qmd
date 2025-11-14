@@ -1,0 +1,925 @@
+# Lists: Python's Most Versatile Data Structure {#sec-lists}
+
+Lists are one of Python's most powerful and frequently used data structures. They're ordered, mutable collections that can hold any type of data. Whether you're managing a shopping list, processing user data, or implementing algorithms, lists are your go-to tool!
+
+## Creating Lists
+
+There are several ways to create lists in Python:
+
+### Basic List Creation
+
+```{python}
+# Empty list
+empty = []
+print(f"Empty list: {empty}")
+
+# List with items
+fruits = ["apple", "banana", "orange"]
+print(f"Fruits: {fruits}")
+
+# List with different types
+mixed = [1, "hello", 3.14, True]
+print(f"Mixed types: {mixed}")
+
+# Using the list() constructor
+numbers = list(range(5))
+print(f"From range: {numbers}")
+
+# From a string
+letters = list("Python")
+print(f"From string: {letters}")
+```
+
+### Lists Can Contain Anything
+
+```{python}
+# Numbers
+numbers = [1, 2, 3, 4, 5]
+
+# Strings
+names = ["Alice", "Bob", "Charlie"]
+
+# Mixed types
+mixed = [42, "hello", 3.14, True, None]
+
+# Even other lists!
+nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+print(f"Numbers: {numbers}")
+print(f"Names: {names}")
+print(f"Mixed: {mixed}")
+print(f"Nested: {nested}")
+```
+
+::: {.callout-note}
+## Lists Are Mutable
+Unlike strings and tuples, lists can be modified after creation. You can add, remove, or change elements!
+:::
+
+## Accessing List Elements
+
+### Indexing
+
+Access individual elements using square brackets:
+
+```{python}
+fruits = ["apple", "banana", "orange", "grape", "mango"]
+
+# Positive indexing (0-based)
+print(f"First fruit: {fruits[0]}")
+print(f"Second fruit: {fruits[1]}")
+print(f"Last fruit: {fruits[4]}")
+
+# Negative indexing (from the end)
+print(f"Last fruit: {fruits[-1]}")
+print(f"Second to last: {fruits[-2]}")
+```
+
+### Slicing
+
+Extract sublists using slicing:
+
+```{python}
+numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Basic slicing
+print(f"First 5: {numbers[0:5]}")
+print(f"Same as: {numbers[:5]}")
+
+# From middle to end
+print(f"From index 5: {numbers[5:]}")
+
+# Middle portion
+print(f"Middle: {numbers[3:7]}")
+
+# With step
+print(f"Every other: {numbers[::2]}")
+print(f"Reverse: {numbers[::-1]}")
+
+# Last 3 elements
+print(f"Last 3: {numbers[-3:]}")
+```
+
+::: {.callout-tip}
+## Slicing Syntax
+```python
+list[start:stop:step]
+```
+- `start`: First index (inclusive), default is 0
+- `stop`: Last index (exclusive)
+- `step`: Increment, default is 1
+- Negative step reverses direction
+:::
+
+## Modifying Lists
+
+Lists are mutable, so you can change them after creation:
+
+### Changing Elements
+
+```{python}
+fruits = ["apple", "banana", "orange"]
+print(f"Original: {fruits}")
+
+# Change one element
+fruits[1] = "blueberry"
+print(f"After change: {fruits}")
+
+# Change multiple elements with slicing
+fruits[0:2] = ["apricot", "blackberry"]
+print(f"After slice change: {fruits}")
+```
+
+### Adding Elements
+
+```{python}
+# append() - add to end
+fruits = ["apple", "banana"]
+fruits.append("orange")
+print(f"After append: {fruits}")
+
+# insert() - add at specific position
+fruits.insert(1, "apricot")
+print(f"After insert at 1: {fruits}")
+
+# extend() - add multiple elements
+fruits.extend(["grape", "mango"])
+print(f"After extend: {fruits}")
+
+# Using + operator
+more_fruits = fruits + ["kiwi", "lemon"]
+print(f"Using +: {more_fruits}")
+
+# Using += operator
+fruits += ["papaya"]
+print(f"Using +=: {fruits}")
+```
+
+::: {.callout-important}
+## append() vs extend()
+- `append()` adds a single element (even if it's a list)
+- `extend()` adds each element from an iterable
+
+```python
+list1 = [1, 2, 3]
+list1.append([4, 5])    # [1, 2, 3, [4, 5]]
+
+list2 = [1, 2, 3]
+list2.extend([4, 5])    # [1, 2, 3, 4, 5]
+```
+:::
+
+### Removing Elements
+
+```{python}
+fruits = ["apple", "banana", "orange", "grape", "banana"]
+
+# remove() - remove first occurrence
+fruits_copy = fruits.copy()
+fruits_copy.remove("banana")
+print(f"After remove('banana'): {fruits_copy}")
+
+# pop() - remove and return by index
+fruits_copy = fruits.copy()
+removed = fruits_copy.pop(2)
+print(f"Popped '{removed}': {fruits_copy}")
+
+# pop() without argument removes last element
+fruits_copy = fruits.copy()
+last = fruits_copy.pop()
+print(f"Popped last '{last}': {fruits_copy}")
+
+# del statement - remove by index or slice
+fruits_copy = fruits.copy()
+del fruits_copy[1]
+print(f"After del [1]: {fruits_copy}")
+
+# clear() - remove all elements
+fruits_copy = fruits.copy()
+fruits_copy.clear()
+print(f"After clear(): {fruits_copy}")
+```
+
+## List Methods
+
+Python lists come with many built-in methods:
+
+### Common List Methods
+
+```{python}
+numbers = [3, 1, 4, 1, 5, 9, 2, 6, 5]
+
+# count() - count occurrences
+count_1 = numbers.count(1)
+count_5 = numbers.count(5)
+print(f"Count of 1: {count_1}, Count of 5: {count_5}")
+
+# index() - find first position
+position = numbers.index(4)
+print(f"First position of 4: {position}")
+
+# index with start and end
+position_5 = numbers.index(5, 5)  # Start searching from index 5
+print(f"Position of 5 (after index 5): {position_5}")
+```
+
+### Sorting Lists
+
+```{python}
+# sort() - sort in place
+numbers = [3, 1, 4, 1, 5, 9, 2, 6]
+numbers.sort()
+print(f"Sorted: {numbers}")
+
+# Sort in descending order
+numbers = [3, 1, 4, 1, 5, 9, 2, 6]
+numbers.sort(reverse=True)
+print(f"Sorted descending: {numbers}")
+
+# sorted() - return new sorted list
+original = [3, 1, 4, 1, 5, 9, 2, 6]
+sorted_list = sorted(original)
+print(f"Original: {original}")
+print(f"Sorted copy: {sorted_list}")
+
+# Sorting strings
+words = ["banana", "apple", "cherry", "date"]
+words.sort()
+print(f"Sorted words: {words}")
+
+# Case-insensitive sort
+mixed_case = ["banana", "Apple", "cherry", "Date"]
+mixed_case.sort(key=str.lower)
+print(f"Case-insensitive: {mixed_case}")
+```
+
+### Reversing Lists
+
+```{python}
+# reverse() - reverse in place
+numbers = [1, 2, 3, 4, 5]
+numbers.reverse()
+print(f"Reversed: {numbers}")
+
+# Using slicing
+original = [1, 2, 3, 4, 5]
+reversed_copy = original[::-1]
+print(f"Original: {original}")
+print(f"Reversed copy: {reversed_copy}")
+
+# reversed() - return iterator
+numbers = [1, 2, 3, 4, 5]
+reversed_list = list(reversed(numbers))
+print(f"Using reversed(): {reversed_list}")
+```
+
+### Copying Lists
+
+```{python}
+# copy() method
+original = [1, 2, 3]
+copy1 = original.copy()
+copy1[0] = 999
+print(f"Original: {original}")
+print(f"Copy: {copy1}")
+
+# Using slicing
+copy2 = original[:]
+copy2[0] = 888
+print(f"Original: {original}")
+print(f"Copy: {copy2}")
+
+# Using list()
+copy3 = list(original)
+copy3[0] = 777
+print(f"Original: {original}")
+print(f"Copy: {copy3}")
+```
+
+::: {.callout-warning}
+## Shallow vs Deep Copy
+The methods above create shallow copies. For nested lists, use `copy.deepcopy()`:
+
+```python
+import copy
+original = [[1, 2], [3, 4]]
+shallow = original.copy()
+deep = copy.deepcopy(original)
+
+shallow[0][0] = 999  # Modifies original too!
+deep[1][0] = 888     # Doesn't affect original
+```
+:::
+
+## List Operations
+
+### Concatenation and Repetition
+
+```{python}
+# Concatenation with +
+list1 = [1, 2, 3]
+list2 = [4, 5, 6]
+combined = list1 + list2
+print(f"Concatenated: {combined}")
+
+# Repetition with *
+repeated = [0] * 5
+print(f"Repeated: {repeated}")
+
+pattern = [1, 2, 3] * 3
+print(f"Pattern: {pattern}")
+```
+
+### Membership Testing
+
+```{python}
+fruits = ["apple", "banana", "orange"]
+
+# in operator
+print(f"'apple' in fruits: {'apple' in fruits}")
+print(f"'grape' in fruits: {'grape' in fruits}")
+
+# not in operator
+print(f"'grape' not in fruits: {'grape' not in fruits}")
+```
+
+### Length and Statistics
+
+```{python}
+numbers = [10, 20, 30, 40, 50]
+
+# Length
+print(f"Length: {len(numbers)}")
+
+# Sum
+print(f"Sum: {sum(numbers)}")
+
+# Min and max
+print(f"Min: {min(numbers)}")
+print(f"Max: {max(numbers)}")
+
+# Average
+average = sum(numbers) / len(numbers)
+print(f"Average: {average}")
+```
+
+## List Comprehensions
+
+List comprehensions provide a concise way to create lists:
+
+### Basic List Comprehensions
+
+```{python}
+# Traditional way
+squares = []
+for i in range(10):
+    squares.append(i ** 2)
+print(f"Traditional: {squares}")
+
+# List comprehension
+squares = [i ** 2 for i in range(10)]
+print(f"Comprehension: {squares}")
+```
+
+### List Comprehensions with Conditions
+
+```{python}
+# Even numbers only
+evens = [x for x in range(20) if x % 2 == 0]
+print(f"Evens: {evens}")
+
+# Odd numbers
+odds = [x for x in range(20) if x % 2 != 0]
+print(f"Odds: {odds}")
+
+# Positive numbers from mixed list
+numbers = [-2, 5, -1, 8, -4, 3, -7, 9]
+positives = [x for x in numbers if x > 0]
+print(f"Positives: {positives}")
+```
+
+### Transforming Data
+
+```{python}
+# Convert to uppercase
+words = ["hello", "world", "python"]
+uppercase = [word.upper() for word in words]
+print(f"Uppercase: {uppercase}")
+
+# Get lengths
+lengths = [len(word) for word in words]
+print(f"Lengths: {lengths}")
+
+# Extract first character
+first_chars = [word[0] for word in words]
+print(f"First chars: {first_chars}")
+```
+
+### Nested List Comprehensions
+
+```{python}
+# Create a matrix
+matrix = [[i + j for j in range(3)] for i in range(3)]
+print("Matrix:")
+for row in matrix:
+    print(row)
+
+# Flatten a matrix
+nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened = [num for row in nested for num in row]
+print(f"Flattened: {flattened}")
+```
+
+### Advanced Comprehensions
+
+```{python}
+# With if-else
+numbers = [1, 2, 3, 4, 5, 6]
+result = ["even" if x % 2 == 0 else "odd" for x in numbers]
+print(f"Even/Odd: {result}")
+
+# Multiple conditions
+numbers = range(20)
+filtered = [x for x in numbers if x % 2 == 0 if x % 3 == 0]
+print(f"Divisible by 2 and 3: {filtered}")
+
+# Combining lists
+list1 = [1, 2, 3]
+list2 = ['a', 'b', 'c']
+pairs = [(num, letter) for num in list1 for letter in list2]
+print(f"Pairs: {pairs}")
+```
+
+::: {.callout-tip}
+## List Comprehension Benefits
+- More concise and readable
+- Often faster than traditional loops
+- Pythonic way to create lists
+- Don't overuse for complex logic - readability matters!
+:::
+
+## Nested Lists
+
+Lists can contain other lists, creating multi-dimensional structures:
+
+### Working with Nested Lists
+
+```{python}
+# 2D list (matrix)
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+# Accessing elements
+print(f"First row: {matrix[0]}")
+print(f"Element at [1][2]: {matrix[1][2]}")
+
+# Modifying elements
+matrix[0][0] = 99
+print(f"After modification: {matrix[0]}")
+```
+
+### Iterating Over Nested Lists
+
+```{python}
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+# Iterate over rows
+print("By rows:")
+for row in matrix:
+    print(row)
+
+# Iterate over individual elements
+print("\nIndividual elements:")
+for row in matrix:
+    for element in row:
+        print(element, end=" ")
+print()
+
+# With indices
+print("\nWith indices:")
+for i, row in enumerate(matrix):
+    for j, element in enumerate(row):
+        print(f"[{i}][{j}] = {element}")
+```
+
+### Common Nested List Operations
+
+```{python}
+# Sum all elements
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+total = sum(sum(row) for row in matrix)
+print(f"Sum of all elements: {total}")
+
+# Transpose matrix
+matrix = [[1, 2, 3], [4, 5, 6]]
+transposed = [[row[i] for row in matrix] for i in range(len(matrix[0]))]
+print("Original:")
+for row in matrix:
+    print(row)
+print("Transposed:")
+for row in transposed:
+    print(row)
+
+# Flatten nested list
+nested = [[1, 2], [3, 4, 5], [6, 7, 8, 9]]
+flattened = [item for sublist in nested for item in sublist]
+print(f"Flattened: {flattened}")
+```
+
+## Practical Examples
+
+Let's apply lists to real-world problems:
+
+### Grade Manager
+
+```{python}
+class GradeManager:
+    """Manage student grades"""
+    def __init__(self):
+        self.grades = []
+
+    def add_grade(self, grade):
+        """Add a grade"""
+        if 0 <= grade <= 100:
+            self.grades.append(grade)
+        else:
+            print("Invalid grade!")
+
+    def get_average(self):
+        """Calculate average grade"""
+        if not self.grades:
+            return 0
+        return sum(self.grades) / len(self.grades)
+
+    def get_letter_grade(self):
+        """Convert average to letter grade"""
+        avg = self.get_average()
+        if avg >= 90:
+            return "A"
+        elif avg >= 80:
+            return "B"
+        elif avg >= 70:
+            return "C"
+        elif avg >= 60:
+            return "D"
+        else:
+            return "F"
+
+    def get_stats(self):
+        """Get grade statistics"""
+        if not self.grades:
+            return "No grades"
+
+        return {
+            "count": len(self.grades),
+            "average": self.get_average(),
+            "min": min(self.grades),
+            "max": max(self.grades),
+            "letter": self.get_letter_grade()
+        }
+
+# Test
+manager = GradeManager()
+for grade in [85, 92, 78, 95, 88]:
+    manager.add_grade(grade)
+
+stats = manager.get_stats()
+print("Grade Statistics:")
+for key, value in stats.items():
+    if key == "average":
+        print(f"{key.capitalize()}: {value:.2f}")
+    else:
+        print(f"{key.capitalize()}: {value}")
+```
+
+### Todo List Application
+
+```{python}
+class TodoList:
+    """Simple todo list manager"""
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, task):
+        """Add a task"""
+        self.tasks.append({"task": task, "done": False})
+        print(f"Added: {task}")
+
+    def complete_task(self, index):
+        """Mark task as complete"""
+        if 0 <= index < len(self.tasks):
+            self.tasks[index]["done"] = True
+            print(f"Completed: {self.tasks[index]['task']}")
+        else:
+            print("Invalid task index!")
+
+    def remove_task(self, index):
+        """Remove a task"""
+        if 0 <= index < len(self.tasks):
+            removed = self.tasks.pop(index)
+            print(f"Removed: {removed['task']}")
+        else:
+            print("Invalid task index!")
+
+    def show_tasks(self):
+        """Display all tasks"""
+        if not self.tasks:
+            print("No tasks!")
+            return
+
+        print("\nTODO LIST:")
+        print("-" * 40)
+        for i, task in enumerate(self.tasks):
+            status = "✓" if task["done"] else " "
+            print(f"{i + 1}. [{status}] {task['task']}")
+        print("-" * 40)
+
+# Test
+todo = TodoList()
+todo.add_task("Write Python code")
+todo.add_task("Read a book")
+todo.add_task("Exercise")
+todo.show_tasks()
+
+todo.complete_task(0)
+todo.show_tasks()
+```
+
+### Shopping Cart
+
+```{python}
+def manage_shopping_cart():
+    """Shopping cart with list operations"""
+    cart = []
+
+    def add_item(name, price, quantity=1):
+        cart.append({
+            "name": name,
+            "price": price,
+            "quantity": quantity
+        })
+
+    def get_total():
+        return sum(item["price"] * item["quantity"] for item in cart)
+
+    def display_cart():
+        if not cart:
+            print("Cart is empty!")
+            return
+
+        print("\n" + "=" * 50)
+        print("SHOPPING CART".center(50))
+        print("=" * 50)
+        print(f"{'Item':<20} {'Price':>10} {'Qty':>5} {'Subtotal':>12}")
+        print("-" * 50)
+
+        for item in cart:
+            subtotal = item["price"] * item["quantity"]
+            print(f"{item['name']:<20} ${item['price']:>9.2f} {item['quantity']:>5} ${subtotal:>11.2f}")
+
+        print("-" * 50)
+        print(f"{'TOTAL:':>45} ${get_total():>12.2f}")
+        print("=" * 50)
+
+    # Add items
+    add_item("Laptop", 999.99, 1)
+    add_item("Mouse", 29.99, 2)
+    add_item("Keyboard", 79.99, 1)
+
+    # Display
+    display_cart()
+
+manage_shopping_cart()
+```
+
+### Data Analysis
+
+```{python}
+def analyze_data(data):
+    """Analyze a list of numbers"""
+    if not data:
+        return "No data to analyze"
+
+    # Basic statistics
+    n = len(data)
+    total = sum(data)
+    mean = total / n
+    minimum = min(data)
+    maximum = max(data)
+
+    # Median
+    sorted_data = sorted(data)
+    if n % 2 == 0:
+        median = (sorted_data[n//2 - 1] + sorted_data[n//2]) / 2
+    else:
+        median = sorted_data[n//2]
+
+    # Range
+    data_range = maximum - minimum
+
+    # Variance and standard deviation
+    variance = sum((x - mean) ** 2 for x in data) / n
+    std_dev = variance ** 0.5
+
+    print("DATA ANALYSIS")
+    print("=" * 40)
+    print(f"Count:      {n}")
+    print(f"Sum:        {total:.2f}")
+    print(f"Mean:       {mean:.2f}")
+    print(f"Median:     {median:.2f}")
+    print(f"Minimum:    {minimum:.2f}")
+    print(f"Maximum:    {maximum:.2f}")
+    print(f"Range:      {data_range:.2f}")
+    print(f"Std Dev:    {std_dev:.2f}")
+    print("=" * 40)
+
+# Test
+data = [85, 92, 78, 90, 88, 76, 95, 82, 89, 91]
+analyze_data(data)
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Creating lists**:
+  - Empty lists, lists with elements
+  - Mixed types, nested lists
+  - Using `list()` constructor
+
+- **Accessing elements**:
+  - Indexing (positive and negative)
+  - Slicing with start:stop:step
+
+- **Modifying lists**:
+  - Changing elements
+  - Adding: `append()`, `insert()`, `extend()`
+  - Removing: `remove()`, `pop()`, `del`, `clear()`
+
+- **List methods**:
+  - `count()`, `index()`
+  - `sort()`, `reverse()`
+  - `copy()`
+
+- **List operations**:
+  - Concatenation (+), repetition (*)
+  - Membership testing (in, not in)
+  - Length, sum, min, max
+
+- **List comprehensions**:
+  - Basic syntax
+  - With conditions
+  - Nested comprehensions
+  - Transforming data
+
+- **Nested lists**:
+  - Creating matrices
+  - Accessing and modifying
+  - Iterating and processing
+
+::: {.callout-important}
+## Key Takeaways
+1. Lists are **mutable** - they can be changed after creation
+2. Use **indexing** [i] and **slicing** [start:stop:step]
+3. **append()** adds one item, **extend()** adds multiple
+4. **List comprehensions** are concise and Pythonic
+5. Remember: lists are **ordered** and allow **duplicates**
+6. Use appropriate methods for your needs (in-place vs. returning new list)
+:::
+
+## Practice Exercises
+
+### Exercise 1: Remove Duplicates
+
+Write a function that removes duplicates from a list while preserving order.
+
+```{python}
+def remove_duplicates(lst):
+    """Solution"""
+    result = []
+    for item in lst:
+        if item not in result:
+            result.append(item)
+    return result
+
+# Test
+numbers = [1, 2, 2, 3, 4, 4, 5, 1]
+unique = remove_duplicates(numbers)
+print(f"Original: {numbers}")
+print(f"Unique: {unique}")
+```
+
+### Exercise 2: Merge Sorted Lists
+
+Write a function that merges two sorted lists into one sorted list.
+
+```{python}
+def merge_sorted_lists(list1, list2):
+    """Solution"""
+    result = []
+    i, j = 0, 0
+
+    while i < len(list1) and j < len(list2):
+        if list1[i] < list2[j]:
+            result.append(list1[i])
+            i += 1
+        else:
+            result.append(list2[j])
+            j += 1
+
+    # Add remaining elements
+    result.extend(list1[i:])
+    result.extend(list2[j:])
+
+    return result
+
+# Test
+list1 = [1, 3, 5, 7]
+list2 = [2, 4, 6, 8]
+merged = merge_sorted_lists(list1, list2)
+print(f"Merged: {merged}")
+```
+
+### Exercise 3: Rotate List
+
+Write a function that rotates a list by n positions.
+
+```{python}
+def rotate_list(lst, n):
+    """Solution"""
+    if not lst:
+        return lst
+
+    n = n % len(lst)  # Handle n > length
+    return lst[n:] + lst[:n]
+
+# Test
+numbers = [1, 2, 3, 4, 5]
+print(f"Original: {numbers}")
+print(f"Rotate by 2: {rotate_list(numbers, 2)}")
+print(f"Rotate by -1: {rotate_list(numbers, -1)}")
+```
+
+### Exercise 4: Find Second Largest
+
+Write a function that finds the second largest number in a list.
+
+```{python}
+def second_largest(lst):
+    """Solution"""
+    if len(lst) < 2:
+        return None
+
+    # Remove duplicates and sort
+    unique = list(set(lst))
+    unique.sort(reverse=True)
+
+    return unique[1] if len(unique) >= 2 else None
+
+# Test
+numbers = [10, 5, 20, 8, 20, 15]
+result = second_largest(numbers)
+print(f"Second largest in {numbers}: {result}")
+```
+
+### Exercise 5: Group by Property
+
+Write a function that groups items by a property (e.g., group words by length).
+
+```{python}
+def group_by_length(words):
+    """Solution"""
+    groups = {}
+
+    for word in words:
+        length = len(word)
+        if length not in groups:
+            groups[length] = []
+        groups[length].append(word)
+
+    return groups
+
+# Test
+words = ["hi", "hello", "a", "python", "code", "programming"]
+grouped = group_by_length(words)
+
+print("Words grouped by length:")
+for length, word_list in sorted(grouped.items()):
+    print(f"{length}: {word_list}")
+```
+
+::: {.callout-tip}
+## Keep Practicing!
+Lists are fundamental to Python. The more you practice, the more natural they'll become. Try creating your own list-based projects!
+:::
+
+---
+
+Excellent work! You've mastered lists. Next, we'll explore tuples, the immutable cousin of lists!

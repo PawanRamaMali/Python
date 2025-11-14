@@ -1,0 +1,761 @@
+# Generators {#sec-generators}
+
+## Introduction
+
+What if you could create sequences that produce values on-demand instead of storing them all in memory? That's the magic of generators! Generators are memory-efficient iterators that generate values lazily, making them perfect for handling large datasets or infinite sequences.
+
+In this chapter, we'll explore generators, learning how they work, when to use them, and how they can make your code more efficient and elegant.
+
+::: {.callout-note}
+## What You'll Learn
+
+- Understanding generator functions
+- The `yield` keyword
+- Generator expressions
+- Memory efficiency benefits
+- Generator methods: send, throw, close
+- Real-world generator applications
+:::
+
+## The Problem: Memory Consumption
+
+Consider creating a list of one million numbers:
+
+```python
+# Memory intensive!
+def get_numbers(n):
+    result = []
+    for i in range(n):
+        result.append(i ** 2)
+    return result
+
+numbers = get_numbers(1000000)  # Uses lots of memory!
+```
+
+This creates a list with one million items in memory. What if we only need to process them one at a time?
+
+## The Solution: Generators
+
+Generators produce values on-demand:
+
+```python
+# Memory efficient!
+def get_numbers(n):
+    for i in range(n):
+        yield i ** 2  # Generate values one at a time
+
+numbers = get_numbers(1000000)  # Uses minimal memory!
+for num in numbers:
+    print(num)
+    if num > 100:
+        break  # Can stop early!
+```
+
+::: {.callout-tip}
+## Memory Efficiency
+
+Generators don't store all values in memory. They generate each value when requested, making them perfect for large or infinite sequences.
+:::
+
+## The `yield` Keyword
+
+The `yield` keyword transforms a function into a generator:
+
+```python
+def simple_generator():
+    print("First yield")
+    yield 1
+    print("Second yield")
+    yield 2
+    print("Third yield")
+    yield 3
+
+# Create generator
+gen = simple_generator()
+
+# Get values one at a time
+print(next(gen))  # First yield, then 1
+print(next(gen))  # Second yield, then 2
+print(next(gen))  # Third yield, then 3
+# print(next(gen))  # StopIteration exception
+```
+
+### `yield` vs `return`
+
+```python
+# Regular function - returns once
+def regular_function():
+    return 1
+    return 2  # Never reached
+    return 3  # Never reached
+
+print(regular_function())  # 1
+
+# Generator function - yields multiple times
+def generator_function():
+    yield 1
+    yield 2
+    yield 3
+
+gen = generator_function()
+for value in gen:
+    print(value)  # 1, 2, 3
+```
+
+## Creating Generators
+
+### Basic Generator Function
+
+```python
+def count_up_to(n):
+    """Generator that counts from 1 to n"""
+    count = 1
+    while count <= n:
+        yield count
+        count += 1
+
+# Using it
+counter = count_up_to(5)
+for num in counter:
+    print(num)  # 1, 2, 3, 4, 5
+```
+
+### Infinite Generator
+
+```python
+def infinite_sequence():
+    """Generator that produces infinite sequence"""
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+# Using it (carefully!)
+gen = infinite_sequence()
+for i in gen:
+    print(i)
+    if i >= 5:
+        break  # Must break to avoid infinite loop!
+```
+
+### Fibonacci Generator
+
+```python
+def fibonacci():
+    """Generate Fibonacci sequence indefinitely"""
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+# Using it
+fib = fibonacci()
+for i in range(10):
+    print(next(fib), end=" ")
+# Output: 0 1 1 2 3 5 8 13 21 34
+```
+
+### Reading Large Files
+
+```python
+def read_large_file(filename):
+    """Read file line by line without loading entire file"""
+    with open(filename, 'r') as file:
+        for line in file:
+            yield line.strip()
+
+# Using it
+for line in read_large_file('huge_file.txt'):
+    # Process one line at a time
+    print(line)
+    if 'STOP' in line:
+        break
+```
+
+## Generator Expressions
+
+Generator expressions are like list comprehensions but return generators:
+
+```python
+# List comprehension - creates entire list
+squares_list = [x ** 2 for x in range(1000000)]  # Uses lots of memory
+
+# Generator expression - creates generator
+squares_gen = (x ** 2 for x in range(1000000))   # Uses minimal memory
+
+# Using generator expression
+for square in squares_gen:
+    print(square)
+    if square > 100:
+        break
+```
+
+### Syntax Comparison
+
+```python
+# List comprehension: [ ]
+list_comp = [x * 2 for x in range(10)]
+print(type(list_comp))  # <class 'list'>
+print(list_comp)        # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+# Generator expression: ( )
+gen_exp = (x * 2 for x in range(10))
+print(type(gen_exp))    # <class 'generator'>
+print(gen_exp)          # <generator object at 0x...>
+print(list(gen_exp))    # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+```
+
+### When to Use Generator Expressions
+
+```python
+# Good use: sum of squares
+total = sum(x ** 2 for x in range(1000000))
+
+# Good use: check if any match
+has_even = any(x % 2 == 0 for x in range(10))
+
+# Good use: get first match
+first_big = next(x for x in range(1000) if x > 500)
+
+# Good use: chain operations
+result = sum(x ** 2 for x in range(100) if x % 2 == 0)
+```
+
+## Generator Methods
+
+### `send()` Method
+
+Send values back into the generator:
+
+```python
+def echo_generator():
+    """Generator that echoes received values"""
+    while True:
+        received = yield
+        print(f"Received: {received}")
+
+# Using it
+gen = echo_generator()
+next(gen)  # Prime the generator
+gen.send("Hello")
+gen.send("World")
+```
+
+### `send()` with Return Values
+
+```python
+def running_average():
+    """Generator that calculates running average"""
+    total = 0.0
+    count = 0
+    average = None
+
+    while True:
+        value = yield average
+        total += value
+        count += 1
+        average = total / count
+
+# Using it
+avg = running_average()
+next(avg)  # Prime it
+
+print(avg.send(10))    # 10.0
+print(avg.send(20))    # 15.0
+print(avg.send(30))    # 20.0
+```
+
+### `throw()` Method
+
+Inject an exception into the generator:
+
+```python
+def resilient_generator():
+    """Generator that handles exceptions"""
+    while True:
+        try:
+            value = yield
+            print(f"Processing: {value}")
+        except ValueError:
+            print("ValueError caught! Continuing...")
+
+# Using it
+gen = resilient_generator()
+next(gen)
+gen.send(10)
+gen.throw(ValueError, "Something went wrong")
+gen.send(20)
+```
+
+### `close()` Method
+
+Close the generator:
+
+```python
+def count_forever():
+    """Infinite counter"""
+    count = 0
+    try:
+        while True:
+            yield count
+            count += 1
+    finally:
+        print("Generator closed!")
+
+# Using it
+gen = count_forever()
+print(next(gen))  # 0
+print(next(gen))  # 1
+gen.close()       # Generator closed!
+# print(next(gen))  # StopIteration
+```
+
+## Memory Efficiency Demonstration
+
+Let's compare memory usage:
+
+```python
+import sys
+
+# List - stores all values
+list_nums = [x for x in range(1000000)]
+print(f"List size: {sys.getsizeof(list_nums):,} bytes")
+
+# Generator - stores only state
+gen_nums = (x for x in range(1000000))
+print(f"Generator size: {sys.getsizeof(gen_nums):,} bytes")
+
+# Huge difference!
+# List size: 8,000,056 bytes
+# Generator size: 112 bytes
+```
+
+## Practical Generator Examples
+
+### Batch Processing
+
+```python
+def batch_data(data, batch_size):
+    """Yield data in batches"""
+    for i in range(0, len(data), batch_size):
+        yield data[i:i + batch_size]
+
+# Using it
+data = list(range(100))
+for batch in batch_data(data, 10):
+    print(f"Processing batch: {batch[:3]}... ({len(batch)} items)")
+```
+
+### CSV Reader
+
+```python
+def read_csv(filename):
+    """Read CSV file line by line"""
+    with open(filename, 'r') as file:
+        header = next(file).strip().split(',')
+        for line in file:
+            values = line.strip().split(',')
+            yield dict(zip(header, values))
+
+# Using it
+for row in read_csv('data.csv'):
+    print(row)
+    # {'name': 'Alice', 'age': '30', 'city': 'NYC'}
+```
+
+### Number Range Generator
+
+```python
+def range_float(start, stop, step):
+    """Like range() but works with floats"""
+    current = start
+    while current < stop:
+        yield current
+        current += step
+
+# Using it
+for num in range_float(0, 1, 0.1):
+    print(f"{num:.1f}", end=" ")
+# Output: 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+```
+
+### Infinite Data Stream
+
+```python
+import random
+import time
+
+def sensor_data():
+    """Simulate infinite sensor data stream"""
+    while True:
+        temperature = random.uniform(20, 30)
+        humidity = random.uniform(40, 60)
+        yield {
+            'temperature': temperature,
+            'humidity': humidity,
+            'timestamp': time.time()
+        }
+        time.sleep(0.1)  # Simulate delay
+
+# Using it
+sensor = sensor_data()
+for i, reading in enumerate(sensor):
+    print(f"Reading {i + 1}: {reading}")
+    if i >= 5:  # Get only 5 readings
+        break
+```
+
+### Tree Traversal
+
+```python
+class Node:
+    def __init__(self, value, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+def inorder_traversal(node):
+    """In-order tree traversal using generator"""
+    if node:
+        yield from inorder_traversal(node.left)
+        yield node.value
+        yield from inorder_traversal(node.right)
+
+# Create a tree
+#       4
+#      / \
+#     2   6
+#    / \ / \
+#   1  3 5  7
+tree = Node(4,
+    Node(2, Node(1), Node(3)),
+    Node(6, Node(5), Node(7))
+)
+
+# Traverse
+for value in inorder_traversal(tree):
+    print(value, end=" ")
+# Output: 1 2 3 4 5 6 7
+```
+
+## The `yield from` Statement
+
+Delegate to another generator:
+
+```python
+def generator1():
+    yield 1
+    yield 2
+
+def generator2():
+    yield 3
+    yield 4
+
+def combined_generator():
+    # Instead of:
+    # for value in generator1():
+    #     yield value
+    # Use:
+    yield from generator1()
+    yield from generator2()
+
+# Using it
+for value in combined_generator():
+    print(value)  # 1, 2, 3, 4
+```
+
+### Flattening Nested Lists
+
+```python
+def flatten(nested_list):
+    """Flatten nested list using yield from"""
+    for item in nested_list:
+        if isinstance(item, list):
+            yield from flatten(item)
+        else:
+            yield item
+
+# Using it
+nested = [1, [2, 3, [4, 5]], 6, [7, [8, 9]]]
+flat = list(flatten(nested))
+print(flat)  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+## Generator Pipelines
+
+Chain generators for data processing:
+
+```python
+def read_lines(filename):
+    """Read file lines"""
+    with open(filename, 'r') as f:
+        for line in f:
+            yield line
+
+def filter_comments(lines):
+    """Filter out comments"""
+    for line in lines:
+        if not line.strip().startswith('#'):
+            yield line
+
+def remove_whitespace(lines):
+    """Remove extra whitespace"""
+    for line in lines:
+        yield line.strip()
+
+def to_uppercase(lines):
+    """Convert to uppercase"""
+    for line in lines:
+        yield line.upper()
+
+# Chain generators
+pipeline = to_uppercase(
+    remove_whitespace(
+        filter_comments(
+            read_lines('config.txt')
+        )
+    )
+)
+
+for line in pipeline:
+    print(line)
+```
+
+## Generators vs Lists: When to Use Each
+
+### Use Generators When:
+
+```python
+# 1. Working with large datasets
+def process_huge_file():
+    with open('huge_file.txt') as f:
+        for line in f:  # Generator-like behavior
+            yield process_line(line)
+
+# 2. Don't need all values at once
+first_match = next(x for x in huge_dataset if condition(x))
+
+# 3. Creating infinite sequences
+def infinite_counter():
+    count = 0
+    while True:
+        yield count
+        count += 1
+
+# 4. Pipeline processing
+result = sum(
+    x ** 2
+    for x in range(1000000)
+    if x % 2 == 0
+)
+```
+
+### Use Lists When:
+
+```python
+# 1. Need to access values multiple times
+numbers = [1, 2, 3, 4, 5]
+print(sum(numbers))
+print(max(numbers))  # Can reuse
+
+# 2. Need random access
+values = [x ** 2 for x in range(10)]
+print(values[5])  # Direct access
+
+# 3. Need to modify values
+numbers = [1, 2, 3]
+numbers.append(4)
+numbers[0] = 10
+
+# 4. Small datasets
+small_list = [x for x in range(10)]
+```
+
+::: {.callout-important}
+## Generator Exhaustion
+
+Generators can only be iterated once! After exhaustion, they don't produce any more values. Create a new generator if you need to iterate again.
+:::
+
+```python
+gen = (x for x in range(5))
+print(list(gen))  # [0, 1, 2, 3, 4]
+print(list(gen))  # [] - exhausted!
+
+# Need to create new generator
+gen = (x for x in range(5))
+print(list(gen))  # [0, 1, 2, 3, 4]
+```
+
+## Advanced Generator Patterns
+
+### Generator State Machine
+
+```python
+def traffic_light():
+    """Traffic light state machine"""
+    while True:
+        yield "RED"
+        yield "YELLOW"
+        yield "GREEN"
+        yield "YELLOW"
+
+# Using it
+light = traffic_light()
+for _ in range(10):
+    state = next(light)
+    print(f"Light is {state}")
+```
+
+### Coroutine Pattern
+
+```python
+def grep(pattern):
+    """Coroutine that filters lines matching pattern"""
+    print(f"Looking for {pattern}")
+    while True:
+        line = yield
+        if pattern in line:
+            print(line)
+
+# Using it
+g = grep("Python")
+next(g)  # Prime the coroutine
+g.send("I love Python")
+g.send("Java is cool")
+g.send("Python is awesome")
+```
+
+### Generator as Context Manager
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def managed_resource():
+    """Generator as context manager"""
+    print("Acquiring resource")
+    resource = "Resource"
+    try:
+        yield resource
+    finally:
+        print("Releasing resource")
+
+# Using it
+with managed_resource() as res:
+    print(f"Using {res}")
+```
+
+## Performance Comparison
+
+```python
+import time
+import sys
+
+def time_it(func):
+    """Time function execution"""
+    start = time.time()
+    result = func()
+    end = time.time()
+    return end - start, result
+
+# List comprehension
+def list_approach():
+    return sum([x ** 2 for x in range(1000000)])
+
+# Generator expression
+def generator_approach():
+    return sum(x ** 2 for x in range(1000000))
+
+# Compare
+list_time, list_result = time_it(list_approach)
+gen_time, gen_result = time_it(generator_approach)
+
+print(f"List time: {list_time:.4f}s")
+print(f"Generator time: {gen_time:.4f}s")
+print(f"Generator is {list_time / gen_time:.2f}x faster")
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **Generators** produce values on-demand for memory efficiency
+- **`yield`** transforms functions into generators
+- **Generator expressions** are memory-efficient alternatives to list comprehensions
+- **Generator methods** include `send()`, `throw()`, and `close()`
+- **`yield from`** delegates to other generators
+- **Generator pipelines** enable efficient data processing
+
+Generators are essential for efficient Python programming, especially when dealing with large datasets or streams of data!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Generators save memory by producing values on-demand
+- Use `yield` to create generator functions
+- Generator expressions use `()` instead of `[]`
+- Generators can only be iterated once
+- Perfect for large datasets and infinite sequences
+:::
+
+## Practice Exercises
+
+### Exercise 1: Prime Number Generator
+Create a generator that produces prime numbers:
+
+```python
+def prime_numbers():
+    # Your code here
+    pass
+
+# Should generate: 2, 3, 5, 7, 11, 13, ...
+```
+
+### Exercise 2: Sliding Window
+Create a generator that yields sliding windows of a sequence:
+
+```python
+def sliding_window(sequence, size):
+    # Your code here
+    pass
+
+# sliding_window([1,2,3,4,5], 3) yields: [1,2,3], [2,3,4], [3,4,5]
+```
+
+### Exercise 3: File Chunk Reader
+Create a generator that reads files in chunks:
+
+```python
+def read_in_chunks(filename, chunk_size):
+    # Your code here
+    pass
+
+# Read file in 1024-byte chunks
+```
+
+### Exercise 4: Cycle Through Items
+Create a generator that cycles through items infinitely:
+
+```python
+def cycle(items):
+    # Your code here
+    pass
+
+# cycle([1,2,3]) yields: 1, 2, 3, 1, 2, 3, 1, 2, 3, ...
+```
+
+### Exercise 5: Merge Sorted Sequences
+Create a generator that merges two sorted sequences:
+
+```python
+def merge_sorted(seq1, seq2):
+    # Your code here
+    pass
+
+# merge_sorted([1,3,5], [2,4,6]) yields: 1, 2, 3, 4, 5, 6
+```
+
+## Next Steps
+
+In the next chapter, we'll dive deeper into **iterators**, understanding the protocol behind generators and how to create custom iterators. Get ready to iterate like a pro!

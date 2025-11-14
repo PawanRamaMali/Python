@@ -1,0 +1,813 @@
+# Debugging Your Code {#sec-debugging}
+
+## Introduction
+
+Every developer's journey includes debugging. That mysterious bug that only appears in production, the logic error that has you scratching your head, or the exception you can't figure out - debugging is an essential skill. The good news? Python provides excellent tools to help you find and fix bugs!
+
+In this chapter, we'll explore debugging techniques, from simple print statements to powerful debuggers, learning how to track down and eliminate bugs efficiently.
+
+::: {.callout-note}
+## What You'll Learn
+
+- Debugging strategies and mindset
+- Print debugging effectively
+- Using the Python debugger (pdb)
+- The logging module
+- Common bug patterns
+- Debugging best practices
+:::
+
+## The Debugging Mindset
+
+### Scientific Method for Debugging
+
+1. **Observe**: What's the actual behavior?
+2. **Hypothesize**: What might be causing it?
+3. **Test**: Verify your hypothesis
+4. **Iterate**: Refine and repeat
+
+```python
+# Bug: Function returns wrong value
+def calculate_discount(price, discount_percent):
+    return price - discount_percent
+
+# Observe: calculate_discount(100, 10) returns 90, not 90.0
+# Hypothesis: Missing percentage conversion
+# Test: Add percentage division
+def calculate_discount(price, discount_percent):
+    return price - (price * discount_percent / 100)
+
+# Result: Now calculate_discount(100, 10) returns 90.0 ✓
+```
+
+::: {.callout-tip}
+## Debug Like a Detective
+
+Don't just fix symptoms - find the root cause! Ask yourself:
+- What changed recently?
+- Can I reproduce it consistently?
+- What are the inputs that cause the problem?
+- What was I expecting vs. what happened?
+:::
+
+## Print Debugging
+
+The simplest and most common debugging technique.
+
+### Basic Print Debugging
+
+```python
+def calculate_average(numbers):
+    print(f"Input: {numbers}")  # Debug: See input
+    total = sum(numbers)
+    print(f"Total: {total}")    # Debug: Check intermediate value
+    count = len(numbers)
+    print(f"Count: {count}")    # Debug: Check count
+    average = total / count
+    print(f"Average: {average}") # Debug: See result
+    return average
+
+result = calculate_average([1, 2, 3, 4, 5])
+```
+
+### Better Print Debugging
+
+```python
+def debug_print(label, value):
+    """Helper function for debug printing"""
+    print(f"[DEBUG] {label}: {value}")
+
+def calculate_average(numbers):
+    debug_print("Input numbers", numbers)
+    debug_print("Sum", sum(numbers))
+    debug_print("Count", len(numbers))
+
+    if not numbers:
+        debug_print("WARNING", "Empty list!")
+        return 0
+
+    return sum(numbers) / len(numbers)
+```
+
+### Print with Context
+
+```python
+import sys
+
+def debug(msg, value):
+    """Print debug message with line number"""
+    frame = sys._getframe(1)
+    filename = frame.f_code.co_filename
+    lineno = frame.f_lineno
+    print(f"[{filename}:{lineno}] {msg}: {value}")
+
+def process_data(data):
+    debug("Processing data", data)
+    result = data * 2
+    debug("Result", result)
+    return result
+```
+
+### Debugging with f-strings
+
+```python
+def complex_calculation(x, y, z):
+    # Show variable names and values
+    print(f"{x=}, {y=}, {z=}")  # Python 3.8+
+
+    result = x * y + z
+    print(f"{result=}")
+
+    return result
+
+complex_calculation(10, 20, 30)
+# Output:
+# x=10, y=20, z=30
+# result=230
+```
+
+## The Python Debugger (pdb)
+
+`pdb` is Python's interactive debugger - a powerful tool for inspecting code execution.
+
+### Starting the Debugger
+
+```python
+import pdb
+
+def buggy_function(numbers):
+    pdb.set_trace()  # Execution pauses here
+    total = 0
+    for num in numbers:
+        total += num
+    return total / len(numbers)
+
+buggy_function([1, 2, 3, 4, 5])
+```
+
+### Common pdb Commands
+
+```python
+# When pdb prompt appears:
+
+# l (list)       - Show current code
+# n (next)       - Execute next line
+# s (step)       - Step into function
+# c (continue)   - Continue execution
+# p variable     - Print variable value
+# pp variable    - Pretty-print variable
+# w (where)      - Show stack trace
+# u (up)         - Move up stack frame
+# d (down)       - Move down stack frame
+# q (quit)       - Quit debugger
+```
+
+### Interactive Example
+
+```python
+import pdb
+
+def calculate_factorial(n):
+    pdb.set_trace()
+    result = 1
+    for i in range(1, n + 1):
+        result *= i
+    return result
+
+# When running:
+# (Pdb) p n          # Print n
+# (Pdb) n            # Next line
+# (Pdb) p result     # Check result
+# (Pdb) c            # Continue
+```
+
+### Breakpoints (Python 3.7+)
+
+```python
+def process_items(items):
+    for item in items:
+        if item < 0:
+            breakpoint()  # Modern way to enter debugger
+        print(f"Processing: {item}")
+
+process_items([1, 2, -3, 4])
+```
+
+### Post-Mortem Debugging
+
+```python
+import pdb
+
+def divide(a, b):
+    return a / b
+
+try:
+    divide(10, 0)
+except Exception:
+    pdb.post_mortem()  # Enter debugger at exception
+```
+
+### Conditional Breakpoints
+
+```python
+import pdb
+
+def process_data(items):
+    for i, item in enumerate(items):
+        # Only break when condition is met
+        if item > 100:
+            pdb.set_trace()
+        result = item * 2
+        print(result)
+
+process_data([10, 20, 150, 30])  # Breaks at 150
+```
+
+## The Logging Module
+
+Logging is better than print statements for production code.
+
+### Basic Logging
+
+```python
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+def calculate_average(numbers):
+    logging.debug(f"Input: {numbers}")
+
+    if not numbers:
+        logging.warning("Empty list provided")
+        return 0
+
+    result = sum(numbers) / len(numbers)
+    logging.info(f"Calculated average: {result}")
+
+    return result
+
+calculate_average([1, 2, 3, 4, 5])
+calculate_average([])
+```
+
+### Log Levels
+
+```python
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+# Different severity levels
+logging.debug("Detailed debugging information")
+logging.info("General information")
+logging.warning("Something unexpected happened")
+logging.error("An error occurred")
+logging.critical("Critical problem!")
+
+# Example usage
+def divide(a, b):
+    logging.debug(f"Dividing {a} by {b}")
+
+    if b == 0:
+        logging.error("Division by zero attempted!")
+        return None
+
+    result = a / b
+    logging.info(f"Result: {result}")
+    return result
+```
+
+### Logging to File
+
+```python
+import logging
+
+# Log to file
+logging.basicConfig(
+    filename='app.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+def process_data(data):
+    logging.info("Processing started")
+    try:
+        result = data * 2
+        logging.debug(f"Intermediate result: {result}")
+        return result
+    except Exception as e:
+        logging.error(f"Error processing data: {e}")
+        raise
+    finally:
+        logging.info("Processing completed")
+```
+
+### Advanced Logging Setup
+
+```python
+import logging
+import sys
+
+# Create logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Console handler
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.INFO)
+
+# File handler
+file_handler = logging.FileHandler('debug.log')
+file_handler.setLevel(logging.DEBUG)
+
+# Formatter
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+console_handler.setFormatter(formatter)
+file_handler.setFormatter(formatter)
+
+# Add handlers
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+
+# Use logger
+logger.debug("Debug message (file only)")
+logger.info("Info message (console and file)")
+logger.error("Error message (console and file)")
+```
+
+### Logging Exceptions
+
+```python
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+def risky_operation(x, y):
+    try:
+        result = x / y
+        return result
+    except Exception as e:
+        # Log exception with traceback
+        logging.exception("Exception occurred in risky_operation")
+        raise
+
+try:
+    risky_operation(10, 0)
+except ZeroDivisionError:
+    pass  # Already logged
+```
+
+## Debugging Strategies
+
+### Binary Search Debugging
+
+```python
+def complex_function(data):
+    # Checkpoint 1
+    print("Checkpoint 1: Start")
+
+    step1_result = process_step1(data)
+    print(f"Checkpoint 2: After step1 - {step1_result}")
+
+    step2_result = process_step2(step1_result)
+    print(f"Checkpoint 3: After step2 - {step2_result}")
+
+    final_result = process_step3(step2_result)
+    print(f"Checkpoint 4: Final - {final_result}")
+
+    return final_result
+
+# Narrow down which step fails
+```
+
+### Rubber Duck Debugging
+
+```python
+def confusing_function(numbers):
+    """
+    Explaining to a rubber duck:
+
+    1. I'm trying to calculate the sum of even numbers
+    2. I iterate through the list
+    3. If the number is even... wait!
+    4. I'm checking if i (index) is even, not the number!
+
+    Bug found! Fix: Check numbers[i] % 2 == 0
+    """
+    total = 0
+    for i in range(len(numbers)):
+        # Bug: checking index, not value
+        # if i % 2 == 0:
+        # Fix: check the actual number
+        if numbers[i] % 2 == 0:
+            total += numbers[i]
+    return total
+```
+
+### Defensive Programming
+
+```python
+def calculate_statistics(numbers):
+    # Validate inputs
+    assert isinstance(numbers, list), "Input must be a list"
+    assert len(numbers) > 0, "List cannot be empty"
+    assert all(isinstance(n, (int, float)) for n in numbers), \
+        "All elements must be numbers"
+
+    # Calculations
+    mean = sum(numbers) / len(numbers)
+    minimum = min(numbers)
+    maximum = max(numbers)
+
+    # Validate outputs
+    assert minimum <= mean <= maximum, "Mean should be between min and max"
+
+    return {
+        'mean': mean,
+        'min': minimum,
+        'max': maximum
+    }
+```
+
+## Common Bug Patterns
+
+### Off-by-One Errors
+
+```python
+# Bug: Missing last element
+def print_items(items):
+    for i in range(len(items) - 1):  # Bug!
+        print(items[i])
+
+# Fix
+def print_items(items):
+    for i in range(len(items)):  # Correct
+        print(items[i])
+
+# Or better
+def print_items(items):
+    for item in items:  # Best!
+        print(item)
+```
+
+### Mutable Default Arguments
+
+```python
+# Bug: Shared mutable default
+def add_item(item, items=[]):  # Bug!
+    items.append(item)
+    return items
+
+print(add_item(1))  # [1]
+print(add_item(2))  # [1, 2] - Unexpected!
+
+# Fix: Use None
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+
+print(add_item(1))  # [1]
+print(add_item(2))  # [2] - Correct!
+```
+
+### Integer Division
+
+```python
+# Bug: Integer division in Python 2 style
+def calculate_average(numbers):
+    return sum(numbers) / len(numbers)  # Might be integer division
+
+# Fix: Explicit float division
+def calculate_average(numbers):
+    return float(sum(numbers)) / len(numbers)
+
+# Or use from __future__ import division (Python 2)
+# Python 3 uses float division by default
+```
+
+### Name Shadowing
+
+```python
+# Bug: Shadowing built-in
+def process_data(list):  # Bug! Shadows built-in list
+    result = list()  # Error!
+    return result
+
+# Fix: Use different name
+def process_data(data_list):
+    result = list()
+    return result
+```
+
+### Reference vs Value
+
+```python
+# Bug: Unintended reference sharing
+original = [1, 2, 3]
+copy = original  # Bug! Same reference
+copy.append(4)
+print(original)  # [1, 2, 3, 4] - Original changed!
+
+# Fix: Create actual copy
+original = [1, 2, 3]
+copy = original.copy()  # or list(original) or original[:]
+copy.append(4)
+print(original)  # [1, 2, 3] - Original unchanged
+```
+
+## Debugging Tools
+
+### Using `assert` for Sanity Checks
+
+```python
+def calculate_discount(price, discount_percent):
+    assert price >= 0, "Price cannot be negative"
+    assert 0 <= discount_percent <= 100, "Discount must be 0-100"
+
+    discount = price * (discount_percent / 100)
+    final_price = price - discount
+
+    assert final_price >= 0, "Final price cannot be negative"
+    return final_price
+
+# calculate_discount(-10, 50)  # AssertionError!
+```
+
+### Using `traceback` Module
+
+```python
+import traceback
+
+def function_a():
+    function_b()
+
+def function_b():
+    function_c()
+
+def function_c():
+    raise ValueError("Something went wrong")
+
+try:
+    function_a()
+except Exception:
+    # Print full traceback
+    traceback.print_exc()
+
+    # Get traceback as string
+    tb_str = traceback.format_exc()
+    print("Traceback:", tb_str)
+```
+
+### Using `inspect` Module
+
+```python
+import inspect
+
+def debug_caller():
+    """Show who called this function"""
+    frame = inspect.currentframe()
+    caller_frame = frame.f_back
+
+    filename = caller_frame.f_code.co_filename
+    function_name = caller_frame.f_code.co_name
+    line_number = caller_frame.f_lineno
+
+    print(f"Called from {function_name} in {filename}:{line_number}")
+
+def my_function():
+    debug_caller()
+
+my_function()
+```
+
+## Debugging Best Practices
+
+### 1. Use Version Control
+
+```bash
+# Find when bug was introduced
+git bisect start
+git bisect bad  # Current version has bug
+git bisect good v1.0  # Version 1.0 was fine
+# Git will binary search through commits
+```
+
+### 2. Write Reproducible Test Cases
+
+```python
+import unittest
+
+class TestBuggyFunction(unittest.TestCase):
+    def test_bug_reproduction(self):
+        """Reproduce the bug"""
+        # Given
+        input_data = [1, 2, 3, 4, 5]
+
+        # When
+        result = buggy_function(input_data)
+
+        # Then
+        self.assertEqual(result, expected_value)
+
+    # Keep this test after fixing the bug
+    # to ensure it doesn't come back!
+```
+
+### 3. Simplify and Isolate
+
+```python
+# Complex code with bug
+def complex_function(data):
+    processed = [transform(x) for x in data if validate(x)]
+    filtered = [x for x in processed if x > threshold]
+    return sum(filtered) / len(filtered)
+
+# Simplify to find bug
+def complex_function(data):
+    # Step by step
+    validated = [x for x in data if validate(x)]
+    print(f"After validation: {validated}")
+
+    processed = [transform(x) for x in validated]
+    print(f"After transform: {processed}")
+
+    filtered = [x for x in processed if x > threshold]
+    print(f"After filter: {filtered}")
+
+    result = sum(filtered) / len(filtered)
+    return result
+```
+
+### 4. Use Type Hints
+
+```python
+from typing import List, Optional
+
+def calculate_average(numbers: List[float]) -> Optional[float]:
+    """Type hints help catch bugs early"""
+    if not numbers:
+        return None
+    return sum(numbers) / len(numbers)
+
+# Use mypy for static type checking
+# mypy my_script.py
+```
+
+## Practical Debugging Examples
+
+### Example 1: Finding a Logic Error
+
+```python
+# Bug: Calculate sum of even numbers
+def sum_evens(numbers):
+    total = 0
+    for i in range(len(numbers)):
+        if i % 2 == 0:  # Bug! Checking index, not value
+            total += numbers[i]
+    return total
+
+# Debug
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+def sum_evens(numbers):
+    total = 0
+    for i in range(len(numbers)):
+        logging.debug(f"i={i}, numbers[i]={numbers[i]}, i%2={i%2}")
+        if i % 2 == 0:
+            logging.debug(f"Adding {numbers[i]}")
+            total += numbers[i]
+    return total
+
+# Fixed
+def sum_evens(numbers):
+    total = 0
+    for num in numbers:
+        if num % 2 == 0:  # Check value, not index
+            total += num
+    return total
+```
+
+### Example 2: Tracking Down an Exception
+
+```python
+import traceback
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+def process_file(filename):
+    try:
+        with open(filename, 'r') as f:
+            data = f.read()
+            result = parse_data(data)
+            return result
+    except FileNotFoundError:
+        logging.error(f"File not found: {filename}")
+        raise
+    except Exception as e:
+        logging.error(f"Error processing file: {e}")
+        logging.debug(traceback.format_exc())
+        raise
+
+def parse_data(data):
+    # Potential bugs here
+    logging.debug(f"Parsing data of length: {len(data)}")
+    lines = data.split('\n')
+    logging.debug(f"Number of lines: {len(lines)}")
+    # ... rest of parsing
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **Debugging mindset** - Scientific approach to finding bugs
+- **Print debugging** - Simple but effective
+- **pdb** - Python's interactive debugger
+- **Logging** - Better than print statements for production
+- **Common bugs** - Off-by-one, mutable defaults, etc.
+- **Best practices** - Reproduce, isolate, simplify
+
+Debugging is a skill that improves with practice. Don't be afraid of bugs - they're opportunities to learn!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Start simple: print debugging works!
+- Learn pdb for interactive debugging
+- Use logging for production code
+- Reproduce bugs with test cases
+- Simplify and isolate problems
+- Keep a debugging journal of lessons learned
+:::
+
+## Practice Exercises
+
+### Exercise 1: Debug This Function
+Find and fix the bugs:
+
+```python
+def calculate_total(prices, tax_rate):
+    total = 0
+    for price in prices:
+        total += price
+    total = total * tax_rate
+    return total
+```
+
+### Exercise 2: Add Logging
+Add appropriate logging to this function:
+
+```python
+def process_orders(orders):
+    processed = []
+    for order in orders:
+        if order['status'] == 'pending':
+            order['status'] = 'processed'
+            processed.append(order)
+    return processed
+```
+
+### Exercise 3: Use pdb
+Use pdb to debug this function:
+
+```python
+def find_duplicates(items):
+    seen = []
+    duplicates = []
+    for item in items:
+        if item in seen:
+            duplicates.append(item)
+        seen.append(item)
+    return duplicates
+```
+
+### Exercise 4: Fix Mutable Default
+Fix the mutable default argument bug:
+
+```python
+def add_student(name, grades=[]):
+    grades.append(100)
+    return {'name': name, 'grades': grades}
+```
+
+### Exercise 5: Add Assertions
+Add assertions to validate inputs and outputs:
+
+```python
+def calculate_percentage(part, whole):
+    return (part / whole) * 100
+```
+
+## Next Steps
+
+In the next chapter, we'll explore **best practices** and **clean code principles**. Get ready to write professional-quality Python code!

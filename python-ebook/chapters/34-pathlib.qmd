@@ -1,0 +1,810 @@
+# Working with Files and Paths {#sec-pathlib}
+
+## Introduction
+
+Tired of dealing with messy string paths and `os.path` functions? Say hello to `pathlib`! Introduced in Python 3.4, `pathlib` provides an object-oriented approach to file system paths that's more intuitive, safer, and more Pythonic than traditional string-based paths.
+
+In this chapter, we'll explore `pathlib`, learning how to work with files and directories elegantly and safely across different operating systems.
+
+::: {.callout-note}
+## What You'll Learn
+
+- `Path` objects and path operations
+- Reading and writing files with `pathlib`
+- Directory operations
+- Path manipulation and navigation
+- Cross-platform path handling
+- Practical file system patterns
+:::
+
+## Why `pathlib`?
+
+### The Old Way (os.path)
+
+```python
+import os
+
+# String-based paths are error-prone
+path = os.path.join('folder', 'subfolder', 'file.txt')
+directory = os.path.dirname(path)
+filename = os.path.basename(path)
+exists = os.path.exists(path)
+
+# Lots of functions to remember!
+```
+
+### The New Way (pathlib)
+
+```python
+from pathlib import Path
+
+# Object-oriented paths are intuitive
+path = Path('folder') / 'subfolder' / 'file.txt'
+directory = path.parent
+filename = path.name
+exists = path.exists()
+
+# Clean and readable!
+```
+
+::: {.callout-tip}
+## Why Use `pathlib`?
+
+- **Object-oriented**: Paths are objects with methods
+- **Cross-platform**: Automatically handles Windows/Unix differences
+- **Intuitive**: Uses `/` operator to join paths
+- **Safe**: Less prone to errors than string manipulation
+- **Modern**: The recommended way in Python 3
+:::
+
+## Creating Path Objects
+
+### Basic Path Creation
+
+```python
+from pathlib import Path
+
+# Current working directory
+cwd = Path.cwd()
+print(cwd)  # /home/user/project
+
+# Home directory
+home = Path.home()
+print(home)  # /home/user
+
+# Specific path
+path = Path('/usr/local/bin')
+print(path)  # /usr/local/bin
+
+# Relative path
+path = Path('folder/file.txt')
+print(path)  # folder/file.txt
+
+# From string
+path = Path('/home/user/documents/file.txt')
+print(path)
+```
+
+### The `/` Operator
+
+```python
+from pathlib import Path
+
+# Join paths with /
+base = Path('/home/user')
+documents = base / 'documents'
+file_path = documents / 'report.txt'
+
+print(file_path)  # /home/user/documents/report.txt
+
+# Chain multiple joins
+path = Path('/home') / 'user' / 'documents' / 'reports' / '2025' / 'january.txt'
+print(path)
+
+# Mix Path and strings
+base = Path('/home/user')
+path = base / 'documents' / 'file.txt'
+print(path)
+```
+
+## Path Properties
+
+### Path Components
+
+```python
+from pathlib import Path
+
+path = Path('/home/user/documents/report.pdf')
+
+# Name components
+print(path.name)       # report.pdf (filename with extension)
+print(path.stem)       # report (filename without extension)
+print(path.suffix)     # .pdf (file extension)
+print(path.suffixes)   # ['.pdf'] (all extensions)
+
+# Multiple extensions
+path = Path('archive.tar.gz')
+print(path.suffixes)   # ['.tar', '.gz']
+print(path.stem)       # archive.tar
+
+# Parent directory
+print(path.parent)     # /home/user/documents
+
+# All parents
+path = Path('/home/user/documents/report.pdf')
+for parent in path.parents:
+    print(parent)
+# /home/user/documents
+# /home/user
+# /home
+# /
+
+# Root and anchor
+path = Path('/home/user/file.txt')
+print(path.anchor)     # / (Unix) or C:\ (Windows)
+print(path.root)       # /
+```
+
+### Path Parts
+
+```python
+from pathlib import Path
+
+path = Path('/home/user/documents/report.pdf')
+
+# Path parts as tuple
+print(path.parts)
+# ('/', 'home', 'user', 'documents', 'report.pdf')
+
+# Drive (Windows) and root
+print(path.drive)      # '' (Unix) or 'C:' (Windows)
+print(path.root)       # '/'
+
+# Convert to string
+print(str(path))       # /home/user/documents/report.pdf
+print(path.as_posix()) # /home/user/documents/report.pdf (POSIX format)
+print(path.as_uri())   # file:///home/user/documents/report.pdf
+```
+
+## Path Operations
+
+### Checking Path Properties
+
+```python
+from pathlib import Path
+
+path = Path('/home/user/documents/report.pdf')
+
+# Check existence
+print(path.exists())      # True/False
+
+# Check type
+print(path.is_file())     # True if file
+print(path.is_dir())      # True if directory
+print(path.is_symlink())  # True if symbolic link
+print(path.is_absolute()) # True if absolute path
+
+# File permissions (Unix)
+# print(path.is_readable())
+# print(path.is_writable())
+# print(path.is_executable())
+```
+
+### Manipulating Paths
+
+```python
+from pathlib import Path
+
+path = Path('/home/user/documents/report.pdf')
+
+# Change name
+new_path = path.with_name('summary.pdf')
+print(new_path)  # /home/user/documents/summary.pdf
+
+# Change extension
+new_path = path.with_suffix('.txt')
+print(new_path)  # /home/user/documents/report.txt
+
+# Change stem (filename without extension)
+new_path = path.with_stem('final_report')
+print(new_path)  # /home/user/documents/final_report.pdf
+
+# Make absolute
+relative = Path('documents/report.pdf')
+absolute = relative.absolute()
+print(absolute)  # /home/user/project/documents/report.pdf
+
+# Resolve (follow symlinks, make absolute)
+path = Path('~/documents/../documents/./report.pdf')
+resolved = path.expanduser().resolve()
+print(resolved)  # /home/user/documents/report.pdf
+```
+
+### Relative Paths
+
+```python
+from pathlib import Path
+
+# Make relative to another path
+path = Path('/home/user/documents/report.pdf')
+base = Path('/home/user')
+relative = path.relative_to(base)
+print(relative)  # documents/report.pdf
+
+# Check if path is relative to another
+print(path.is_relative_to(base))  # True (Python 3.9+)
+
+# Join with relative path
+new_path = base / relative
+print(new_path)  # /home/user/documents/report.pdf
+```
+
+## Reading and Writing Files
+
+### Reading Files
+
+```python
+from pathlib import Path
+
+path = Path('file.txt')
+
+# Read entire file
+content = path.read_text()
+print(content)
+
+# Read as bytes
+binary = path.read_bytes()
+print(binary)
+
+# Read with encoding
+content = path.read_text(encoding='utf-8')
+
+# Read lines
+lines = path.read_text().splitlines()
+for line in lines:
+    print(line)
+
+# Open and iterate
+with path.open('r') as f:
+    for line in f:
+        print(line.strip())
+```
+
+### Writing Files
+
+```python
+from pathlib import Path
+
+path = Path('output.txt')
+
+# Write text (overwrites existing)
+path.write_text('Hello, World!')
+
+# Write bytes
+path.write_bytes(b'Binary data')
+
+# Append to file
+with path.open('a') as f:
+    f.write('Appended line\n')
+
+# Write multiple lines
+lines = ['Line 1', 'Line 2', 'Line 3']
+path.write_text('\n'.join(lines))
+```
+
+## Directory Operations
+
+### Creating Directories
+
+```python
+from pathlib import Path
+
+# Create single directory
+path = Path('new_folder')
+path.mkdir()
+
+# Create with parents (like mkdir -p)
+path = Path('parent/child/grandchild')
+path.mkdir(parents=True, exist_ok=True)
+
+# exist_ok=True: Don't error if exists
+# parents=True: Create parent directories
+```
+
+### Listing Directory Contents
+
+```python
+from pathlib import Path
+
+directory = Path('/home/user/documents')
+
+# List all items
+for item in directory.iterdir():
+    print(item)
+
+# List only files
+for file in directory.iterdir():
+    if file.is_file():
+        print(file)
+
+# List only directories
+for subdir in directory.iterdir():
+    if subdir.is_dir():
+        print(subdir)
+```
+
+### Pattern Matching (glob)
+
+```python
+from pathlib import Path
+
+directory = Path('/home/user/documents')
+
+# Match pattern (non-recursive)
+for txt_file in directory.glob('*.txt'):
+    print(txt_file)
+
+# Match pattern (recursive)
+for py_file in directory.glob('**/*.py'):
+    print(py_file)
+
+# Match multiple patterns
+for file in directory.glob('*.[pt][xy][tx]'):  # .txt or .py
+    print(file)
+
+# More specific patterns
+for file in directory.glob('report_*.pdf'):
+    print(file)
+
+# rglob - recursive glob (shorthand)
+for py_file in directory.rglob('*.py'):
+    print(py_file)
+```
+
+### Walking Directory Trees
+
+```python
+from pathlib import Path
+
+def walk_directory(path):
+    """Recursively walk directory"""
+    for item in path.iterdir():
+        if item.is_file():
+            print(f"File: {item}")
+        elif item.is_dir():
+            print(f"Directory: {item}")
+            walk_directory(item)  # Recurse into subdirectory
+
+# Using it
+root = Path('/home/user/project')
+walk_directory(root)
+
+# Or use rglob for all files
+for file in root.rglob('*'):
+    if file.is_file():
+        print(file)
+```
+
+## File Operations
+
+### Copying, Moving, and Deleting
+
+```python
+from pathlib import Path
+import shutil
+
+# Copy file
+source = Path('source.txt')
+destination = Path('destination.txt')
+shutil.copy(source, destination)
+
+# Copy file with metadata
+shutil.copy2(source, destination)
+
+# Move/rename file
+source.rename(destination)
+
+# Delete file
+path = Path('file_to_delete.txt')
+path.unlink()  # Delete file
+
+# Delete file if exists
+path.unlink(missing_ok=True)  # Python 3.8+
+
+# Delete directory (must be empty)
+directory = Path('empty_folder')
+directory.rmdir()
+
+# Delete directory tree
+directory = Path('folder_with_files')
+shutil.rmtree(directory)
+```
+
+### File Information
+
+```python
+from pathlib import Path
+
+path = Path('file.txt')
+
+# File statistics
+stats = path.stat()
+print(stats.st_size)   # Size in bytes
+print(stats.st_mtime)  # Modification time
+print(stats.st_atime)  # Access time
+print(stats.st_ctime)  # Creation time (Unix: metadata change)
+
+# File size in different units
+size_bytes = path.stat().st_size
+size_kb = size_bytes / 1024
+size_mb = size_bytes / (1024 * 1024)
+
+print(f"Size: {size_mb:.2f} MB")
+
+# Modification time as datetime
+from datetime import datetime
+mtime = datetime.fromtimestamp(path.stat().st_mtime)
+print(f"Modified: {mtime}")
+```
+
+## Cross-Platform Paths
+
+### Platform-Specific Paths
+
+```python
+from pathlib import Path, PureWindowsPath, PurePosixPath
+
+# Current platform
+path = Path('/home/user/file.txt')
+
+# Windows path (even on Unix)
+win_path = PureWindowsPath('C:/Users/user/file.txt')
+print(win_path)  # C:\Users\user\file.txt
+
+# Unix path (even on Windows)
+unix_path = PurePosixPath('/home/user/file.txt')
+print(unix_path)  # /home/user/file.txt
+
+# Useful for testing or cross-platform tools
+```
+
+### Path Separators
+
+```python
+from pathlib import Path
+import os
+
+# pathlib handles separators automatically
+path = Path('folder') / 'subfolder' / 'file.txt'
+
+# On Unix: folder/subfolder/file.txt
+# On Windows: folder\subfolder\file.txt
+
+# Always use /, pathlib converts appropriately
+# Never use \\ or os.sep
+```
+
+## Practical Examples
+
+### Find All Python Files
+
+```python
+from pathlib import Path
+
+def find_python_files(directory):
+    """Find all Python files recursively"""
+    return list(Path(directory).rglob('*.py'))
+
+# Using it
+py_files = find_python_files('/home/user/project')
+for file in py_files:
+    print(file)
+```
+
+### Calculate Directory Size
+
+```python
+from pathlib import Path
+
+def directory_size(path):
+    """Calculate total size of directory"""
+    total = 0
+    for file in Path(path).rglob('*'):
+        if file.is_file():
+            total += file.stat().st_size
+    return total
+
+# Using it
+size = directory_size('/home/user/documents')
+print(f"Directory size: {size / (1024**2):.2f} MB")
+```
+
+### Backup Files
+
+```python
+from pathlib import Path
+from datetime import datetime
+import shutil
+
+def backup_file(file_path):
+    """Create timestamped backup of file"""
+    path = Path(file_path)
+    if not path.exists():
+        print(f"File not found: {path}")
+        return
+
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_path = path.with_name(f"{path.stem}_{timestamp}{path.suffix}")
+
+    shutil.copy2(path, backup_path)
+    print(f"Backup created: {backup_path}")
+
+# Using it
+backup_file('important_data.txt')
+# Creates: important_data_20251104_143045.txt
+```
+
+### Clean Old Files
+
+```python
+from pathlib import Path
+from datetime import datetime, timedelta
+
+def clean_old_files(directory, days=30):
+    """Delete files older than specified days"""
+    cutoff = datetime.now() - timedelta(days=days)
+    count = 0
+
+    for file in Path(directory).rglob('*'):
+        if file.is_file():
+            mtime = datetime.fromtimestamp(file.stat().st_mtime)
+            if mtime < cutoff:
+                print(f"Deleting: {file}")
+                file.unlink()
+                count += 1
+
+    print(f"Deleted {count} files")
+
+# Using it
+clean_old_files('/home/user/temp', days=7)
+```
+
+### Find Duplicate Files
+
+```python
+from pathlib import Path
+from collections import defaultdict
+import hashlib
+
+def find_duplicates(directory):
+    """Find duplicate files by content"""
+    hashes = defaultdict(list)
+
+    # Calculate hash for each file
+    for file in Path(directory).rglob('*'):
+        if file.is_file():
+            file_hash = hashlib.md5(file.read_bytes()).hexdigest()
+            hashes[file_hash].append(file)
+
+    # Find duplicates
+    duplicates = {h: files for h, files in hashes.items() if len(files) > 1}
+
+    return duplicates
+
+# Using it
+dupes = find_duplicates('/home/user/downloads')
+for hash_val, files in dupes.items():
+    print(f"\nDuplicates (hash: {hash_val[:8]}...):")
+    for file in files:
+        print(f"  {file}")
+```
+
+### Organize Files by Extension
+
+```python
+from pathlib import Path
+import shutil
+
+def organize_by_extension(directory):
+    """Organize files into folders by extension"""
+    directory = Path(directory)
+
+    for file in directory.iterdir():
+        if file.is_file():
+            # Get extension (without dot)
+            ext = file.suffix[1:] if file.suffix else 'no_extension'
+
+            # Create folder for extension
+            ext_folder = directory / ext
+            ext_folder.mkdir(exist_ok=True)
+
+            # Move file
+            new_path = ext_folder / file.name
+            shutil.move(file, new_path)
+            print(f"Moved {file.name} to {ext}/")
+
+# Using it
+organize_by_extension('/home/user/downloads')
+```
+
+### Generate File Tree
+
+```python
+from pathlib import Path
+
+def file_tree(directory, prefix='', max_depth=None, _current_depth=0):
+    """Generate visual file tree"""
+    directory = Path(directory)
+
+    if max_depth is not None and _current_depth >= max_depth:
+        return
+
+    items = sorted(directory.iterdir(), key=lambda x: (not x.is_dir(), x.name))
+
+    for i, item in enumerate(items):
+        is_last = i == len(items) - 1
+        current_prefix = '└── ' if is_last else '├── '
+        print(f"{prefix}{current_prefix}{item.name}")
+
+        if item.is_dir():
+            extension = '    ' if is_last else '│   '
+            file_tree(item, prefix + extension, max_depth, _current_depth + 1)
+
+# Using it
+file_tree('/home/user/project', max_depth=2)
+```
+
+### Find Large Files
+
+```python
+from pathlib import Path
+
+def find_large_files(directory, min_size_mb=10):
+    """Find files larger than specified size"""
+    min_bytes = min_size_mb * 1024 * 1024
+    large_files = []
+
+    for file in Path(directory).rglob('*'):
+        if file.is_file():
+            size = file.stat().st_size
+            if size > min_bytes:
+                large_files.append((file, size))
+
+    # Sort by size (largest first)
+    large_files.sort(key=lambda x: x[1], reverse=True)
+
+    return large_files
+
+# Using it
+large = find_large_files('/home/user', min_size_mb=50)
+for file, size in large[:10]:  # Top 10
+    print(f"{size / (1024**2):.2f} MB - {file}")
+```
+
+## Best Practices
+
+### Use Path Objects, Not Strings
+
+```python
+from pathlib import Path
+
+# Bad: String manipulation
+path = '/home/user' + '/' + 'documents' + '/' + 'file.txt'
+
+# Good: Path objects
+path = Path('/home/user') / 'documents' / 'file.txt'
+
+# Bad: String checking
+if '/documents/' in path_string:
+    pass
+
+# Good: Path methods
+if Path('documents') in path.parents:
+    pass
+```
+
+### Always Use `/` for Joining
+
+```python
+from pathlib import Path
+
+# Bad: Manual joining
+path = Path('C:\\Users\\user\\documents\\file.txt')  # Windows-specific!
+
+# Good: Use / operator
+path = Path('C:') / 'Users' / 'user' / 'documents' / 'file.txt'
+# Works on all platforms!
+```
+
+### Check Existence Before Operations
+
+```python
+from pathlib import Path
+
+path = Path('file.txt')
+
+# Good: Check before reading
+if path.exists():
+    content = path.read_text()
+
+# Good: Check type
+if path.is_file():
+    content = path.read_text()
+elif path.is_dir():
+    files = list(path.iterdir())
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **Path objects** - Object-oriented file paths
+- **The `/` operator** - Intuitive path joining
+- **Path properties** - Name, stem, suffix, parent, etc.
+- **File operations** - Reading, writing, copying, moving
+- **Directory operations** - Creating, listing, pattern matching
+- **Practical examples** - Real-world file system tasks
+
+`pathlib` is the modern, Pythonic way to work with file paths. Use it instead of `os.path`!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- Use `Path` objects, not strings
+- Use `/` to join paths (works on all platforms)
+- `pathlib` is cross-platform by default
+- Methods like `.exists()`, `.is_file()`, `.is_dir()` are your friends
+- Use `.rglob()` for recursive pattern matching
+- Always use `parents=True, exist_ok=True` when creating directories
+:::
+
+## Practice Exercises
+
+### Exercise 1: File Counter
+Count files by extension in a directory:
+
+```python
+def count_by_extension(directory):
+    # Your code here
+    pass
+```
+
+### Exercise 2: Find Empty Directories
+Find all empty directories:
+
+```python
+def find_empty_dirs(directory):
+    # Your code here
+    pass
+```
+
+### Exercise 3: Rename Files
+Rename all files to lowercase:
+
+```python
+def rename_to_lowercase(directory):
+    # Your code here
+    pass
+```
+
+### Exercise 4: File Age Report
+List files with their age in days:
+
+```python
+def file_age_report(directory):
+    # Your code here
+    pass
+```
+
+### Exercise 5: Safe Delete
+Delete file with confirmation:
+
+```python
+def safe_delete(file_path):
+    # Your code here (ask for confirmation)
+    pass
+```
+
+## Next Steps
+
+In the next chapter, we'll dive into **testing** with `unittest` and `pytest`. Get ready to write bug-free code!

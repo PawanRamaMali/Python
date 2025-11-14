@@ -1,0 +1,783 @@
+# Input and Output: Communicating with Your Programs {#sec-input-output}
+
+Programs are much more interesting when they can interact with users! In this chapter, you'll learn how to get input from users, display output in various formats, and even work with files. Let's make your programs come alive!
+
+## Getting User Input
+
+The `input()` function allows you to get data from the user. It always returns a string, even if the user types a number.
+
+### Basic Input
+
+```{python}
+#| eval: false
+
+# Basic input - program waits for user to type something
+name = input("What's your name? ")
+print(f"Hello, {name}! Nice to meet you!")
+```
+
+::: {.callout-note}
+## Interactive Code
+The code above won't execute in this ebook because it requires user interaction. You'll need to run it in your Python environment to try it out!
+:::
+
+### How input() Works
+
+```{python}
+#| eval: false
+
+# The prompt is optional but recommended
+age = input("How old are you? ")
+print(f"You entered: {age}")
+print(f"Type of input: {type(age)}")  # Always a string!
+```
+
+::: {.callout-important}
+## Remember!
+The `input()` function ALWAYS returns a string, even if the user types numbers. You'll need to convert the input to the appropriate type.
+:::
+
+## Type Conversion of Input
+
+Since `input()` returns strings, you'll often need to convert user input to numbers or other types.
+
+### Converting to Integers
+
+```{python}
+#| eval: false
+
+# Converting string to integer
+age_str = input("Enter your age: ")
+age = int(age_str)  # Convert to integer
+
+# Or do it in one line
+age = int(input("Enter your age: "))
+
+print(f"Next year, you'll be {age + 1} years old!")
+```
+
+### Converting to Floats
+
+```{python}
+#| eval: false
+
+# Converting to float for decimal numbers
+height = float(input("Enter your height in meters: "))
+print(f"Your height is {height:.2f} meters")
+
+weight = float(input("Enter your weight in kg: "))
+bmi = weight / (height ** 2)
+print(f"Your BMI is: {bmi:.2f}")
+```
+
+### Handling Multiple Inputs
+
+```{python}
+#| eval: false
+
+# Getting multiple values in one line
+data = input("Enter your name and age (separated by space): ")
+name, age = data.split()
+age = int(age)  # Convert age to integer
+
+print(f"Name: {name}, Age: {age}")
+```
+
+### Safe Type Conversion
+
+It's good practice to handle errors when converting user input:
+
+```{python}
+#| eval: false
+
+# Safe conversion with error handling
+age_str = input("Enter your age: ")
+
+try:
+    age = int(age_str)
+    print(f"You are {age} years old")
+except ValueError:
+    print("That's not a valid number!")
+```
+
+::: {.callout-tip}
+## Best Practice: Validate User Input
+Always validate and handle potential errors when working with user input. Users can type anything, and your program should handle it gracefully!
+:::
+
+## The print() Function
+
+You've been using `print()` throughout this book, but there's much more to it than meets the eye!
+
+### Basic Printing
+
+```{python}
+# Simple printing
+print("Hello, World!")
+
+# Printing multiple items
+print("Python", "is", "awesome")
+
+# Printing variables
+name = "Alice"
+age = 25
+print("Name:", name, "Age:", age)
+```
+
+### The sep Parameter
+
+Control what separates multiple arguments:
+
+```{python}
+# Default separator is a space
+print("Python", "is", "fun")
+
+# Custom separator
+print("Python", "is", "fun", sep="-")
+print("2025", "11", "04", sep="/")
+print("apple", "banana", "orange", sep=", ")
+
+# No separator
+print("Hello", "World", sep="")
+```
+
+### The end Parameter
+
+Control what's printed at the end (default is a newline):
+
+```{python}
+# Default end is newline
+print("Line 1")
+print("Line 2")
+
+# Custom end
+print("Loading", end="...")
+print("Done!")
+
+# Printing on same line
+for i in range(5):
+    print(i, end=" ")
+print()  # Print newline at the end
+```
+
+### Combining sep and end
+
+```{python}
+# Print a horizontal line
+print("*", "*", "*", "*", "*", sep="", end="")
+print()
+
+# Print coordinates
+x, y, z = 10, 20, 30
+print("Position:", x, y, z, sep=",", end=")\n")
+```
+
+## Formatted Output
+
+Python provides several ways to format output. Let's explore them!
+
+### F-Strings (Recommended)
+
+F-strings are the modern and most readable way to format output:
+
+```{python}
+name = "Bob"
+age = 30
+salary = 75000.50
+
+# Basic f-string
+print(f"Name: {name}, Age: {age}")
+
+# With expressions
+print(f"{name} will be {age + 1} next year")
+
+# Number formatting
+print(f"Salary: ${salary:,.2f}")
+```
+
+### Number Formatting with F-Strings
+
+```{python}
+# Decimal places
+pi = 3.14159265359
+print(f"Pi to 2 decimals: {pi:.2f}")
+print(f"Pi to 5 decimals: {pi:.5f}")
+
+# Thousands separator
+population = 1234567890
+print(f"World population: {population:,}")
+
+# Percentages
+success_rate = 0.856
+print(f"Success rate: {success_rate:.1%}")
+
+# Scientific notation
+big_number = 123456789
+print(f"Scientific: {big_number:.2e}")
+```
+
+### Alignment and Padding
+
+```{python}
+# Column headers
+print(f"{'Name':<15} {'Age':>5} {'City':<10}")
+print("-" * 35)
+
+# Aligned data
+print(f"{'Alice':<15} {25:>5} {'New York':<10}")
+print(f"{'Bob':<15} {30:>5} {'London':<10}")
+print(f"{'Charlie':<15} {35:>5} {'Paris':<10}")
+```
+
+```{python}
+# Center alignment
+title = "PYTHON"
+print(f"{title:=^30}")  # Center with = padding
+
+# Right alignment with zeros
+number = 42
+print(f"{number:0>5}")  # Pad with zeros on left
+```
+
+### Advanced F-String Examples
+
+```{python}
+# Multiple formatting options
+name = "Product"
+price = 49.99
+quantity = 3
+
+print(f"{name:<10} ${price:>8.2f} x {quantity:>3} = ${price * quantity:>8.2f}")
+
+# Datetime formatting
+from datetime import datetime
+now = datetime.now()
+print(f"Current time: {now:%Y-%m-%d %H:%M:%S}")
+
+# Nested formatting
+width = 10
+precision = 2
+value = 3.14159
+print(f"Value: {value:{width}.{precision}f}")
+```
+
+### The format() Method
+
+While f-strings are recommended, `format()` is still useful:
+
+```{python}
+# Basic format
+print("Hello, {}!".format("World"))
+
+# Multiple placeholders
+print("{} + {} = {}".format(5, 3, 5+3))
+
+# Named placeholders
+print("Name: {name}, Age: {age}".format(name="Alice", age=25))
+
+# With index
+print("{1} comes before {0}".format("second", "first"))
+
+# Number formatting
+print("Pi: {:.3f}".format(3.14159))
+```
+
+## Creating Tables and Reports
+
+Let's use our formatting skills to create nice-looking output:
+
+### Simple Table
+
+```{python}
+# Define data
+products = [
+    ("Laptop", 999.99, 5),
+    ("Mouse", 29.99, 15),
+    ("Keyboard", 79.99, 10),
+    ("Monitor", 299.99, 7)
+]
+
+# Print header
+print(f"{'Product':<15} {'Price':>10} {'Quantity':>10} {'Total':>12}")
+print("=" * 50)
+
+# Print rows
+total_value = 0
+for name, price, qty in products:
+    total = price * qty
+    total_value += total
+    print(f"{name:<15} ${price:>9.2f} {qty:>10} ${total:>11.2f}")
+
+print("=" * 50)
+print(f"{'Total Inventory Value:':>37} ${total_value:>11.2f}")
+```
+
+### Progress Bar
+
+```{python}
+# Simple text-based progress bar
+def print_progress_bar(progress, total, length=40):
+    """Print a progress bar"""
+    filled = int(length * progress / total)
+    bar = "█" * filled + "░" * (length - filled)
+    percent = 100 * progress / total
+    print(f"\r[{bar}] {percent:.1f}%", end="")
+
+# Simulate progress
+import time
+for i in range(101):
+    print_progress_bar(i, 100)
+    time.sleep(0.02)
+print()  # New line when done
+```
+
+### Formatted Receipt
+
+```{python}
+# Receipt example
+def print_receipt(items):
+    """Print a formatted receipt"""
+    width = 40
+    print("=" * width)
+    print("PYTHON STORE".center(width))
+    print("=" * width)
+    print()
+
+    subtotal = 0
+    for item, price in items:
+        print(f"{item:<25} ${price:>10.2f}")
+        subtotal += price
+
+    print("-" * width)
+    print(f"{'Subtotal:':<25} ${subtotal:>10.2f}")
+
+    tax = subtotal * 0.08
+    print(f"{'Tax (8%):':<25} ${tax:>10.2f}")
+
+    total = subtotal + tax
+    print("=" * width)
+    print(f"{'TOTAL:':<25} ${total:>10.2f}")
+    print("=" * width)
+    print("\nThank you for shopping!".center(width))
+
+# Test the receipt
+items = [
+    ("Python Book", 49.99),
+    ("Coffee Mug", 12.99),
+    ("Laptop Sticker", 5.99)
+]
+print_receipt(items)
+```
+
+## Working with Files (Preview)
+
+While we'll cover file handling in depth later, here's a quick preview:
+
+### Reading from a File
+
+```{python}
+#| eval: false
+
+# Reading entire file
+with open("data.txt", "r") as file:
+    content = file.read()
+    print(content)
+
+# Reading line by line
+with open("data.txt", "r") as file:
+    for line in file:
+        print(line.strip())
+```
+
+### Writing to a File
+
+```{python}
+#| eval: false
+
+# Writing to a file
+with open("output.txt", "w") as file:
+    file.write("Hello, File!\n")
+    file.write("This is line 2\n")
+
+# Appending to a file
+with open("output.txt", "a") as file:
+    file.write("This is appended\n")
+```
+
+::: {.callout-note}
+## File Operations
+We'll explore file operations in much more detail in a later chapter. This is just a taste of what's possible!
+:::
+
+## Practical Examples
+
+Let's build some useful programs using input and output!
+
+### Interactive Calculator
+
+```{python}
+#| eval: false
+
+def calculator():
+    """Simple interactive calculator"""
+    print("=" * 40)
+    print("SIMPLE CALCULATOR".center(40))
+    print("=" * 40)
+
+    num1 = float(input("Enter first number: "))
+    num2 = float(input("Enter second number: "))
+
+    print("\nOperations:")
+    print("1. Addition (+)")
+    print("2. Subtraction (-)")
+    print("3. Multiplication (*)")
+    print("4. Division (/)")
+
+    choice = input("\nEnter your choice (1-4): ")
+
+    if choice == '1':
+        result = num1 + num2
+        operation = "+"
+    elif choice == '2':
+        result = num1 - num2
+        operation = "-"
+    elif choice == '3':
+        result = num1 * num2
+        operation = "*"
+    elif choice == '4':
+        if num2 != 0:
+            result = num1 / num2
+            operation = "/"
+        else:
+            print("Error: Cannot divide by zero!")
+            return
+    else:
+        print("Invalid choice!")
+        return
+
+    print(f"\n{num1} {operation} {num2} = {result:.2f}")
+
+calculator()
+```
+
+### Temperature Converter
+
+```{python}
+#| eval: false
+
+def temperature_converter():
+    """Convert between Celsius and Fahrenheit"""
+    print("\n" + "=" * 40)
+    print("TEMPERATURE CONVERTER".center(40))
+    print("=" * 40)
+
+    print("\n1. Celsius to Fahrenheit")
+    print("2. Fahrenheit to Celsius")
+
+    choice = input("\nEnter your choice (1 or 2): ")
+
+    temp = float(input("Enter temperature: "))
+
+    if choice == '1':
+        result = (temp * 9/5) + 32
+        print(f"\n{temp:.1f}°C = {result:.1f}°F")
+    elif choice == '2':
+        result = (temp - 32) * 5/9
+        print(f"\n{temp:.1f}°F = {result:.1f}°C")
+    else:
+        print("Invalid choice!")
+
+temperature_converter()
+```
+
+### Mad Libs Game
+
+```{python}
+#| eval: false
+
+def mad_libs():
+    """Fun Mad Libs word game"""
+    print("\n" + "=" * 50)
+    print("MAD LIBS GAME!".center(50))
+    print("=" * 50)
+    print("\nAnswer the following prompts:\n")
+
+    adjective1 = input("Enter an adjective: ")
+    noun1 = input("Enter a noun: ")
+    verb1 = input("Enter a verb (past tense): ")
+    adjective2 = input("Enter another adjective: ")
+    noun2 = input("Enter another noun: ")
+
+    story = f"""
+    Once upon a time, there was a {adjective1} {noun1}.
+    One day, it {verb1} to a {adjective2} {noun2}.
+    It was the most amazing adventure ever!
+    """
+
+    print("\n" + "=" * 50)
+    print("YOUR STORY:".center(50))
+    print("=" * 50)
+    print(story)
+
+mad_libs()
+```
+
+### BMI Calculator
+
+```{python}
+#| eval: false
+
+def bmi_calculator():
+    """Calculate and interpret BMI"""
+    print("\n" + "=" * 40)
+    print("BMI CALCULATOR".center(40))
+    print("=" * 40)
+
+    weight = float(input("\nEnter your weight (kg): "))
+    height = float(input("Enter your height (m): "))
+
+    bmi = weight / (height ** 2)
+
+    print(f"\nYour BMI: {bmi:.2f}")
+
+    if bmi < 18.5:
+        category = "Underweight"
+    elif bmi < 25:
+        category = "Normal weight"
+    elif bmi < 30:
+        category = "Overweight"
+    else:
+        category = "Obese"
+
+    print(f"Category: {category}")
+
+    # Visual representation
+    print("\nBMI Scale:")
+    print(f"{'Underweight':<15} {'Normal':<15} {'Overweight':<15} {'Obese':<15}")
+    print("|" + "-" * 14 + "|" + "-" * 14 + "|" + "-" * 14 + "|" + "-" * 14 + "|")
+    print("0            18.5          25            30             40+")
+
+bmi_calculator()
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Input operations**:
+  - Using `input()` to get user input
+  - Converting input strings to appropriate types (`int()`, `float()`)
+  - Handling multiple inputs
+  - Safe type conversion with error handling
+
+- **Output operations**:
+  - Using `print()` with multiple arguments
+  - The `sep` parameter for custom separators
+  - The `end` parameter for custom line endings
+
+- **Formatted output**:
+  - F-strings for modern, readable formatting
+  - Number formatting (decimals, thousands separators, percentages)
+  - Alignment and padding (left, right, center)
+  - The `format()` method
+
+- **Creating tables and reports**:
+  - Formatting data in columns
+  - Creating progress bars
+  - Generating receipts and reports
+
+- **File operations (preview)**:
+  - Reading from files
+  - Writing to files
+
+::: {.callout-important}
+## Key Takeaways
+1. Always convert `input()` results to the appropriate type
+2. Use f-strings for formatting (modern and readable)
+3. Validate user input to prevent errors
+4. Use alignment for creating tables and reports
+5. The `sep` and `end` parameters give you fine control over printing
+:::
+
+## Practice Exercises
+
+### Exercise 1: Personal Info Card
+
+Write a program that asks for name, age, city, and hobby, then displays a formatted info card.
+
+```{python}
+#| eval: false
+
+def personal_info_card():
+    """Solution"""
+    print("=" * 40)
+    print("PERSONAL INFO CARD CREATOR".center(40))
+    print("=" * 40)
+
+    name = input("\nEnter your name: ")
+    age = int(input("Enter your age: "))
+    city = input("Enter your city: ")
+    hobby = input("Enter your hobby: ")
+
+    print("\n" + "=" * 40)
+    print("PERSONAL INFO CARD".center(40))
+    print("=" * 40)
+    print(f"Name:     {name}")
+    print(f"Age:      {age} years old")
+    print(f"Location: {city}")
+    print(f"Hobby:    {hobby}")
+    print("=" * 40)
+
+personal_info_card()
+```
+
+### Exercise 2: Shopping Cart Total
+
+Write a program that asks for item names and prices, then displays a formatted total.
+
+```{python}
+#| eval: false
+
+def shopping_cart():
+    """Solution"""
+    items = []
+
+    print("Shopping Cart (enter 'done' when finished)\n")
+
+    while True:
+        name = input("Item name (or 'done'): ")
+        if name.lower() == 'done':
+            break
+
+        price = float(input("Item price: $"))
+        items.append((name, price))
+
+    if not items:
+        print("No items in cart!")
+        return
+
+    print("\n" + "=" * 40)
+    print("SHOPPING CART SUMMARY".center(40))
+    print("=" * 40)
+
+    total = 0
+    for name, price in items:
+        print(f"{name:<25} ${price:>10.2f}")
+        total += price
+
+    print("=" * 40)
+    print(f"{'TOTAL:':<25} ${total:>10.2f}")
+
+shopping_cart()
+```
+
+### Exercise 3: Grade Calculator
+
+Write a program that calculates final grade based on assignments, midterm, and final exam.
+
+```{python}
+#| eval: false
+
+def grade_calculator():
+    """Solution"""
+    print("GRADE CALCULATOR")
+    print("=" * 40)
+
+    assignments = float(input("Assignments score (0-100): "))
+    midterm = float(input("Midterm score (0-100): "))
+    final = float(input("Final exam score (0-100): "))
+
+    # Weighted calculation: 40% assignments, 30% midterm, 30% final
+    final_grade = assignments * 0.4 + midterm * 0.3 + final * 0.3
+
+    print("\n" + "=" * 40)
+    print("GRADE BREAKDOWN".center(40))
+    print("=" * 40)
+    print(f"Assignments (40%): {assignments:>6.1f}")
+    print(f"Midterm (30%):     {midterm:>6.1f}")
+    print(f"Final (30%):       {final:>6.1f}")
+    print("-" * 40)
+    print(f"Final Grade:       {final_grade:>6.1f}")
+
+    if final_grade >= 90:
+        letter = "A"
+    elif final_grade >= 80:
+        letter = "B"
+    elif final_grade >= 70:
+        letter = "C"
+    elif final_grade >= 60:
+        letter = "D"
+    else:
+        letter = "F"
+
+    print(f"Letter Grade:      {letter:>6}")
+    print("=" * 40)
+
+grade_calculator()
+```
+
+### Exercise 4: Distance Converter
+
+Write a program that converts distances between different units.
+
+```{python}
+#| eval: false
+
+def distance_converter():
+    """Solution"""
+    print("\nDISTANCE CONVERTER")
+    print("=" * 40)
+    print("1. Kilometers to Miles")
+    print("2. Miles to Kilometers")
+    print("3. Meters to Feet")
+    print("4. Feet to Meters")
+
+    choice = input("\nEnter choice (1-4): ")
+    distance = float(input("Enter distance: "))
+
+    conversions = {
+        '1': (distance * 0.621371, "km", "miles"),
+        '2': (distance * 1.60934, "miles", "km"),
+        '3': (distance * 3.28084, "m", "feet"),
+        '4': (distance * 0.3048, "feet", "m")
+    }
+
+    if choice in conversions:
+        result, from_unit, to_unit = conversions[choice]
+        print(f"\n{distance:.2f} {from_unit} = {result:.2f} {to_unit}")
+    else:
+        print("Invalid choice!")
+
+distance_converter()
+```
+
+### Exercise 5: Multiplication Table
+
+Write a program that displays a formatted multiplication table for a given number.
+
+```{python}
+#| eval: false
+
+def multiplication_table():
+    """Solution"""
+    number = int(input("Enter a number: "))
+    print(f"\nMultiplication Table for {number}")
+    print("=" * 30)
+
+    for i in range(1, 13):
+        result = number * i
+        print(f"{number:>3} × {i:>2} = {result:>4}")
+
+    print("=" * 30)
+
+multiplication_table()
+```
+
+::: {.callout-tip}
+## Challenge!
+Combine input, output, and string formatting to create interactive programs. The more you practice, the better you'll get at creating user-friendly applications!
+:::
+
+---
+
+Great job! You now know how to make your programs interactive. In the next chapter, we'll learn about conditionals to make decisions in your code!

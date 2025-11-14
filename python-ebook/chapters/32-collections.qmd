@@ -1,0 +1,722 @@
+# The Collections Module {#sec-collections}
+
+## Introduction
+
+Need a dictionary with default values? Want to count items efficiently? Looking for an ordered dictionary or a double-ended queue? The `collections` module provides specialized container datatypes that extend Python's built-in collections with powerful features.
+
+In this chapter, we'll explore the `collections` module's gems, learning how these specialized containers can make your code more efficient and elegant.
+
+::: {.callout-note}
+## What You'll Learn
+
+- `namedtuple` - Tuple with named fields
+- `Counter` - Count hashable objects
+- `defaultdict` - Dictionary with default values
+- `OrderedDict` - Dictionary that remembers order (pre-Python 3.7)
+- `deque` - Double-ended queue
+- `ChainMap` - Multiple dictionaries as one
+:::
+
+## `namedtuple` - Tuples with Names
+
+`namedtuple` creates tuple subclasses with named fields, making your code more readable.
+
+### Creating Named Tuples
+
+```python
+from collections import namedtuple
+
+# Define a named tuple
+Point = namedtuple('Point', ['x', 'y'])
+
+# Create instances
+p1 = Point(10, 20)
+p2 = Point(x=5, y=15)
+
+# Access by name (readable!)
+print(p1.x, p1.y)  # 10 20
+
+# Access by index (still works)
+print(p1[0], p1[1])  # 10 20
+
+# Immutable like regular tuples
+# p1.x = 30  # AttributeError!
+```
+
+### Alternative Field Definitions
+
+```python
+from collections import namedtuple
+
+# Space-separated string
+Point = namedtuple('Point', 'x y')
+
+# Comma-separated string
+Point = namedtuple('Point', 'x, y')
+
+# List of strings
+Point = namedtuple('Point', ['x', 'y'])
+
+# All create the same named tuple!
+```
+
+### Named Tuple Methods
+
+```python
+from collections import namedtuple
+
+Person = namedtuple('Person', ['name', 'age', 'city'])
+person = Person('Alice', 30, 'NYC')
+
+# Convert to dictionary
+print(person._asdict())
+# OrderedDict([('name', 'Alice'), ('age', 30), ('city', 'NYC')])
+
+# Replace values (returns new tuple)
+person2 = person._replace(age=31)
+print(person2)  # Person(name='Alice', age=31, city='NYC')
+
+# Get field names
+print(Person._fields)  # ('name', 'age', 'city')
+
+# Create from iterable
+data = ['Bob', 25, 'LA']
+person3 = Person._make(data)
+print(person3)  # Person(name='Bob', age=25, city='LA')
+```
+
+### Practical Examples
+
+```python
+from collections import namedtuple
+
+# Card game
+Card = namedtuple('Card', ['rank', 'suit'])
+ace_of_spades = Card('A', 'Spades')
+print(f"{ace_of_spades.rank} of {ace_of_spades.suit}")
+
+# RGB color
+Color = namedtuple('Color', ['red', 'green', 'blue'])
+white = Color(255, 255, 255)
+print(f"RGB: ({white.red}, {white.green}, {white.blue})")
+
+# Employee record
+Employee = namedtuple('Employee', ['id', 'name', 'department', 'salary'])
+emp = Employee(1001, 'Alice', 'Engineering', 75000)
+print(f"{emp.name} works in {emp.department}")
+
+# Function returning multiple named values
+def get_stats(numbers):
+    Stats = namedtuple('Stats', ['min', 'max', 'avg'])
+    return Stats(min(numbers), max(numbers), sum(numbers) / len(numbers))
+
+stats = get_stats([1, 2, 3, 4, 5])
+print(f"Min: {stats.min}, Max: {stats.max}, Avg: {stats.avg}")
+```
+
+::: {.callout-tip}
+## When to Use `namedtuple`
+
+Use `namedtuple` when:
+- You want lightweight, immutable objects
+- You need both named and positional access
+- You're returning multiple values from functions
+- You want to make tuple code more readable
+:::
+
+## `Counter` - Count Things Easily
+
+`Counter` is a dictionary subclass for counting hashable objects.
+
+### Creating Counters
+
+```python
+from collections import Counter
+
+# From list
+colors = ['red', 'blue', 'red', 'green', 'blue', 'blue']
+color_counts = Counter(colors)
+print(color_counts)  # Counter({'blue': 3, 'red': 2, 'green': 1})
+
+# From string
+letter_counts = Counter('mississippi')
+print(letter_counts)  # Counter({'i': 4, 's': 4, 'p': 2, 'm': 1})
+
+# From dictionary
+counts = Counter({'red': 4, 'blue': 2})
+print(counts)
+
+# From keyword arguments
+counts = Counter(cats=4, dogs=8)
+print(counts)
+```
+
+### Counter Operations
+
+```python
+from collections import Counter
+
+counter = Counter('abracadabra')
+
+# Most common elements
+print(counter.most_common())     # All, sorted
+print(counter.most_common(3))    # Top 3
+# [('a', 5), ('b', 2), ('r', 2)]
+
+# Get count (returns 0 for missing items)
+print(counter['a'])  # 5
+print(counter['z'])  # 0 (not KeyError!)
+
+# Total count
+print(sum(counter.values()))  # 11
+
+# List all elements
+print(list(counter.elements()))
+# ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'r', 'r', ...]
+```
+
+### Counter Arithmetic
+
+```python
+from collections import Counter
+
+c1 = Counter(['a', 'b', 'c', 'a', 'b', 'b'])
+c2 = Counter(['a', 'b', 'd', 'b'])
+
+# Addition
+print(c1 + c2)  # Counter({'b': 5, 'a': 3, 'c': 1, 'd': 1})
+
+# Subtraction (keeps only positive counts)
+print(c1 - c2)  # Counter({'b': 2, 'a': 1, 'c': 1})
+
+# Intersection (minimum)
+print(c1 & c2)  # Counter({'b': 2, 'a': 1})
+
+# Union (maximum)
+print(c1 | c2)  # Counter({'b': 3, 'a': 2, 'c': 1, 'd': 1})
+```
+
+### Practical Examples
+
+```python
+from collections import Counter
+
+# Word frequency
+text = "the quick brown fox jumps over the lazy dog the fox"
+words = text.split()
+word_freq = Counter(words)
+print(word_freq.most_common(3))  # [('the', 3), ('fox', 2), ...]
+
+# Character frequency
+text = "hello world"
+char_freq = Counter(text.replace(' ', ''))
+print(char_freq)  # Counter({'l': 3, 'o': 2, ...})
+
+# Find duplicates
+numbers = [1, 2, 3, 2, 4, 5, 3, 6]
+duplicates = [num for num, count in Counter(numbers).items() if count > 1]
+print(duplicates)  # [2, 3]
+
+# Voting system
+votes = ['Alice', 'Bob', 'Alice', 'Charlie', 'Alice', 'Bob']
+vote_counts = Counter(votes)
+winner = vote_counts.most_common(1)[0][0]
+print(f"Winner: {winner}")  # Winner: Alice
+```
+
+## `defaultdict` - Dictionaries with Default Values
+
+`defaultdict` never raises `KeyError` - it provides a default value for missing keys.
+
+### Creating defaultdicts
+
+```python
+from collections import defaultdict
+
+# With list as default
+dd_list = defaultdict(list)
+dd_list['colors'].append('red')
+dd_list['colors'].append('blue')
+print(dd_list)  # defaultdict(<class 'list'>, {'colors': ['red', 'blue']})
+
+# With int as default (useful for counting)
+dd_int = defaultdict(int)
+dd_int['count'] += 1
+dd_int['count'] += 1
+print(dd_int)  # defaultdict(<class 'int'>, {'count': 2})
+
+# With set as default
+dd_set = defaultdict(set)
+dd_set['tags'].add('python')
+dd_set['tags'].add('programming')
+print(dd_set)  # defaultdict(<class 'set'>, {'tags': {'python', 'programming'}})
+```
+
+### Comparison with Regular Dict
+
+```python
+# Regular dict
+regular_dict = {}
+# regular_dict['key'] += 1  # KeyError!
+
+# Need to check first
+if 'key' in regular_dict:
+    regular_dict['key'] += 1
+else:
+    regular_dict['key'] = 1
+
+# defaultdict - much simpler!
+from collections import defaultdict
+dd = defaultdict(int)
+dd['key'] += 1  # Just works!
+```
+
+### Practical Examples
+
+```python
+from collections import defaultdict
+
+# Group items by property
+students = [
+    ('Alice', 'Math'),
+    ('Bob', 'Science'),
+    ('Charlie', 'Math'),
+    ('David', 'Science'),
+]
+
+by_subject = defaultdict(list)
+for name, subject in students:
+    by_subject[subject].append(name)
+
+print(dict(by_subject))
+# {'Math': ['Alice', 'Charlie'], 'Science': ['Bob', 'David']}
+
+# Count word occurrences by first letter
+words = ['apple', 'ant', 'banana', 'bear', 'cherry']
+by_letter = defaultdict(list)
+for word in words:
+    by_letter[word[0]].append(word)
+
+print(dict(by_letter))
+# {'a': ['apple', 'ant'], 'b': ['banana', 'bear'], 'c': ['cherry']}
+
+# Build graph (adjacency list)
+graph = defaultdict(list)
+edges = [(1, 2), (1, 3), (2, 4), (3, 4)]
+for start, end in edges:
+    graph[start].append(end)
+
+print(dict(graph))  # {1: [2, 3], 2: [4], 3: [4]}
+
+# Nested defaultdict
+nested = defaultdict(lambda: defaultdict(int))
+nested['user1']['login'] += 1
+nested['user1']['logout'] += 1
+nested['user2']['login'] += 1
+
+print(dict(nested))
+# {'user1': {'login': 1, 'logout': 1}, 'user2': {'login': 1}}
+```
+
+## `OrderedDict` - Remember Insertion Order
+
+::: {.callout-note}
+## Note on `OrderedDict`
+
+Since Python 3.7, regular `dict` objects maintain insertion order. `OrderedDict` is still useful for:
+- Explicit ordering semantics
+- `move_to_end()` method
+- Equality checking that considers order
+:::
+
+```python
+from collections import OrderedDict
+
+# Create ordered dict
+od = OrderedDict()
+od['first'] = 1
+od['second'] = 2
+od['third'] = 3
+
+# Maintains insertion order
+for key, value in od.items():
+    print(f"{key}: {value}")
+# first: 1
+# second: 2
+# third: 3
+
+# Move to end
+od.move_to_end('first')
+print(list(od.keys()))  # ['second', 'third', 'first']
+
+# Move to beginning
+od.move_to_end('third', last=False)
+print(list(od.keys()))  # ['third', 'second', 'first']
+
+# Pop last item
+key, value = od.popitem(last=True)
+print(f"Popped: {key} = {value}")
+
+# Pop first item
+key, value = od.popitem(last=False)
+print(f"Popped: {key} = {value}")
+```
+
+### Equality with Order
+
+```python
+from collections import OrderedDict
+
+# Regular dicts (order doesn't matter for equality)
+d1 = {'a': 1, 'b': 2}
+d2 = {'b': 2, 'a': 1}
+print(d1 == d2)  # True
+
+# OrderedDicts (order matters!)
+od1 = OrderedDict([('a', 1), ('b', 2)])
+od2 = OrderedDict([('b', 2), ('a', 1)])
+print(od1 == od2)  # False (different order!)
+```
+
+## `deque` - Double-Ended Queue
+
+`deque` (pronounced "deck") allows fast appends and pops from both ends.
+
+### Creating Deques
+
+```python
+from collections import deque
+
+# Empty deque
+dq = deque()
+
+# From iterable
+dq = deque([1, 2, 3, 4, 5])
+print(dq)  # deque([1, 2, 3, 4, 5])
+
+# With max length
+dq = deque([1, 2, 3], maxlen=5)
+print(dq)  # deque([1, 2, 3], maxlen=5)
+```
+
+### Deque Operations
+
+```python
+from collections import deque
+
+dq = deque([1, 2, 3])
+
+# Append to right
+dq.append(4)
+print(dq)  # deque([1, 2, 3, 4])
+
+# Append to left
+dq.appendleft(0)
+print(dq)  # deque([0, 1, 2, 3, 4])
+
+# Pop from right
+right = dq.pop()
+print(right)  # 4
+print(dq)     # deque([0, 1, 2, 3])
+
+# Pop from left
+left = dq.popleft()
+print(left)  # 0
+print(dq)    # deque([1, 2, 3])
+
+# Extend right
+dq.extend([4, 5])
+print(dq)  # deque([1, 2, 3, 4, 5])
+
+# Extend left
+dq.extendleft([0, -1])
+print(dq)  # deque([-1, 0, 1, 2, 3, 4, 5])
+
+# Rotate (positive = rotate right)
+dq = deque([1, 2, 3, 4, 5])
+dq.rotate(2)
+print(dq)  # deque([4, 5, 1, 2, 3])
+
+# Rotate left
+dq.rotate(-1)
+print(dq)  # deque([5, 1, 2, 3, 4])
+```
+
+### Limited Length Deque
+
+```python
+from collections import deque
+
+# Fixed-size deque (automatically removes from other end)
+recent = deque(maxlen=3)
+
+recent.append(1)
+recent.append(2)
+recent.append(3)
+print(recent)  # deque([1, 2, 3], maxlen=3)
+
+recent.append(4)  # Removes 1 automatically
+print(recent)     # deque([2, 3, 4], maxlen=3)
+
+recent.appendleft(1)  # Removes 4 automatically
+print(recent)         # deque([1, 2, 3], maxlen=3)
+```
+
+### Practical Examples
+
+```python
+from collections import deque
+
+# Sliding window
+def moving_average(data, window_size):
+    """Calculate moving average using deque"""
+    window = deque(maxlen=window_size)
+    averages = []
+
+    for value in data:
+        window.append(value)
+        averages.append(sum(window) / len(window))
+
+    return averages
+
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+avgs = moving_average(data, 3)
+print(avgs)  # [1.0, 1.5, 2.0, 3.0, 4.0, 5.0, ...]
+
+# Recent items tracker
+recent_searches = deque(maxlen=5)
+searches = ['python', 'java', 'javascript', 'go', 'rust', 'c++']
+for search in searches:
+    recent_searches.append(search)
+print(list(recent_searches))  # Last 5 searches
+
+# Breadth-first search
+def bfs(graph, start):
+    """BFS using deque"""
+    visited = set()
+    queue = deque([start])
+
+    while queue:
+        node = queue.popleft()
+        if node not in visited:
+            visited.add(node)
+            queue.extend(graph[node])
+
+    return visited
+
+graph = {1: [2, 3], 2: [4], 3: [4], 4: []}
+print(bfs(graph, 1))  # {1, 2, 3, 4}
+
+# Palindrome checker
+def is_palindrome(text):
+    """Check if text is palindrome using deque"""
+    dq = deque(text.lower().replace(' ', ''))
+    while len(dq) > 1:
+        if dq.popleft() != dq.pop():
+            return False
+    return True
+
+print(is_palindrome("racecar"))       # True
+print(is_palindrome("A man a plan a canal Panama"))  # True
+print(is_palindrome("hello"))         # False
+```
+
+## `ChainMap` - Multiple Dictionaries as One
+
+`ChainMap` groups multiple dictionaries into a single view.
+
+### Creating ChainMaps
+
+```python
+from collections import ChainMap
+
+# Multiple dictionaries
+dict1 = {'a': 1, 'b': 2}
+dict2 = {'b': 3, 'c': 4}
+dict3 = {'c': 5, 'd': 6}
+
+# Create chain (searches in order)
+chain = ChainMap(dict1, dict2, dict3)
+
+# Lookup (first match wins)
+print(chain['a'])  # 1 (from dict1)
+print(chain['b'])  # 2 (from dict1, not dict2!)
+print(chain['c'])  # 4 (from dict2, not dict3!)
+print(chain['d'])  # 6 (from dict3)
+
+# All keys and values
+print(dict(chain))  # {'d': 6, 'c': 4, 'b': 2, 'a': 1}
+```
+
+### ChainMap Operations
+
+```python
+from collections import ChainMap
+
+defaults = {'color': 'blue', 'size': 'medium'}
+user_prefs = {'color': 'red'}
+
+config = ChainMap(user_prefs, defaults)
+
+# Get value (user pref overrides default)
+print(config['color'])  # red (from user_prefs)
+print(config['size'])   # medium (from defaults)
+
+# Modify (affects first dict only)
+config['color'] = 'green'
+print(user_prefs)  # {'color': 'green'}
+
+# Add new child
+new_prefs = {'size': 'large'}
+config = config.new_child(new_prefs)
+print(config['size'])  # large
+
+# Access parent
+config = config.parents
+print(config['size'])  # medium
+```
+
+### Practical Example: Configuration Layers
+
+```python
+from collections import ChainMap
+
+# Application configuration layers
+defaults = {
+    'debug': False,
+    'port': 8000,
+    'host': 'localhost',
+}
+
+config_file = {
+    'port': 8080,
+}
+
+env_vars = {
+    'debug': True,
+}
+
+# Priority: env_vars > config_file > defaults
+config = ChainMap(env_vars, config_file, defaults)
+
+print(config['debug'])  # True (from env_vars)
+print(config['port'])   # 8080 (from config_file)
+print(config['host'])   # localhost (from defaults)
+
+# All settings
+print(dict(config))
+```
+
+## Performance Considerations
+
+### List vs Deque
+
+```python
+from collections import deque
+import time
+
+# Test list
+lst = []
+start = time.time()
+for i in range(100000):
+    lst.insert(0, i)  # Insert at beginning
+list_time = time.time() - start
+
+# Test deque
+dq = deque()
+start = time.time()
+for i in range(100000):
+    dq.appendleft(i)  # Insert at beginning
+deque_time = time.time() - start
+
+print(f"List: {list_time:.4f}s")
+print(f"Deque: {deque_time:.4f}s")
+print(f"Deque is {list_time / deque_time:.0f}x faster!")
+```
+
+::: {.callout-tip}
+## Performance Tips
+
+- Use `Counter` instead of manual counting
+- Use `defaultdict` to avoid key existence checks
+- Use `deque` for operations at both ends
+- Use `ChainMap` to layer dictionaries without copying
+:::
+
+## Summary
+
+In this chapter, we've explored:
+
+- **`namedtuple`** - Readable tuple with named fields
+- **`Counter`** - Efficient counting and statistics
+- **`defaultdict`** - Dictionaries with automatic default values
+- **`OrderedDict`** - Dictionary with ordering features
+- **`deque`** - Fast double-ended queue
+- **`ChainMap`** - Multiple dictionaries as one view
+
+The `collections` module provides powerful, specialized containers that can make your code more efficient and elegant!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- `namedtuple` makes tuples readable and self-documenting
+- `Counter` is perfect for counting and frequency analysis
+- `defaultdict` eliminates KeyError checks
+- `deque` is much faster than list for operations at both ends
+- `ChainMap` layers dictionaries without copying
+:::
+
+## Practice Exercises
+
+### Exercise 1: Top N Words
+Find the N most common words in a text:
+
+```python
+def top_n_words(text, n):
+    # Your code here using Counter
+    pass
+```
+
+### Exercise 2: Group By
+Group items by a key function:
+
+```python
+def group_by(items, key_func):
+    # Your code here using defaultdict
+    pass
+
+# group_by(['apple', 'ant', 'bear'], lambda x: x[0])
+# {'a': ['apple', 'ant'], 'b': ['bear']}
+```
+
+### Exercise 3: LRU Cache
+Implement a simple LRU cache using deque:
+
+```python
+class LRUCache:
+    def __init__(self, capacity):
+        # Your code here
+        pass
+```
+
+### Exercise 4: Student Records
+Create a Student named tuple and sort students by GPA:
+
+```python
+# Your code here
+```
+
+### Exercise 5: Word Anagrams
+Find anagram groups using Counter:
+
+```python
+def find_anagrams(words):
+    # Your code here
+    pass
+
+# ['eat', 'tea', 'ate', 'bat'] -> [['eat', 'tea', 'ate'], ['bat']]
+```
+
+## Next Steps
+
+In the next chapter, we'll explore **itertools**, Python's module for creating efficient iterators. Get ready for some powerful iteration patterns!

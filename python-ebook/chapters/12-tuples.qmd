@@ -1,0 +1,808 @@
+# Tuples: The Immutable Sequences {#sec-tuples}
+
+Tuples are like lists' responsible older sibling. They're ordered collections of items, but with one key difference: they're **immutable** (can't be changed after creation). This makes them perfect for data that shouldn't be modified, like coordinates, database records, or function return values!
+
+## What Are Tuples?
+
+A **tuple** is an ordered, immutable collection of items. Once created, you cannot add, remove, or modify elements.
+
+### Creating Tuples
+
+```{python}
+# Empty tuple
+empty = ()
+print(f"Empty tuple: {empty}, Type: {type(empty)}")
+
+# Tuple with items
+coordinates = (10, 20)
+print(f"Coordinates: {coordinates}")
+
+# Tuple without parentheses (tuple packing)
+point = 3, 4
+print(f"Point: {point}, Type: {type(point)}")
+
+# Single element tuple (note the comma!)
+single = (42,)
+print(f"Single element: {single}, Type: {type(single)}")
+
+# Without comma, it's not a tuple!
+not_tuple = (42)
+print(f"Not a tuple: {not_tuple}, Type: {type(not_tuple)}")
+
+# Mixed types
+mixed = (1, "hello", 3.14, True)
+print(f"Mixed: {mixed}")
+
+# Using tuple() constructor
+from_list = tuple([1, 2, 3, 4])
+print(f"From list: {from_list}")
+
+from_string = tuple("Python")
+print(f"From string: {from_string}")
+```
+
+::: {.callout-important}
+## Single Element Tuples
+Always include a trailing comma for single-element tuples:
+```python
+(42,)   # This is a tuple
+(42)    # This is just an integer in parentheses
+```
+:::
+
+### Why Use Tuples?
+
+```{python}
+# Tuples are faster than lists
+import sys
+
+my_list = [1, 2, 3, 4, 5]
+my_tuple = (1, 2, 3, 4, 5)
+
+print(f"List size: {sys.getsizeof(my_list)} bytes")
+print(f"Tuple size: {sys.getsizeof(my_tuple)} bytes")
+```
+
+::: {.callout-note}
+## When to Use Tuples?
+- When data shouldn't change (immutability)
+- For heterogeneous data (mixed types)
+- As dictionary keys (lists can't be keys)
+- For function return values
+- When you want better performance than lists
+- To protect data from accidental modification
+:::
+
+## Accessing Tuple Elements
+
+Tuples support the same indexing and slicing as lists:
+
+### Indexing
+
+```{python}
+fruits = ("apple", "banana", "orange", "grape")
+
+# Positive indexing
+print(f"First: {fruits[0]}")
+print(f"Second: {fruits[1]}")
+
+# Negative indexing
+print(f"Last: {fruits[-1]}")
+print(f"Second to last: {fruits[-2]}")
+```
+
+### Slicing
+
+```{python}
+numbers = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+# Basic slicing
+print(f"First 5: {numbers[:5]}")
+print(f"Last 5: {numbers[-5:]}")
+print(f"Middle: {numbers[3:7]}")
+
+# With step
+print(f"Every other: {numbers[::2]}")
+print(f"Reverse: {numbers[::-1]}")
+```
+
+## Tuple Immutability
+
+The key characteristic of tuples is that they cannot be modified:
+
+```{python}
+coordinates = (10, 20, 30)
+
+# This works - accessing elements
+print(f"X: {coordinates[0]}")
+
+# This would raise an error if uncommented:
+# coordinates[0] = 15  # TypeError!
+
+# You can't add or remove elements either:
+# coordinates.append(40)  # AttributeError!
+# del coordinates[0]      # TypeError!
+
+print("Tuples are immutable!")
+```
+
+### But Wait... There's a Catch!
+
+```{python}
+# If a tuple contains mutable objects, those can be modified!
+mixed = (1, 2, [3, 4, 5])
+print(f"Original: {mixed}")
+
+# Modify the list inside the tuple
+mixed[2][0] = 999
+print(f"After modification: {mixed}")
+
+# But you still can't reassign the tuple element
+# mixed[2] = [10, 20]  # This would error!
+```
+
+::: {.callout-warning}
+## Immutability Gotcha
+Tuples are immutable, but if they contain mutable objects (like lists), those objects can still be modified. The tuple structure itself cannot change, but the contents of mutable elements can.
+:::
+
+## Tuple Methods
+
+Tuples have fewer methods than lists because they're immutable:
+
+### count()
+
+```{python}
+numbers = (1, 2, 3, 2, 4, 2, 5, 2)
+
+# Count occurrences
+count_2 = numbers.count(2)
+print(f"Count of 2: {count_2}")
+
+count_5 = numbers.count(5)
+print(f"Count of 5: {count_5}")
+
+# Count non-existent element
+count_10 = numbers.count(10)
+print(f"Count of 10: {count_10}")
+```
+
+### index()
+
+```{python}
+fruits = ("apple", "banana", "orange", "grape", "banana")
+
+# Find first occurrence
+position = fruits.index("banana")
+print(f"First 'banana' at: {position}")
+
+# Find with start position
+position2 = fruits.index("banana", 2)
+print(f"'banana' after index 2: {position2}")
+
+# Searching for non-existent element raises error
+try:
+    position = fruits.index("mango")
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+## Tuple Operations
+
+### Concatenation and Repetition
+
+```{python}
+# Concatenation with +
+tuple1 = (1, 2, 3)
+tuple2 = (4, 5, 6)
+combined = tuple1 + tuple2
+print(f"Combined: {combined}")
+
+# Repetition with *
+repeated = (0,) * 5
+print(f"Repeated: {repeated}")
+
+pattern = (1, 2, 3) * 3
+print(f"Pattern: {pattern}")
+```
+
+### Comparison
+
+```{python}
+# Tuples can be compared
+tuple1 = (1, 2, 3)
+tuple2 = (1, 2, 3)
+tuple3 = (1, 2, 4)
+
+print(f"{tuple1} == {tuple2}: {tuple1 == tuple2}")
+print(f"{tuple1} == {tuple3}: {tuple1 == tuple3}")
+print(f"{tuple1} < {tuple3}: {tuple1 < tuple3}")
+
+# Comparison is lexicographic (element by element)
+print(f"(1, 2, 3) < (1, 3, 0): {(1, 2, 3) < (1, 3, 0)}")
+```
+
+### Membership Testing
+
+```{python}
+fruits = ("apple", "banana", "orange")
+
+print(f"'apple' in fruits: {'apple' in fruits}")
+print(f"'grape' in fruits: {'grape' in fruits}")
+print(f"'grape' not in fruits: {'grape' not in fruits}")
+```
+
+### Other Operations
+
+```{python}
+numbers = (10, 20, 30, 40, 50)
+
+# Length
+print(f"Length: {len(numbers)}")
+
+# Min, max, sum
+print(f"Min: {min(numbers)}")
+print(f"Max: {max(numbers)}")
+print(f"Sum: {sum(numbers)}")
+
+# Sorting (returns a list!)
+sorted_numbers = sorted((3, 1, 4, 1, 5, 9))
+print(f"Sorted: {sorted_numbers}, Type: {type(sorted_numbers)}")
+```
+
+## Tuple Packing and Unpacking
+
+One of the most powerful features of tuples!
+
+### Packing
+
+```{python}
+# Tuple packing (creating a tuple without parentheses)
+coordinates = 10, 20, 30
+print(f"Packed: {coordinates}")
+
+person = "Alice", 25, "New York"
+print(f"Person: {person}")
+
+# Multiple assignment uses packing
+x, y = 10, 20
+print(f"x={x}, y={y}")
+```
+
+### Unpacking
+
+```{python}
+# Basic unpacking
+point = (10, 20)
+x, y = point
+print(f"x={x}, y={y}")
+
+# Unpacking with more values
+person = ("Alice", 25, "New York")
+name, age, city = person
+print(f"Name: {name}, Age: {age}, City: {city}")
+
+# Swapping variables using unpacking
+a, b = 5, 10
+print(f"Before swap: a={a}, b={b}")
+a, b = b, a
+print(f"After swap: a={a}, b={b}")
+```
+
+### Extended Unpacking (Python 3)
+
+```{python}
+# Using * to capture multiple values
+numbers = (1, 2, 3, 4, 5, 6)
+
+first, *middle, last = numbers
+print(f"First: {first}")
+print(f"Middle: {middle}")  # This becomes a list!
+print(f"Last: {last}")
+
+# At the beginning
+first, *rest = numbers
+print(f"First: {first}, Rest: {rest}")
+
+# At the end
+*initial, last = numbers
+print(f"Initial: {initial}, Last: {last}")
+
+# In the middle
+first, second, *middle, last = numbers
+print(f"First: {first}, Second: {second}, Middle: {middle}, Last: {last}")
+```
+
+::: {.callout-tip}
+## Unpacking Power
+Tuple unpacking is incredibly useful:
+- Swap values: `a, b = b, a`
+- Return multiple values from functions
+- Iterate over pairs: `for x, y in points`
+- Extract values: `first, *rest = sequence`
+:::
+
+### Unpacking in Loops
+
+```{python}
+# Unpacking in for loops
+points = [(1, 2), (3, 4), (5, 6)]
+
+for x, y in points:
+    print(f"Point: ({x}, {y})")
+
+# With enumerate
+fruits = ["apple", "banana", "orange"]
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")
+
+# With zip
+names = ["Alice", "Bob", "Charlie"]
+ages = [25, 30, 35]
+
+for name, age in zip(names, ages):
+    print(f"{name} is {age} years old")
+```
+
+## Converting Between Lists and Tuples
+
+```{python}
+# List to tuple
+my_list = [1, 2, 3, 4, 5]
+my_tuple = tuple(my_list)
+print(f"List: {my_list}, Tuple: {my_tuple}")
+
+# Tuple to list
+original_tuple = (10, 20, 30)
+new_list = list(original_tuple)
+print(f"Tuple: {original_tuple}, List: {new_list}")
+
+# Modify and convert back
+mutable_version = list((1, 2, 3))
+mutable_version.append(4)
+immutable_again = tuple(mutable_version)
+print(f"Back to tuple: {immutable_again}")
+```
+
+## Tuples as Dictionary Keys
+
+Because tuples are immutable, they can be used as dictionary keys (lists cannot):
+
+```{python}
+# Using tuples as keys
+locations = {
+    (0, 0): "Origin",
+    (1, 0): "East",
+    (0, 1): "North",
+    (-1, 0): "West",
+    (0, -1): "South"
+}
+
+# Access values
+print(f"Location at (0, 0): {locations[(0, 0)]}")
+print(f"Location at (1, 0): {locations[(1, 0)]}")
+
+# Add new location
+locations[(2, 2)] = "Northeast"
+print(f"All locations: {locations}")
+```
+
+```{python}
+# Student records with (name, id) as key
+students = {
+    ("Alice", 101): {"grade": 85, "major": "CS"},
+    ("Bob", 102): {"grade": 92, "major": "Math"},
+    ("Charlie", 103): {"grade": 78, "major": "Physics"}
+}
+
+# Look up student
+student_id = ("Alice", 101)
+print(f"Alice's record: {students[student_id]}")
+```
+
+## Named Tuples
+
+For even more readable code, use named tuples from the `collections` module:
+
+```{python}
+from collections import namedtuple
+
+# Define a named tuple
+Point = namedtuple('Point', ['x', 'y'])
+
+# Create instances
+p1 = Point(10, 20)
+p2 = Point(x=30, y=40)
+
+# Access by name or index
+print(f"p1.x = {p1.x}, p1.y = {p1.y}")
+print(f"p1[0] = {p1[0]}, p1[1] = {p1[1]}")
+
+# Unpack like regular tuples
+x, y = p1
+print(f"Unpacked: x={x}, y={y}")
+```
+
+```{python}
+# More complex example
+Person = namedtuple('Person', ['name', 'age', 'city'])
+
+alice = Person('Alice', 25, 'New York')
+bob = Person('Bob', 30, 'London')
+
+print(f"{alice.name} is {alice.age} years old")
+print(f"{bob.name} lives in {bob.city}")
+
+# Named tuples are still immutable
+# alice.age = 26  # This would raise an error!
+```
+
+::: {.callout-tip}
+## Named Tuples Benefits
+- More readable than regular tuples
+- Self-documenting code
+- Still immutable and lightweight
+- Can be used anywhere regular tuples can
+- Access by name or index
+:::
+
+## Practical Examples
+
+Let's see tuples in action:
+
+### Function Return Values
+
+```{python}
+def get_statistics(numbers):
+    """Return multiple statistics as a tuple"""
+    if not numbers:
+        return None
+
+    return (
+        len(numbers),
+        sum(numbers),
+        min(numbers),
+        max(numbers),
+        sum(numbers) / len(numbers)
+    )
+
+# Use the function
+data = [85, 92, 78, 90, 88]
+count, total, minimum, maximum, average = get_statistics(data)
+
+print(f"Statistics for {data}:")
+print(f"  Count: {count}")
+print(f"  Total: {total}")
+print(f"  Min: {minimum}")
+print(f"  Max: {maximum}")
+print(f"  Average: {average:.2f}")
+```
+
+### RGB Colors
+
+```{python}
+# Define colors as tuples
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+def mix_colors(color1, color2):
+    """Mix two RGB colors"""
+    r = (color1[0] + color2[0]) // 2
+    g = (color1[1] + color2[1]) // 2
+    b = (color1[2] + color2[2]) // 2
+    return (r, g, b)
+
+purple = mix_colors(RED, BLUE)
+print(f"Red + Blue = {purple}")
+
+gray = mix_colors(WHITE, BLACK)
+print(f"White + Black = {gray}")
+```
+
+### Database Records
+
+```{python}
+# Simulate database records as tuples
+def get_user_records():
+    """Return user records from database"""
+    return [
+        (1, "alice", "alice@email.com", 25),
+        (2, "bob", "bob@email.com", 30),
+        (3, "charlie", "charlie@email.com", 35)
+    ]
+
+# Process records
+print("User Records:")
+print(f"{'ID':<5} {'Name':<10} {'Email':<20} {'Age':<5}")
+print("-" * 45)
+
+for user_id, name, email, age in get_user_records():
+    print(f"{user_id:<5} {name:<10} {email:<20} {age:<5}")
+```
+
+### Coordinates System
+
+```{python}
+class CoordinateSystem:
+    """Manage 2D coordinates using tuples"""
+    def __init__(self):
+        self.points = []
+
+    def add_point(self, x, y):
+        """Add a point"""
+        self.points.append((x, y))
+
+    def distance_from_origin(self, point):
+        """Calculate distance from origin"""
+        x, y = point
+        return (x**2 + y**2) ** 0.5
+
+    def distance_between(self, point1, point2):
+        """Calculate distance between two points"""
+        x1, y1 = point1
+        x2, y2 = point2
+        return ((x2-x1)**2 + (y2-y1)**2) ** 0.5
+
+    def get_quadrant(self, point):
+        """Determine which quadrant the point is in"""
+        x, y = point
+        if x > 0 and y > 0:
+            return "I"
+        elif x < 0 and y > 0:
+            return "II"
+        elif x < 0 and y < 0:
+            return "III"
+        elif x > 0 and y < 0:
+            return "IV"
+        else:
+            return "On axis"
+
+# Test
+cs = CoordinateSystem()
+points = [(3, 4), (-2, 5), (-3, -4), (5, -2)]
+
+for point in points:
+    cs.add_point(*point)
+    distance = cs.distance_from_origin(point)
+    quadrant = cs.get_quadrant(point)
+    print(f"Point {point}: Distance={distance:.2f}, Quadrant={quadrant}")
+```
+
+### Time Representation
+
+```{python}
+def parse_time(time_string):
+    """Parse time string into tuple"""
+    parts = time_string.split(":")
+    return (int(parts[0]), int(parts[1]), int(parts[2]))
+
+def format_time(time_tuple):
+    """Format time tuple as string"""
+    hours, minutes, seconds = time_tuple
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+def add_seconds(time_tuple, seconds_to_add):
+    """Add seconds to a time"""
+    hours, minutes, seconds = time_tuple
+
+    # Convert to total seconds
+    total_seconds = hours * 3600 + minutes * 60 + seconds
+    total_seconds += seconds_to_add
+
+    # Convert back
+    hours = (total_seconds // 3600) % 24
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+
+    return (hours, minutes, seconds)
+
+# Test
+time1 = parse_time("10:30:45")
+print(f"Parsed time: {time1}")
+print(f"Formatted: {format_time(time1)}")
+
+time2 = add_seconds(time1, 3600)
+print(f"After adding 1 hour: {format_time(time2)}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Creating tuples**:
+  - With parentheses: `(1, 2, 3)`
+  - Without (packing): `1, 2, 3`
+  - Single element: `(42,)`
+  - Using `tuple()` constructor
+
+- **Immutability**:
+  - Cannot modify, add, or remove elements
+  - Faster and more memory-efficient than lists
+  - Can be used as dictionary keys
+
+- **Tuple operations**:
+  - Indexing and slicing (like lists)
+  - Concatenation and repetition
+  - `count()` and `index()` methods
+  - Comparison and membership testing
+
+- **Packing and unpacking**:
+  - Create tuples without parentheses
+  - Extract values: `x, y = point`
+  - Extended unpacking: `first, *rest = tuple`
+  - Swap values: `a, b = b, a`
+
+- **Use cases**:
+  - Function return values
+  - Dictionary keys
+  - Immutable data records
+  - Coordinates and positions
+  - Named tuples for clarity
+
+::: {.callout-important}
+## Key Takeaways
+1. Tuples are **immutable** - cannot be changed after creation
+2. Use parentheses `()` or just commas for creation
+3. Single element tuples need a trailing comma: `(42,)`
+4. Perfect for **heterogeneous data** (mixed types)
+5. **Faster** and more **memory-efficient** than lists
+6. Use **unpacking** for elegant code
+7. Can be **dictionary keys** (lists cannot)
+8. Consider **named tuples** for better readability
+:::
+
+## Practice Exercises
+
+### Exercise 1: Tuple Reverser
+
+Write a function that reverses a tuple without converting to a list.
+
+```{python}
+def reverse_tuple(t):
+    """Solution"""
+    return t[::-1]
+
+# Test
+original = (1, 2, 3, 4, 5)
+reversed_t = reverse_tuple(original)
+print(f"Original: {original}")
+print(f"Reversed: {reversed_t}")
+```
+
+### Exercise 2: Find Min Max
+
+Write a function that returns both min and max from a tuple of numbers.
+
+```{python}
+def find_min_max(numbers):
+    """Solution"""
+    if not numbers:
+        return None
+
+    return (min(numbers), max(numbers))
+
+# Test
+data = (23, 45, 12, 67, 34, 89, 11)
+min_val, max_val = find_min_max(data)
+print(f"Data: {data}")
+print(f"Min: {min_val}, Max: {max_val}")
+```
+
+### Exercise 3: Merge Tuples
+
+Write a function that merges two tuples, alternating elements.
+
+```{python}
+def merge_alternate(t1, t2):
+    """Solution"""
+    result = []
+    for item1, item2 in zip(t1, t2):
+        result.append(item1)
+        result.append(item2)
+
+    # Add remaining elements if tuples are different lengths
+    if len(t1) > len(t2):
+        result.extend(t1[len(t2):])
+    else:
+        result.extend(t2[len(t1):])
+
+    return tuple(result)
+
+# Test
+t1 = (1, 2, 3)
+t2 = ('a', 'b', 'c')
+merged = merge_alternate(t1, t2)
+print(f"Merged: {merged}")
+```
+
+### Exercise 4: Student Records
+
+Create a system to manage student records using tuples and named tuples.
+
+```{python}
+from collections import namedtuple
+
+Student = namedtuple('Student', ['id', 'name', 'grade', 'major'])
+
+def create_student_record(student_id, name, grade, major):
+    """Create a student record"""
+    return Student(student_id, name, grade, major)
+
+def display_students(students):
+    """Display all student records"""
+    print(f"{'ID':<5} {'Name':<15} {'Grade':<7} {'Major':<10}")
+    print("-" * 45)
+    for student in students:
+        print(f"{student.id:<5} {student.name:<15} {student.grade:<7} {student.major:<10}")
+
+# Test
+students = [
+    create_student_record(101, "Alice", 85, "CS"),
+    create_student_record(102, "Bob", 92, "Math"),
+    create_student_record(103, "Charlie", 78, "Physics")
+]
+
+display_students(students)
+
+# Calculate average grade
+average = sum(s.grade for s in students) / len(students)
+print(f"\nAverage grade: {average:.2f}")
+```
+
+### Exercise 5: Tuple Statistics
+
+Write a function that returns comprehensive statistics for a tuple of numbers.
+
+```{python}
+def tuple_statistics(numbers):
+    """Solution"""
+    if not numbers:
+        return None
+
+    sorted_nums = tuple(sorted(numbers))
+    n = len(numbers)
+
+    # Calculate median
+    if n % 2 == 0:
+        median = (sorted_nums[n//2 - 1] + sorted_nums[n//2]) / 2
+    else:
+        median = sorted_nums[n//2]
+
+    # Return as named tuple
+    Stats = namedtuple('Stats', ['count', 'sum', 'mean', 'median', 'min', 'max'])
+
+    return Stats(
+        count=n,
+        sum=sum(numbers),
+        mean=sum(numbers) / n,
+        median=median,
+        min=min(numbers),
+        max=max(numbers)
+    )
+
+# Test
+data = (85, 92, 78, 90, 88, 76, 95)
+stats = tuple_statistics(data)
+
+print(f"Statistics for {data}:")
+print(f"  Count: {stats.count}")
+print(f"  Sum: {stats.sum}")
+print(f"  Mean: {stats.mean:.2f}")
+print(f"  Median: {stats.median:.2f}")
+print(f"  Min: {stats.min}")
+print(f"  Max: {stats.max}")
+```
+
+::: {.callout-tip}
+## Choose Wisely!
+- Use **tuples** for immutable data and fixed structures
+- Use **lists** when you need to modify the collection
+- Use **named tuples** when tuple elements have meaning
+:::
+
+---
+
+Great job! You've mastered tuples. Next up: dictionaries, Python's powerful key-value storage!

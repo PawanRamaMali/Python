@@ -1,0 +1,1063 @@
+# Polymorphism: Many Forms, One Interface {#sec-polymorphism}
+
+Polymorphism means "many forms" - it's the ability to use objects of different types through a common interface. In Python, polymorphism lets you write flexible code that works with various types without knowing their specific class. It's like having a universal remote that works with any device!
+
+## What is Polymorphism?
+
+**Polymorphism** allows objects of different classes to be treated through a common interface, with each class implementing the interface in its own way.
+
+### Real-World Analogy
+
+```{python}
+# Think of a "play" button:
+# - On music player: plays music
+# - On video player: plays video
+# - On game console: starts game
+# Same interface ("play"), different behavior!
+
+print("Polymorphism: Same interface, different implementations")
+print("Like saying 'move' to a car, boat, or plane")
+print("Each moves differently, but all understand 'move'")
+```
+
+::: {.callout-note}
+## Types of Polymorphism in Python
+1. **Method Overriding**: Subclass changes parent method
+2. **Duck Typing**: "If it walks like a duck and quacks like a duck..."
+3. **Operator Overloading**: Redefine operators like +, -, *, etc.
+4. **Function Polymorphism**: Same function, different arguments
+:::
+
+## Method Overriding Polymorphism
+
+Different classes implement the same method differently.
+
+### Basic Example
+
+```{python}
+class Animal:
+    """Base animal class"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        """Each animal speaks differently"""
+        return "Some sound"
+
+class Dog(Animal):
+    def speak(self):
+        return f"{self.name} says Woof!"
+
+class Cat(Animal):
+    def speak(self):
+        return f"{self.name} says Meow!"
+
+class Cow(Animal):
+    def speak(self):
+        return f"{self.name} says Moo!"
+
+# Polymorphism in action
+animals = [
+    Dog("Buddy"),
+    Cat("Whiskers"),
+    Cow("Bessie")
+]
+
+# Same method call, different behavior!
+for animal in animals:
+    print(animal.speak())  # Polymorphic call
+```
+
+### Function with Polymorphic Parameters
+
+```{python}
+def make_animal_speak(animal):
+    """Works with any animal"""
+    print(animal.speak())
+
+# Works with different types
+dog = Dog("Max")
+cat = Cat("Luna")
+
+make_animal_speak(dog)
+make_animal_speak(cat)
+
+# The function doesn't care about the specific type!
+```
+
+### Shape Example
+
+```{python}
+import math
+
+class Shape:
+    """Base shape class"""
+
+    def area(self):
+        """Subclasses must implement"""
+        raise NotImplementedError("Subclass must implement area()")
+
+    def perimeter(self):
+        """Subclasses must implement"""
+        raise NotImplementedError("Subclass must implement perimeter()")
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return math.pi * self.radius ** 2
+
+    def perimeter(self):
+        return 2 * math.pi * self.radius
+
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+
+class Triangle(Shape):
+    def __init__(self, base, height, side1, side2):
+        self.base = base
+        self.height = height
+        self.side1 = side1
+        self.side2 = side2
+
+    def area(self):
+        return 0.5 * self.base * self.height
+
+    def perimeter(self):
+        return self.base + self.side1 + self.side2
+
+# Polymorphic function
+def print_shape_info(shape):
+    """Works with any shape"""
+    print(f"{shape.__class__.__name__}:")
+    print(f"  Area: {shape.area():.2f}")
+    print(f"  Perimeter: {shape.perimeter():.2f}")
+
+# Create shapes
+shapes = [
+    Circle(5),
+    Rectangle(4, 6),
+    Triangle(6, 4, 5, 5)
+]
+
+# Process polymorphically
+for shape in shapes:
+    print_shape_info(shape)
+    print()
+```
+
+::: {.callout-important}
+## Benefits of Polymorphism
+1. **Flexibility**: Write code that works with multiple types
+2. **Extensibility**: Add new types without changing existing code
+3. **Code Reuse**: Same functions work with different objects
+4. **Maintainability**: Changes isolated to specific classes
+5. **Clean Design**: Promotes loose coupling
+:::
+
+## Duck Typing
+
+Python uses "duck typing" - if an object has the right methods, it can be used regardless of its type.
+
+### "If it walks like a duck..."
+
+```{python}
+class Duck:
+    def swim(self):
+        return "Duck swimming"
+
+    def fly(self):
+        return "Duck flying"
+
+class Airplane:
+    def fly(self):
+        return "Airplane flying"
+
+class Whale:
+    def swim(self):
+        return "Whale swimming"
+
+# Function doesn't check type, just capabilities
+def make_it_fly(thing):
+    """If it has fly(), call it!"""
+    try:
+        return thing.fly()
+    except AttributeError:
+        return f"{thing.__class__.__name__} can't fly!"
+
+def make_it_swim(thing):
+    """If it has swim(), call it!"""
+    try:
+        return thing.swim()
+    except AttributeError:
+        return f"{thing.__class__.__name__} can't swim!"
+
+# Test duck typing
+duck = Duck()
+plane = Airplane()
+whale = Whale()
+
+print(make_it_fly(duck))
+print(make_it_fly(plane))
+print(make_it_fly(whale))
+
+print()
+
+print(make_it_swim(duck))
+print(make_it_swim(whale))
+print(make_it_swim(plane))
+```
+
+### File-Like Objects
+
+```{python}
+class StringFile:
+    """Acts like a file but uses a string"""
+
+    def __init__(self):
+        self.content = ""
+
+    def write(self, text):
+        self.content += text
+        return len(text)
+
+    def read(self):
+        return self.content
+
+    def close(self):
+        pass  # Nothing to do
+
+def write_data(file_obj, data):
+    """Works with any file-like object"""
+    file_obj.write(data)
+
+# Works with real files and our custom class
+string_file = StringFile()
+write_data(string_file, "Hello, World!")
+print(string_file.read())
+
+# Could also work with real file:
+# with open('output.txt', 'w') as f:
+#     write_data(f, "Hello, World!")
+```
+
+### Collection-Like Objects
+
+```{python}
+class Stack:
+    """Custom stack that acts like a list"""
+
+    def __init__(self):
+        self.items = []
+
+    def __len__(self):
+        return len(self.items)
+
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        return self.items.pop()
+
+# Duck typing: acts like a list
+stack = Stack()
+stack.push(1)
+stack.push(2)
+stack.push(3)
+
+# Can use with functions expecting sequences
+print(f"Length: {len(stack)}")  # Uses __len__
+print(f"First item: {stack[0]}")  # Uses __getitem__
+
+# Can iterate
+for item in stack:  # Uses __iter__
+    print(f"  {item}")
+```
+
+::: {.callout-note}
+## Duck Typing Philosophy
+**"Don't check types, just try to use the object"**
+
+```python
+# Instead of:
+if isinstance(obj, SpecificClass):
+    obj.method()
+
+# Do:
+try:
+    obj.method()
+except AttributeError:
+    # Handle if method doesn't exist
+```
+
+This is more Pythonic and flexible!
+:::
+
+### Protocol Classes (Python 3.8+)
+
+```{python}
+from typing import Protocol
+
+class Drawable(Protocol):
+    """Protocol defining what it means to be drawable"""
+
+    def draw(self) -> str:
+        ...
+
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius
+
+    def draw(self):
+        return f"Drawing circle with radius {self.radius}"
+
+class Square:
+    def __init__(self, side):
+        self.side = side
+
+    def draw(self):
+        return f"Drawing square with side {self.side}"
+
+def render(shape: Drawable):
+    """Accepts anything that implements Drawable protocol"""
+    print(shape.draw())
+
+# Both work because they have draw()
+circle = Circle(5)
+square = Square(4)
+
+render(circle)
+render(square)
+```
+
+## Operator Overloading
+
+Make your classes work with Python's operators (+, -, *, etc.).
+
+### Basic Operators
+
+```{python}
+class Vector:
+    """2D vector with operator overloading"""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        """Vector addition: v1 + v2"""
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        """Vector subtraction: v1 - v2"""
+        return Vector(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, scalar):
+        """Scalar multiplication: v * 2"""
+        return Vector(self.x * scalar, self.y * scalar)
+
+    def __str__(self):
+        return f"Vector({self.x}, {self.y})"
+
+    def __repr__(self):
+        return f"Vector({self.x}, {self.y})"
+
+# Use operators naturally
+v1 = Vector(2, 3)
+v2 = Vector(1, 4)
+
+print(f"v1: {v1}")
+print(f"v2: {v2}")
+print(f"v1 + v2 = {v1 + v2}")
+print(f"v1 - v2 = {v1 - v2}")
+print(f"v1 * 3 = {v1 * 3}")
+```
+
+### Comparison Operators
+
+```{python}
+class Money:
+    """Money class with comparisons"""
+
+    def __init__(self, amount, currency="USD"):
+        self.amount = amount
+        self.currency = currency
+
+    def __eq__(self, other):
+        """Equal: m1 == m2"""
+        return (self.amount == other.amount and
+                self.currency == other.currency)
+
+    def __ne__(self, other):
+        """Not equal: m1 != m2"""
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        """Less than: m1 < m2"""
+        if self.currency != other.currency:
+            raise ValueError("Cannot compare different currencies")
+        return self.amount < other.amount
+
+    def __le__(self, other):
+        """Less than or equal: m1 <= m2"""
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __gt__(self, other):
+        """Greater than: m1 > m2"""
+        if self.currency != other.currency:
+            raise ValueError("Cannot compare different currencies")
+        return self.amount > other.amount
+
+    def __ge__(self, other):
+        """Greater than or equal: m1 >= m2"""
+        return self.__gt__(other) or self.__eq__(other)
+
+    def __str__(self):
+        return f"{self.currency} {self.amount:.2f}"
+
+# Use comparison operators
+m1 = Money(100)
+m2 = Money(150)
+m3 = Money(100)
+
+print(f"m1 ({m1}) == m3 ({m3}): {m1 == m3}")
+print(f"m1 ({m1}) < m2 ({m2}): {m1 < m2}")
+print(f"m2 ({m2}) > m1 ({m1}): {m2 > m1}")
+
+# Can sort!
+amounts = [Money(50), Money(200), Money(100)]
+sorted_amounts = sorted(amounts)
+print("\nSorted amounts:")
+for amount in sorted_amounts:
+    print(f"  {amount}")
+```
+
+### Container Operators
+
+```{python}
+class ShoppingCart:
+    """Shopping cart with container operations"""
+
+    def __init__(self):
+        self.items = []
+
+    def __len__(self):
+        """len(cart)"""
+        return len(self.items)
+
+    def __getitem__(self, index):
+        """cart[index]"""
+        return self.items[index]
+
+    def __setitem__(self, index, value):
+        """cart[index] = value"""
+        self.items[index] = value
+
+    def __delitem__(self, index):
+        """del cart[index]"""
+        del self.items[index]
+
+    def __contains__(self, item):
+        """item in cart"""
+        return item in self.items
+
+    def __iter__(self):
+        """for item in cart"""
+        return iter(self.items)
+
+    def add(self, item):
+        self.items.append(item)
+
+# Use like a list
+cart = ShoppingCart()
+cart.add("Apple")
+cart.add("Banana")
+cart.add("Orange")
+
+print(f"Items in cart: {len(cart)}")
+print(f"First item: {cart[0]}")
+print(f"'Apple' in cart: {'Apple' in cart}")
+
+# Iterate
+print("All items:")
+for item in cart:
+    print(f"  {item}")
+```
+
+### Arithmetic and Augmented Assignment
+
+```{python}
+class Counter:
+    """Counter with full arithmetic"""
+
+    def __init__(self, value=0):
+        self.value = value
+
+    def __add__(self, other):
+        """counter + 5"""
+        if isinstance(other, Counter):
+            return Counter(self.value + other.value)
+        return Counter(self.value + other)
+
+    def __iadd__(self, other):
+        """counter += 5"""
+        if isinstance(other, Counter):
+            self.value += other.value
+        else:
+            self.value += other
+        return self
+
+    def __sub__(self, other):
+        """counter - 5"""
+        if isinstance(other, Counter):
+            return Counter(self.value - other.value)
+        return Counter(self.value - other)
+
+    def __isub__(self, other):
+        """counter -= 5"""
+        if isinstance(other, Counter):
+            self.value -= other.value
+        else:
+            self.value -= other
+        return self
+
+    def __str__(self):
+        return str(self.value)
+
+# Use arithmetic operators
+counter = Counter(10)
+print(f"Initial: {counter}")
+
+counter += 5
+print(f"After += 5: {counter}")
+
+counter -= 3
+print(f"After -= 3: {counter}")
+
+counter2 = Counter(20)
+result = counter + counter2
+print(f"{counter} + {counter2} = {result}")
+```
+
+::: {.callout-important}
+## Common Operator Methods
+**Arithmetic:**
+- `__add__(self, other)`: `+`
+- `__sub__(self, other)`: `-`
+- `__mul__(self, other)`: `*`
+- `__truediv__(self, other)`: `/`
+- `__floordiv__(self, other)`: `//`
+- `__mod__(self, other)`: `%`
+- `__pow__(self, other)`: `**`
+
+**Comparison:**
+- `__eq__(self, other)`: `==`
+- `__ne__(self, other)`: `!=`
+- `__lt__(self, other)`: `<`
+- `__le__(self, other)`: `<=`
+- `__gt__(self, other)`: `>`
+- `__ge__(self, other)`: `>=`
+
+**Container:**
+- `__len__(self)`: `len()`
+- `__getitem__(self, key)`: `[]` read
+- `__setitem__(self, key, value)`: `[]` write
+- `__delitem__(self, key)`: `del []`
+- `__contains__(self, item)`: `in`
+- `__iter__(self)`: `for ... in`
+:::
+
+## Real-World Polymorphism Examples
+
+### Payment System
+
+```{python}
+class PaymentMethod:
+    """Base payment method"""
+
+    def process_payment(self, amount):
+        raise NotImplementedError("Subclass must implement")
+
+    def get_receipt(self, amount):
+        return f"Paid ${amount:.2f}"
+
+class CreditCard(PaymentMethod):
+    def __init__(self, card_number):
+        self.card_number = card_number[-4:]  # Last 4 digits
+
+    def process_payment(self, amount):
+        return f"Processing ${amount:.2f} on credit card ****{self.card_number}"
+
+class PayPal(PaymentMethod):
+    def __init__(self, email):
+        self.email = email
+
+    def process_payment(self, amount):
+        return f"Processing ${amount:.2f} via PayPal ({self.email})"
+
+class Cryptocurrency(PaymentMethod):
+    def __init__(self, wallet_address):
+        self.wallet = wallet_address[:8]  # First 8 chars
+
+    def process_payment(self, amount):
+        return f"Processing ${amount:.2f} via crypto (wallet: {self.wallet}...)"
+
+class PaymentProcessor:
+    """Processes payments polymorphically"""
+
+    @staticmethod
+    def process(payment_method, amount):
+        """Works with any payment method"""
+        print(payment_method.process_payment(amount))
+        print(payment_method.get_receipt(amount))
+
+# Test with different payment methods
+methods = [
+    CreditCard("1234567890123456"),
+    PayPal("user@example.com"),
+    Cryptocurrency("1A2b3C4d5E6f7G8h")
+]
+
+for method in methods:
+    print(f"\nUsing {method.__class__.__name__}:")
+    PaymentProcessor.process(method, 99.99)
+```
+
+### Notification System
+
+```{python}
+class NotificationChannel:
+    """Base notification channel"""
+
+    def send(self, message):
+        raise NotImplementedError("Subclass must implement")
+
+class EmailNotification(NotificationChannel):
+    def __init__(self, email):
+        self.email = email
+
+    def send(self, message):
+        return f"Email to {self.email}: {message}"
+
+class SMSNotification(NotificationChannel):
+    def __init__(self, phone):
+        self.phone = phone
+
+    def send(self, message):
+        return f"SMS to {self.phone}: {message}"
+
+class PushNotification(NotificationChannel):
+    def __init__(self, device_id):
+        self.device_id = device_id
+
+    def send(self, message):
+        return f"Push to device {self.device_id}: {message}"
+
+class NotificationService:
+    """Send notifications through multiple channels"""
+
+    def __init__(self):
+        self.channels = []
+
+    def add_channel(self, channel):
+        self.channels.append(channel)
+
+    def notify_all(self, message):
+        """Send notification through all channels"""
+        results = []
+        for channel in self.channels:
+            results.append(channel.send(message))
+        return results
+
+# Setup notification service
+service = NotificationService()
+service.add_channel(EmailNotification("user@example.com"))
+service.add_channel(SMSNotification("+1234567890"))
+service.add_channel(PushNotification("device123"))
+
+# Send notification to all channels
+message = "Your order has been shipped!"
+results = service.notify_all(message)
+
+print("Notifications sent:")
+for result in results:
+    print(f"  {result}")
+```
+
+### Data Export System
+
+```{python}
+import json
+import csv
+from io import StringIO
+
+class DataExporter:
+    """Base data exporter"""
+
+    def export(self, data):
+        raise NotImplementedError("Subclass must implement")
+
+class JSONExporter(DataExporter):
+    def export(self, data):
+        return json.dumps(data, indent=2)
+
+class CSVExporter(DataExporter):
+    def export(self, data):
+        """Convert list of dicts to CSV"""
+        if not data:
+            return ""
+
+        output = StringIO()
+        writer = csv.DictWriter(output, fieldnames=data[0].keys())
+        writer.writeheader()
+        writer.writerows(data)
+        return output.getvalue()
+
+class HTMLTableExporter(DataExporter):
+    def export(self, data):
+        """Convert to HTML table"""
+        if not data:
+            return "<table></table>"
+
+        keys = data[0].keys()
+        html = ["<table>", "  <tr>"]
+
+        # Header
+        for key in keys:
+            html.append(f"    <th>{key}</th>")
+        html.append("  </tr>")
+
+        # Rows
+        for row in data:
+            html.append("  <tr>")
+            for key in keys:
+                html.append(f"    <td>{row[key]}</td>")
+            html.append("  </tr>")
+
+        html.append("</table>")
+        return "\n".join(html)
+
+class DataProcessor:
+    """Process data with any exporter"""
+
+    @staticmethod
+    def export_data(data, exporter):
+        """Polymorphic export"""
+        return exporter.export(data)
+
+# Sample data
+data = [
+    {"name": "Alice", "age": 30, "city": "New York"},
+    {"name": "Bob", "age": 25, "city": "London"},
+    {"name": "Charlie", "age": 35, "city": "Paris"}
+]
+
+# Export in different formats
+exporters = [
+    ("JSON", JSONExporter()),
+    ("CSV", CSVExporter()),
+    ("HTML", HTMLTableExporter())
+]
+
+for format_name, exporter in exporters:
+    print(f"\n{'='*50}")
+    print(f"{format_name} Format:")
+    print(f"{'='*50}")
+    result = DataProcessor.export_data(data, exporter)
+    print(result)
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Polymorphism basics**:
+  - Same interface, different implementations
+  - Method overriding
+  - Treating different types uniformly
+
+- **Duck typing**:
+  - "If it walks like a duck..."
+  - Check capabilities, not types
+  - Protocol classes
+
+- **Operator overloading**:
+  - Arithmetic operators (+, -, *, /)
+  - Comparison operators (==, <, >, etc.)
+  - Container operators ([], len, in)
+  - Making custom classes work naturally
+
+- **Real-world applications**:
+  - Payment processing
+  - Notification systems
+  - Data export
+  - Plugin architectures
+
+::: {.callout-important}
+## Key Takeaways
+1. **Polymorphism** = same interface, different behavior
+2. **Method overriding** enables polymorphism
+3. **Duck typing** = check capabilities, not types
+4. **Operator overloading** makes classes intuitive
+5. **Write flexible code** that works with multiple types
+6. **Focus on behavior** not inheritance
+7. **Use protocols** to define interfaces
+8. **Keep it simple** - don't over-engineer
+:::
+
+## Practice Exercises
+
+### Exercise 1: Media Player
+
+Create a polymorphic media player system.
+
+```{python}
+class Media:
+    """
+    Solution: Base media class
+    """
+
+    def __init__(self, title, duration):
+        self.title = title
+        self.duration = duration
+
+    def play(self):
+        raise NotImplementedError("Subclass must implement")
+
+    def get_info(self):
+        return f"{self.title} ({self.duration}s)"
+
+class AudioTrack(Media):
+    def __init__(self, title, duration, artist):
+        super().__init__(title, duration)
+        self.artist = artist
+
+    def play(self):
+        return f"♪ Playing audio: {self.title} by {self.artist}"
+
+class Video(Media):
+    def __init__(self, title, duration, resolution):
+        super().__init__(title, duration)
+        self.resolution = resolution
+
+    def play(self):
+        return f"▶ Playing video: {self.title} ({self.resolution})"
+
+class Podcast(Media):
+    def __init__(self, title, duration, episode_number):
+        super().__init__(title, duration)
+        self.episode = episode_number
+
+    def play(self):
+        return f"🎙 Playing podcast: {self.title} - Episode {self.episode}"
+
+class MediaPlayer:
+    """Player that works with any media"""
+
+    def __init__(self):
+        self.playlist = []
+
+    def add(self, media):
+        self.playlist.append(media)
+
+    def play_all(self):
+        for media in self.playlist:
+            print(f"{media.get_info()}")
+            print(f"  {media.play()}\n")
+
+# Test
+player = MediaPlayer()
+player.add(AudioTrack("Bohemian Rhapsody", 354, "Queen"))
+player.add(Video("Python Tutorial", 1200, "1080p"))
+player.add(Podcast("Tech Talk", 2400, 42))
+
+player.play_all()
+```
+
+### Exercise 2: Custom Number Class with Operators
+
+```{python}
+class Fraction:
+    """
+    Solution: Fraction class with full operator support
+    """
+
+    def __init__(self, numerator, denominator):
+        if denominator == 0:
+            raise ValueError("Denominator cannot be zero")
+
+        # Simplify fraction
+        from math import gcd
+        divisor = gcd(abs(numerator), abs(denominator))
+        self.numerator = numerator // divisor
+        self.denominator = denominator // divisor
+
+        # Normalize sign
+        if self.denominator < 0:
+            self.numerator = -self.numerator
+            self.denominator = -self.denominator
+
+    def __add__(self, other):
+        """Add fractions"""
+        num = self.numerator * other.denominator + other.numerator * self.denominator
+        den = self.denominator * other.denominator
+        return Fraction(num, den)
+
+    def __sub__(self, other):
+        """Subtract fractions"""
+        num = self.numerator * other.denominator - other.numerator * self.denominator
+        den = self.denominator * other.denominator
+        return Fraction(num, den)
+
+    def __mul__(self, other):
+        """Multiply fractions"""
+        return Fraction(
+            self.numerator * other.numerator,
+            self.denominator * other.denominator
+        )
+
+    def __truediv__(self, other):
+        """Divide fractions"""
+        return Fraction(
+            self.numerator * other.denominator,
+            self.denominator * other.numerator
+        )
+
+    def __eq__(self, other):
+        """Check equality"""
+        return (self.numerator == other.numerator and
+                self.denominator == other.denominator)
+
+    def __lt__(self, other):
+        """Less than"""
+        return (self.numerator * other.denominator <
+                other.numerator * self.denominator)
+
+    def __str__(self):
+        if self.denominator == 1:
+            return str(self.numerator)
+        return f"{self.numerator}/{self.denominator}"
+
+    def __repr__(self):
+        return f"Fraction({self.numerator}, {self.denominator})"
+
+    def __float__(self):
+        """Convert to float"""
+        return self.numerator / self.denominator
+
+# Test
+f1 = Fraction(1, 2)
+f2 = Fraction(1, 3)
+
+print(f"f1 = {f1}")
+print(f"f2 = {f2}")
+print(f"f1 + f2 = {f1 + f2}")
+print(f"f1 - f2 = {f1 - f2}")
+print(f"f1 * f2 = {f1 * f2}")
+print(f"f1 / f2 = {f1 / f2}")
+print(f"f1 == f2: {f1 == f2}")
+print(f"f1 < f2: {f1 < f2}")
+print(f"f1 as float: {float(f1)}")
+```
+
+### Exercise 3: Logging System
+
+```{python}
+from datetime import datetime
+
+class Logger:
+    """
+    Solution: Base logger class
+    """
+
+    def log(self, level, message):
+        raise NotImplementedError("Subclass must implement")
+
+class ConsoleLogger(Logger):
+    """Log to console"""
+
+    def log(self, level, message):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] {level}: {message}")
+
+class FileLogger(Logger):
+    """Log to file"""
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.logs = []
+
+    def log(self, level, message):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] {level}: {message}"
+        self.logs.append(log_entry)
+
+    def save(self):
+        """Save logs to file"""
+        return "\n".join(self.logs)
+
+class LogManager:
+    """Manage multiple loggers"""
+
+    def __init__(self):
+        self.loggers = []
+
+    def add_logger(self, logger):
+        self.loggers.append(logger)
+
+    def info(self, message):
+        for logger in self.loggers:
+            logger.log("INFO", message)
+
+    def warning(self, message):
+        for logger in self.loggers:
+            logger.log("WARNING", message)
+
+    def error(self, message):
+        for logger in self.loggers:
+            logger.log("ERROR", message)
+
+# Test
+manager = LogManager()
+manager.add_logger(ConsoleLogger())
+file_logger = FileLogger("app.log")
+manager.add_logger(file_logger)
+
+manager.info("Application started")
+manager.warning("Low disk space")
+manager.error("Connection failed")
+
+print("\nFile log content:")
+print(file_logger.save())
+```
+
+::: {.callout-tip}
+## Master Polymorphism!
+Polymorphism is everywhere in good code:
+- **Design patterns**: Strategy, Factory, Observer
+- **APIs**: Same interface, different implementations
+- **Plugins**: Extend functionality without changes
+- **Testing**: Mock objects for testing
+
+Practice by creating systems with interchangeable components!
+:::
+
+---
+
+Congratulations! You've mastered polymorphism in Python. You can now write flexible, extensible code that works with multiple types, use duck typing effectively, and create natural-feeling classes with operator overloading. This is a key skill for writing professional Python code!

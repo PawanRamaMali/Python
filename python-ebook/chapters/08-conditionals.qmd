@@ -1,0 +1,902 @@
+# Conditionals: Making Decisions in Code {#sec-conditionals}
+
+Life is full of decisions: "If it's raining, take an umbrella. Otherwise, enjoy the sunshine!" Your programs need to make decisions too. In this chapter, you'll learn how to use conditional statements to control the flow of your programs.
+
+## Introduction to Conditionals
+
+Conditional statements allow your program to execute different code based on whether certain conditions are true or false. They're the foundation of program logic!
+
+### The if Statement
+
+The simplest conditional is the `if` statement:
+
+```{python}
+temperature = 25
+
+if temperature > 20:
+    print("It's a warm day!")
+    print("Perfect for a picnic!")
+
+print("This always runs")
+```
+
+::: {.callout-note}
+## Syntax Notes
+- The condition must be followed by a colon `:`
+- The code block must be indented (4 spaces is standard)
+- Indentation defines what's inside the `if` block
+:::
+
+### Boolean Expressions
+
+Conditions are boolean expressions that evaluate to `True` or `False`:
+
+```{python}
+# Comparison operators
+print(5 > 3)     # True
+print(10 < 5)    # False
+print(7 == 7)    # True
+print(8 != 8)    # False
+print(5 >= 5)    # True
+print(3 <= 2)    # False
+```
+
+```{python}
+# Testing conditions
+age = 18
+is_adult = age >= 18
+print(f"Is adult: {is_adult}")
+
+password = "secret123"
+is_long_enough = len(password) >= 8
+print(f"Password is long enough: {is_long_enough}")
+```
+
+## The if-else Statement
+
+Use `else` to specify what happens when the condition is false:
+
+```{python}
+age = 16
+
+if age >= 18:
+    print("You can vote!")
+else:
+    print("You're too young to vote.")
+    print(f"Wait {18 - age} more years.")
+```
+
+### More Examples
+
+```{python}
+# Check even or odd
+number = 42
+
+if number % 2 == 0:
+    print(f"{number} is even")
+else:
+    print(f"{number} is odd")
+```
+
+```{python}
+# Password checker
+password = "secret"
+
+if len(password) >= 8:
+    print("Password is strong enough")
+else:
+    print("Password is too short!")
+    print(f"Add {8 - len(password)} more characters")
+```
+
+## The if-elif-else Statement
+
+Use `elif` (else if) to check multiple conditions:
+
+```{python}
+score = 85
+
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+elif score >= 60:
+    grade = "D"
+else:
+    grade = "F"
+
+print(f"Score: {score}, Grade: {grade}")
+```
+
+::: {.callout-important}
+## Order Matters!
+Python checks conditions from top to bottom and stops at the first `True` condition. Order your conditions from most specific to most general.
+:::
+
+### Real-World Example: Age Categories
+
+```{python}
+age = 25
+
+if age < 0:
+    print("Invalid age!")
+elif age < 2:
+    print("You're a baby")
+elif age < 13:
+    print("You're a child")
+elif age < 20:
+    print("You're a teenager")
+elif age < 65:
+    print("You're an adult")
+else:
+    print("You're a senior")
+```
+
+### Multiple elif Clauses
+
+You can have as many `elif` clauses as needed:
+
+```{python}
+day = "Monday"
+
+if day == "Monday":
+    print("Start of the work week!")
+elif day == "Tuesday":
+    print("Second day of the week")
+elif day == "Wednesday":
+    print("Midweek!")
+elif day == "Thursday":
+    print("Almost Friday!")
+elif day == "Friday":
+    print("TGIF!")
+elif day == "Saturday" or day == "Sunday":
+    print("Weekend! Time to relax!")
+else:
+    print("That's not a valid day")
+```
+
+## Logical Operators
+
+Combine multiple conditions using logical operators:
+
+### The and Operator
+
+Both conditions must be true:
+
+```{python}
+age = 25
+has_license = True
+
+if age >= 18 and has_license:
+    print("You can drive!")
+else:
+    print("You cannot drive")
+```
+
+```{python}
+# Login system
+username = "admin"
+password = "secret123"
+
+if username == "admin" and password == "secret123":
+    print("Login successful!")
+else:
+    print("Invalid credentials")
+```
+
+### The or Operator
+
+At least one condition must be true:
+
+```{python}
+day = "Saturday"
+
+if day == "Saturday" or day == "Sunday":
+    print("It's the weekend!")
+else:
+    print("It's a weekday")
+```
+
+```{python}
+# Emergency contact
+age = 70
+is_pregnant = False
+
+if age >= 65 or is_pregnant:
+    print("Priority seating available")
+else:
+    print("Standard seating")
+```
+
+### The not Operator
+
+Negates a boolean value:
+
+```{python}
+is_raining = False
+
+if not is_raining:
+    print("You don't need an umbrella")
+else:
+    print("Take an umbrella!")
+```
+
+```{python}
+# File validation
+file_name = "document.pdf"
+
+if not file_name.endswith(".txt"):
+    print("This is not a text file")
+```
+
+### Combining Logical Operators
+
+```{python}
+# Complex conditions
+age = 25
+income = 50000
+credit_score = 720
+
+if (age >= 21 and age <= 65) and (income >= 30000 or credit_score >= 700):
+    print("Loan approved!")
+else:
+    print("Loan denied")
+```
+
+::: {.callout-tip}
+## Parentheses for Clarity
+Use parentheses to make complex conditions easier to read, even when not strictly necessary:
+```python
+if (age >= 18 and age <= 30) and (has_license or has_permit):
+    # Much clearer!
+```
+:::
+
+## Nested Conditionals
+
+You can put `if` statements inside other `if` statements:
+
+```{python}
+age = 25
+has_ticket = True
+
+if age >= 18:
+    if has_ticket:
+        print("Welcome to the concert!")
+    else:
+        print("Please buy a ticket at the entrance")
+else:
+    print("Sorry, you must be 18 or older")
+```
+
+### More Nesting Examples
+
+```{python}
+# Grade with participation bonus
+score = 85
+participation = 95
+
+if score >= 60:
+    if participation >= 80:
+        print(f"Final score: {score + 5} (bonus applied!)")
+    else:
+        print(f"Final score: {score} (no bonus)")
+else:
+    print("Failed - participation bonus not applicable")
+```
+
+```{python}
+# Shipping calculator
+country = "USA"
+weight = 5
+
+if country == "USA":
+    if weight <= 1:
+        shipping = 5
+    elif weight <= 5:
+        shipping = 10
+    else:
+        shipping = 20
+    print(f"Shipping cost: ${shipping}")
+else:
+    print("We don't ship to this country yet")
+```
+
+::: {.callout-warning}
+## Avoid Deep Nesting
+Too many nested levels make code hard to read. If you have more than 2-3 levels of nesting, consider using logical operators or restructuring your code.
+:::
+
+## Conditional Expressions (Ternary Operator)
+
+A shorthand way to write simple if-else statements:
+
+```{python}
+# Traditional if-else
+age = 20
+if age >= 18:
+    status = "adult"
+else:
+    status = "minor"
+print(status)
+
+# Conditional expression (ternary)
+age = 20
+status = "adult" if age >= 18 else "minor"
+print(status)
+```
+
+### More Examples
+
+```{python}
+# Determining message
+score = 75
+message = "Pass" if score >= 60 else "Fail"
+print(message)
+
+# Max of two numbers
+a, b = 10, 20
+maximum = a if a > b else b
+print(f"Maximum: {maximum}")
+
+# Absolute value
+x = -5
+absolute = x if x >= 0 else -x
+print(f"Absolute value: {absolute}")
+```
+
+### Using in Print Statements
+
+```{python}
+temperature = 22
+print(f"The weather is {'warm' if temperature > 20 else 'cold'}")
+
+items = 5
+print(f"You have {items} item{'s' if items != 1 else ''} in your cart")
+```
+
+::: {.callout-note}
+## Ternary Syntax
+```python
+value_if_true if condition else value_if_false
+```
+Use ternary operators for simple cases. For complex logic, use regular if-else statements.
+:::
+
+## Match-Case Statement (Python 3.10+)
+
+Python 3.10 introduced the `match-case` statement (similar to switch in other languages):
+
+```{python}
+# Basic match-case
+command = "start"
+
+match command:
+    case "start":
+        print("Starting the program...")
+    case "stop":
+        print("Stopping the program...")
+    case "pause":
+        print("Pausing the program...")
+    case "restart":
+        print("Restarting the program...")
+    case _:
+        print("Unknown command")
+```
+
+### Matching Values
+
+```{python}
+# HTTP status codes
+status_code = 404
+
+match status_code:
+    case 200:
+        print("OK")
+    case 201:
+        print("Created")
+    case 400:
+        print("Bad Request")
+    case 404:
+        print("Not Found")
+    case 500:
+        print("Internal Server Error")
+    case _:
+        print(f"Status code: {status_code}")
+```
+
+### Matching Multiple Values
+
+```{python}
+# Day type
+day = "Saturday"
+
+match day:
+    case "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday":
+        print("Weekday")
+    case "Saturday" | "Sunday":
+        print("Weekend")
+    case _:
+        print("Invalid day")
+```
+
+### Matching with Conditions (Guards)
+
+```{python}
+# Number classification
+number = 15
+
+match number:
+    case n if n < 0:
+        print("Negative number")
+    case 0:
+        print("Zero")
+    case n if n > 0 and n <= 10:
+        print("Small positive number")
+    case n if n > 10:
+        print("Large positive number")
+```
+
+### Matching Tuples and Structures
+
+```{python}
+# Point coordinates
+point = (0, 5)
+
+match point:
+    case (0, 0):
+        print("Origin")
+    case (0, y):
+        print(f"On Y-axis at {y}")
+    case (x, 0):
+        print(f"On X-axis at {x}")
+    case (x, y):
+        print(f"Point at ({x}, {y})")
+```
+
+::: {.callout-tip}
+## Match-Case Features
+- More readable than multiple if-elif statements for value matching
+- Can match patterns, not just values
+- The underscore `_` is the default case (like `else`)
+- Requires Python 3.10 or later
+:::
+
+## Truthiness in Python
+
+Python considers some values as "truthy" or "falsy":
+
+```{python}
+# Falsy values: False, 0, 0.0, "", [], {}, None
+# Everything else is truthy
+
+# Testing truthiness
+if "":
+    print("Empty string is truthy")
+else:
+    print("Empty string is falsy")
+
+if "Hello":
+    print("Non-empty string is truthy")
+
+if 0:
+    print("Zero is truthy")
+else:
+    print("Zero is falsy")
+
+if []:
+    print("Empty list is truthy")
+else:
+    print("Empty list is falsy")
+```
+
+### Practical Use
+
+```{python}
+# Check if list has items
+items = ["apple", "banana"]
+
+if items:
+    print(f"You have {len(items)} items")
+else:
+    print("Your list is empty")
+
+# Check if string is not empty
+name = input("Enter your name: ") if False else "Alice"
+
+if name:
+    print(f"Hello, {name}!")
+else:
+    print("You didn't enter a name")
+```
+
+::: {.callout-note}
+## Falsy Values in Python
+- `False`
+- `None`
+- `0`, `0.0`
+- Empty sequences: `""`, `[]`, `()`, `{}`
+- Empty mappings: `{}`
+
+Everything else is truthy!
+:::
+
+## Practical Examples
+
+Let's build some useful programs using conditionals:
+
+### Grade Calculator with Comments
+
+```{python}
+def calculate_grade(score):
+    """Calculate letter grade with comments"""
+    if score < 0 or score > 100:
+        return "Invalid score"
+    elif score >= 90:
+        return "A - Excellent work!"
+    elif score >= 80:
+        return "B - Good job!"
+    elif score >= 70:
+        return "C - Satisfactory"
+    elif score >= 60:
+        return "D - Needs improvement"
+    else:
+        return "F - Failed"
+
+# Test the function
+scores = [95, 87, 72, 65, 45, 105]
+for score in scores:
+    print(f"Score {score}: {calculate_grade(score)}")
+```
+
+### BMI Calculator with Categories
+
+```{python}
+def calculate_bmi_category(weight, height):
+    """Calculate BMI and return category"""
+    bmi = weight / (height ** 2)
+
+    if bmi < 18.5:
+        category = "Underweight"
+        advice = "Consider consulting a nutritionist"
+    elif bmi < 25:
+        category = "Normal weight"
+        advice = "Keep up the good work!"
+    elif bmi < 30:
+        category = "Overweight"
+        advice = "Consider regular exercise"
+    else:
+        category = "Obese"
+        advice = "Please consult a healthcare provider"
+
+    return f"BMI: {bmi:.2f} - {category}. {advice}"
+
+# Test
+print(calculate_bmi_category(70, 1.75))  # Normal
+print(calculate_bmi_category(90, 1.75))  # Overweight
+```
+
+### Leap Year Checker
+
+```{python}
+def is_leap_year(year):
+    """
+    Determine if a year is a leap year
+    Rules:
+    - Divisible by 4 → leap year
+    - EXCEPT if divisible by 100 → not leap year
+    - EXCEPT if divisible by 400 → leap year
+    """
+    if year % 400 == 0:
+        return True
+    elif year % 100 == 0:
+        return False
+    elif year % 4 == 0:
+        return True
+    else:
+        return False
+
+# Test
+years = [2000, 2100, 2024, 2023]
+for year in years:
+    status = "is" if is_leap_year(year) else "is not"
+    print(f"{year} {status} a leap year")
+```
+
+### Password Strength Validator
+
+```{python}
+def validate_password(password):
+    """Validate password strength"""
+    errors = []
+
+    if len(password) < 8:
+        errors.append("Password must be at least 8 characters")
+
+    if not any(char.isupper() for char in password):
+        errors.append("Password must contain uppercase letters")
+
+    if not any(char.islower() for char in password):
+        errors.append("Password must contain lowercase letters")
+
+    if not any(char.isdigit() for char in password):
+        errors.append("Password must contain numbers")
+
+    if not any(char in "!@#$%^&*" for char in password):
+        errors.append("Password must contain special characters")
+
+    if errors:
+        return False, errors
+    else:
+        return True, ["Password is strong!"]
+
+# Test passwords
+passwords = ["weak", "StrongPass1!", "NoSpecial1", "short"]
+
+for pwd in passwords:
+    is_valid, messages = validate_password(pwd)
+    print(f"\nPassword: {pwd}")
+    print("Status:", "VALID" if is_valid else "INVALID")
+    for msg in messages:
+        print(f"  - {msg}")
+```
+
+### Ticket Pricing System
+
+```{python}
+def calculate_ticket_price(age, is_student, is_weekend):
+    """Calculate ticket price based on various factors"""
+    base_price = 15
+
+    # Age-based discount
+    if age < 5:
+        discount = 1.0  # 100% off (free)
+    elif age < 18:
+        discount = 0.5  # 50% off
+    elif age >= 65:
+        discount = 0.3  # 30% off
+    else:
+        discount = 0.0  # No discount
+
+    price = base_price * (1 - discount)
+
+    # Student discount (additional 10%)
+    if is_student and age >= 18 and age < 65:
+        price *= 0.9
+
+    # Weekend surcharge (20%)
+    if is_weekend:
+        price *= 1.2
+
+    return round(price, 2)
+
+# Test various scenarios
+scenarios = [
+    (3, False, False, "Child on weekday"),
+    (16, True, False, "Student teenager on weekday"),
+    (25, True, True, "Adult student on weekend"),
+    (70, False, True, "Senior on weekend"),
+]
+
+for age, student, weekend, description in scenarios:
+    price = calculate_ticket_price(age, student, weekend)
+    print(f"{description}: ${price:.2f}")
+```
+
+## Summary
+
+In this chapter, you learned about:
+
+- **Basic conditionals**:
+  - `if` statements for single conditions
+  - `if-else` for two alternatives
+  - `if-elif-else` for multiple conditions
+
+- **Logical operators**:
+  - `and`: All conditions must be true
+  - `or`: At least one condition must be true
+  - `not`: Negates a boolean value
+
+- **Nested conditionals**:
+  - Placing if statements inside other if statements
+  - When to avoid deep nesting
+
+- **Conditional expressions**:
+  - Ternary operator for simple conditions
+  - Inline if-else syntax
+
+- **Match-case statements** (Python 3.10+):
+  - Pattern matching
+  - Multiple value matching
+  - Guards for conditional matching
+
+- **Truthiness**:
+  - Falsy values: `False`, `0`, `""`, `[]`, `{}`, `None`
+  - Everything else is truthy
+
+::: {.callout-important}
+## Key Takeaways
+1. Use comparison operators: `==`, `!=`, `<`, `>`, `<=`, `>=`
+2. Order matters in if-elif-else chains
+3. Use logical operators to combine conditions
+4. Keep nesting to a minimum (2-3 levels max)
+5. Use ternary operators only for simple cases
+6. Consider match-case for value matching (Python 3.10+)
+:::
+
+## Practice Exercises
+
+### Exercise 1: Number Classifier
+
+Write a function that classifies a number as positive, negative, or zero, and whether it's even or odd.
+
+```{python}
+def classify_number(n):
+    """Solution"""
+    # Sign
+    if n > 0:
+        sign = "positive"
+    elif n < 0:
+        sign = "negative"
+    else:
+        sign = "zero"
+
+    # Even or odd
+    if n == 0:
+        parity = "neither even nor odd"
+    elif n % 2 == 0:
+        parity = "even"
+    else:
+        parity = "odd"
+
+    if n == 0:
+        return "Zero is special!"
+    return f"{n} is {sign} and {parity}"
+
+# Test
+numbers = [10, -5, 0, -8, 7]
+for num in numbers:
+    print(classify_number(num))
+```
+
+### Exercise 2: Season Detector
+
+Write a function that takes a month number (1-12) and returns the season.
+
+```{python}
+def get_season(month):
+    """Solution"""
+    if month < 1 or month > 12:
+        return "Invalid month"
+
+    match month:
+        case 12 | 1 | 2:
+            return "Winter"
+        case 3 | 4 | 5:
+            return "Spring"
+        case 6 | 7 | 8:
+            return "Summer"
+        case 9 | 10 | 11:
+            return "Fall"
+
+# Test
+for month in range(1, 13):
+    print(f"Month {month}: {get_season(month)}")
+```
+
+### Exercise 3: Triangle Validator
+
+Write a function that checks if three sides can form a valid triangle and determines its type.
+
+```{python}
+def classify_triangle(a, b, c):
+    """Solution"""
+    # Check if valid triangle
+    if a + b <= c or a + c <= b or b + c <= a:
+        return "Not a valid triangle"
+
+    # Classify by sides
+    if a == b == c:
+        return "Equilateral triangle"
+    elif a == b or b == c or a == c:
+        return "Isosceles triangle"
+    else:
+        return "Scalene triangle"
+
+# Test
+triangles = [
+    (3, 3, 3),    # Equilateral
+    (3, 3, 5),    # Isosceles
+    (3, 4, 5),    # Scalene
+    (1, 2, 10),   # Invalid
+]
+
+for sides in triangles:
+    print(f"{sides}: {classify_triangle(*sides)}")
+```
+
+### Exercise 4: Tax Calculator
+
+Write a function that calculates income tax based on brackets.
+
+```{python}
+def calculate_tax(income):
+    """
+    Solution
+    Tax brackets:
+    - Up to $10,000: 0%
+    - $10,001 to $30,000: 10%
+    - $30,001 to $60,000: 20%
+    - Above $60,000: 30%
+    """
+    if income <= 10000:
+        tax = 0
+    elif income <= 30000:
+        tax = (income - 10000) * 0.10
+    elif income <= 60000:
+        tax = 2000 + (income - 30000) * 0.20
+    else:
+        tax = 2000 + 6000 + (income - 60000) * 0.30
+
+    effective_rate = (tax / income * 100) if income > 0 else 0
+    return tax, effective_rate
+
+# Test
+incomes = [8000, 25000, 50000, 80000]
+for income in incomes:
+    tax, rate = calculate_tax(income)
+    print(f"Income: ${income:,} → Tax: ${tax:,.2f} ({rate:.1f}%)")
+```
+
+### Exercise 5: Rock Paper Scissors
+
+Write a function that determines the winner of Rock, Paper, Scissors.
+
+```{python}
+def rock_paper_scissors(player1, player2):
+    """Solution"""
+    choices = ["rock", "paper", "scissors"]
+
+    # Validate inputs
+    if player1 not in choices or player2 not in choices:
+        return "Invalid choice"
+
+    # Check for tie
+    if player1 == player2:
+        return "It's a tie!"
+
+    # Determine winner
+    winning_combinations = {
+        ("rock", "scissors"): "Player 1 wins! Rock crushes scissors",
+        ("paper", "rock"): "Player 1 wins! Paper covers rock",
+        ("scissors", "paper"): "Player 1 wins! Scissors cut paper",
+    }
+
+    if (player1, player2) in winning_combinations:
+        return winning_combinations[(player1, player2)]
+    else:
+        # Player 2 wins
+        return f"Player 2 wins! {player2.capitalize()} beats {player1}"
+
+# Test
+matches = [
+    ("rock", "scissors"),
+    ("paper", "rock"),
+    ("scissors", "scissors"),
+    ("rock", "paper"),
+]
+
+for p1, p2 in matches:
+    print(f"{p1} vs {p2}: {rock_paper_scissors(p1, p2)}")
+```
+
+::: {.callout-tip}
+## Keep Practicing!
+Conditionals are fundamental to programming. Practice with different scenarios to build your problem-solving skills!
+:::
+
+---
+
+Excellent work! You now know how to make your programs make intelligent decisions. Next up: loops for repeating actions!

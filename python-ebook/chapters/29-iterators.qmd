@@ -1,0 +1,778 @@
+# Iterators {#sec-iterators}
+
+## Introduction
+
+Ever wondered what happens behind the scenes when you use a `for` loop? Or how `range()`, `zip()`, and other sequence functions work? The answer lies in iterators! Iterators are the foundation of Python's looping mechanism, and understanding them will deepen your knowledge of how Python really works.
+
+In this chapter, we'll explore the iterator protocol, learn how to create custom iterators, and understand the relationship between iterables, iterators, and generators.
+
+::: {.callout-note}
+## What You'll Learn
+
+- Understanding iterables vs iterators
+- The iterator protocol
+- `__iter__()` and `__next__()` methods
+- Creating custom iterators
+- Built-in iterator tools
+- Iterator patterns and best practices
+:::
+
+## Iterables vs Iterators
+
+### What is an Iterable?
+
+An iterable is any object that can return an iterator. Common iterables:
+
+```python
+# These are all iterables
+my_list = [1, 2, 3]
+my_tuple = (1, 2, 3)
+my_string = "abc"
+my_dict = {'a': 1, 'b': 2}
+my_set = {1, 2, 3}
+
+# All can be used in for loops
+for item in my_list:
+    print(item)
+```
+
+### What is an Iterator?
+
+An iterator is an object that produces values one at a time. It has:
+1. A `__iter__()` method that returns itself
+2. A `__next__()` method that returns the next value
+
+```python
+# Create an iterator from an iterable
+my_list = [1, 2, 3]
+iterator = iter(my_list)  # Get iterator
+
+# Get values one at a time
+print(next(iterator))  # 1
+print(next(iterator))  # 2
+print(next(iterator))  # 3
+# print(next(iterator))  # StopIteration exception
+```
+
+::: {.callout-tip}
+## Key Difference
+
+- **Iterable**: Can be looped over (has `__iter__()`)
+- **Iterator**: Produces values one at a time (has `__iter__()` and `__next__()`)
+
+All iterators are iterables, but not all iterables are iterators!
+:::
+
+## The Iterator Protocol
+
+The iterator protocol consists of two methods:
+
+```python
+class SimpleIterator:
+    def __iter__(self):
+        """Return the iterator object (self)"""
+        return self
+
+    def __next__(self):
+        """Return the next value"""
+        # When no more values:
+        raise StopIteration
+```
+
+### How For Loops Work
+
+When you write:
+
+```python
+for item in iterable:
+    print(item)
+```
+
+Python actually does:
+
+```python
+# Get iterator
+iterator = iter(iterable)
+
+# Loop until StopIteration
+while True:
+    try:
+        item = next(iterator)
+        print(item)
+    except StopIteration:
+        break
+```
+
+## Creating Custom Iterators
+
+### Basic Counter Iterator
+
+```python
+class Counter:
+    """Iterator that counts from start to end"""
+
+    def __init__(self, start, end):
+        self.current = start
+        self.end = end
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current >= self.end:
+            raise StopIteration
+
+        self.current += 1
+        return self.current - 1
+
+# Using it
+counter = Counter(1, 5)
+for num in counter:
+    print(num)  # 1, 2, 3, 4
+```
+
+### Reverse Iterator
+
+```python
+class Reverse:
+    """Iterator that yields items in reverse"""
+
+    def __init__(self, data):
+        self.data = data
+        self.index = len(data)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index == 0:
+            raise StopIteration
+
+        self.index -= 1
+        return self.data[self.index]
+
+# Using it
+for char in Reverse("Python"):
+    print(char, end="")  # nohtyP
+```
+
+### Even Numbers Iterator
+
+```python
+class EvenNumbers:
+    """Iterator that yields even numbers up to max"""
+
+    def __init__(self, max_value):
+        self.max_value = max_value
+        self.current = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current > self.max_value:
+            raise StopIteration
+
+        result = self.current
+        self.current += 2
+        return result
+
+# Using it
+evens = EvenNumbers(10)
+print(list(evens))  # [0, 2, 4, 6, 8, 10]
+```
+
+## Iterable vs Iterator: Important Distinction
+
+### Problem with Simple Iterators
+
+```python
+class Counter:
+    def __init__(self, start, end):
+        self.current = start
+        self.start = start
+        self.end = end
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current >= self.end:
+            raise StopIteration
+        self.current += 1
+        return self.current - 1
+
+# Problem: Can only iterate once!
+counter = Counter(1, 5)
+print(list(counter))  # [1, 2, 3, 4]
+print(list(counter))  # [] - exhausted!
+```
+
+### Solution: Separate Iterable and Iterator
+
+```python
+class Counter:
+    """Iterable that creates new iterators"""
+
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+    def __iter__(self):
+        return CounterIterator(self.start, self.end)
+
+class CounterIterator:
+    """Iterator for Counter"""
+
+    def __init__(self, start, end):
+        self.current = start
+        self.end = end
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current >= self.end:
+            raise StopIteration
+        self.current += 1
+        return self.current - 1
+
+# Now can iterate multiple times!
+counter = Counter(1, 5)
+print(list(counter))  # [1, 2, 3, 4]
+print(list(counter))  # [1, 2, 3, 4] - works again!
+```
+
+::: {.callout-important}
+## Reusable Iterables
+
+For reusable iteration, separate the iterable (data) from the iterator (state). The iterable's `__iter__()` should return a new iterator each time.
+:::
+
+## Practical Iterator Examples
+
+### Range-like Iterator
+
+```python
+class MyRange:
+    """Custom range implementation"""
+
+    def __init__(self, start, stop=None, step=1):
+        if stop is None:
+            self.start = 0
+            self.stop = start
+        else:
+            self.start = start
+            self.stop = stop
+        self.step = step
+
+    def __iter__(self):
+        return MyRangeIterator(self.start, self.stop, self.step)
+
+class MyRangeIterator:
+    def __init__(self, start, stop, step):
+        self.current = start
+        self.stop = stop
+        self.step = step
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.step > 0 and self.current >= self.stop:
+            raise StopIteration
+        if self.step < 0 and self.current <= self.stop:
+            raise StopIteration
+
+        result = self.current
+        self.current += self.step
+        return result
+
+# Using it
+for num in MyRange(5):
+    print(num, end=" ")  # 0 1 2 3 4
+
+print()
+
+for num in MyRange(2, 10, 2):
+    print(num, end=" ")  # 2 4 6 8
+```
+
+### File Line Iterator
+
+```python
+class FileLines:
+    """Iterate over file lines with line numbers"""
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __iter__(self):
+        return FileLinesIterator(self.filename)
+
+class FileLinesIterator:
+    def __init__(self, filename):
+        self.file = open(filename, 'r')
+        self.line_number = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        line = self.file.readline()
+        if not line:
+            self.file.close()
+            raise StopIteration
+
+        self.line_number += 1
+        return self.line_number, line.rstrip()
+
+# Using it
+for line_num, line in FileLines('data.txt'):
+    print(f"{line_num}: {line}")
+```
+
+### Fibonacci Iterator
+
+```python
+class Fibonacci:
+    """Fibonacci sequence iterator"""
+
+    def __init__(self, max_value=None):
+        self.max_value = max_value
+
+    def __iter__(self):
+        return FibonacciIterator(self.max_value)
+
+class FibonacciIterator:
+    def __init__(self, max_value):
+        self.max_value = max_value
+        self.a = 0
+        self.b = 1
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.max_value is not None and self.a > self.max_value:
+            raise StopIteration
+
+        result = self.a
+        self.a, self.b = self.b, self.a + self.b
+        return result
+
+# Using it
+fib = Fibonacci(100)
+print(list(fib))  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+```
+
+### Infinite Iterator
+
+```python
+class InfiniteCounter:
+    """Count infinitely (careful!)"""
+
+    def __init__(self, start=0, step=1):
+        self.start = start
+        self.step = step
+
+    def __iter__(self):
+        return InfiniteCounterIterator(self.start, self.step)
+
+class InfiniteCounterIterator:
+    def __init__(self, start, step):
+        self.current = start
+        self.step = step
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        result = self.current
+        self.current += self.step
+        return result
+
+# Using it (must limit!)
+counter = InfiniteCounter(10, 5)
+for i, num in enumerate(counter):
+    print(num, end=" ")
+    if i >= 9:  # Stop after 10 items
+        break
+# Output: 10 15 20 25 30 35 40 45 50 55
+```
+
+## Built-in Iterator Functions
+
+### `iter()` Function
+
+```python
+# iter(iterable)
+my_list = [1, 2, 3]
+iterator = iter(my_list)
+print(next(iterator))  # 1
+
+# iter(callable, sentinel)
+# Calls callable until it returns sentinel
+from functools import partial
+
+with open('data.txt', 'r') as f:
+    # Read 10 bytes at a time until empty string
+    for block in iter(partial(f.read, 10), ''):
+        print(block)
+```
+
+### `next()` Function
+
+```python
+iterator = iter([1, 2, 3])
+
+# Get next value
+print(next(iterator))  # 1
+
+# With default value (no exception)
+print(next(iterator))  # 2
+print(next(iterator))  # 3
+print(next(iterator, 'END'))  # END (no exception!)
+```
+
+### `reversed()` Function
+
+```python
+# Reverse any sequence
+my_list = [1, 2, 3, 4, 5]
+for item in reversed(my_list):
+    print(item, end=" ")  # 5 4 3 2 1
+```
+
+### `enumerate()` Function
+
+```python
+# Add counter to iterable
+fruits = ['apple', 'banana', 'cherry']
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")
+
+# Start from different number
+for index, fruit in enumerate(fruits, start=1):
+    print(f"{index}: {fruit}")
+```
+
+### `zip()` Function
+
+```python
+# Combine multiple iterables
+names = ['Alice', 'Bob', 'Charlie']
+ages = [25, 30, 35]
+cities = ['NYC', 'LA', 'Chicago']
+
+for name, age, city in zip(names, ages, cities):
+    print(f"{name} is {age} and lives in {city}")
+```
+
+## Iterator Tools from `itertools`
+
+We'll cover this module in detail in a later chapter, but here's a preview:
+
+```python
+from itertools import count, cycle, repeat, islice
+
+# count: infinite counter
+counter = count(10, 2)  # Start at 10, step 2
+for i, num in enumerate(counter):
+    print(num, end=" ")
+    if i >= 4:
+        break
+# Output: 10 12 14 16 18
+
+# cycle: repeat sequence infinitely
+cycler = cycle(['A', 'B', 'C'])
+for i, item in enumerate(cycler):
+    print(item, end=" ")
+    if i >= 7:
+        break
+# Output: A B C A B C A B
+
+# repeat: repeat value
+repeater = repeat('Hello', 3)
+print(list(repeater))  # ['Hello', 'Hello', 'Hello']
+
+# islice: slice iterator
+numbers = count(0)
+limited = islice(numbers, 5)
+print(list(limited))  # [0, 1, 2, 3, 4]
+```
+
+## Advanced Iterator Patterns
+
+### Chain Iterator
+
+```python
+class Chain:
+    """Chain multiple iterables"""
+
+    def __init__(self, *iterables):
+        self.iterables = iterables
+
+    def __iter__(self):
+        return ChainIterator(self.iterables)
+
+class ChainIterator:
+    def __init__(self, iterables):
+        self.iterables = iter(iterables)
+        self.current = iter([])
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            try:
+                return next(self.current)
+            except StopIteration:
+                self.current = iter(next(self.iterables))
+
+# Using it
+chained = Chain([1, 2], [3, 4], [5, 6])
+print(list(chained))  # [1, 2, 3, 4, 5, 6]
+```
+
+### Peek Iterator
+
+```python
+class PeekableIterator:
+    """Iterator that allows peeking at next value"""
+
+    def __init__(self, iterable):
+        self.iterator = iter(iterable)
+        self.peeked = None
+        self.has_peeked = False
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.has_peeked:
+            self.has_peeked = False
+            return self.peeked
+        return next(self.iterator)
+
+    def peek(self):
+        if not self.has_peeked:
+            self.peeked = next(self.iterator)
+            self.has_peeked = True
+        return self.peeked
+
+# Using it
+it = PeekableIterator([1, 2, 3, 4])
+print(it.peek())   # 1 (doesn't consume)
+print(it.peek())   # 1 (still doesn't consume)
+print(next(it))    # 1 (now consumed)
+print(next(it))    # 2
+```
+
+### Batching Iterator
+
+```python
+class Batch:
+    """Iterate in batches"""
+
+    def __init__(self, iterable, size):
+        self.iterable = iterable
+        self.size = size
+
+    def __iter__(self):
+        return BatchIterator(iter(self.iterable), self.size)
+
+class BatchIterator:
+    def __init__(self, iterator, size):
+        self.iterator = iterator
+        self.size = size
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        batch = []
+        try:
+            for _ in range(self.size):
+                batch.append(next(self.iterator))
+        except StopIteration:
+            if not batch:
+                raise
+        return batch
+
+# Using it
+data = range(10)
+for batch in Batch(data, 3):
+    print(batch)
+# Output:
+# [0, 1, 2]
+# [3, 4, 5]
+# [6, 7, 8]
+# [9]
+```
+
+## Generators vs Iterators
+
+Generators are simpler than iterators for most use cases:
+
+```python
+# Iterator - verbose
+class CounterIterator:
+    def __init__(self, n):
+        self.n = n
+        self.current = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current >= self.n:
+            raise StopIteration
+        self.current += 1
+        return self.current - 1
+
+# Generator - concise
+def counter(n):
+    current = 0
+    while current < n:
+        yield current
+        current += 1
+
+# Both work the same
+for num in CounterIterator(5):
+    print(num, end=" ")
+
+print()
+
+for num in counter(5):
+    print(num, end=" ")
+```
+
+::: {.callout-tip}
+## When to Use Each
+
+- **Use generators** (99% of the time): Simpler, cleaner code
+- **Use iterators**: When you need complex state management, multiple methods, or to implement a protocol
+:::
+
+## Common Patterns
+
+### Sentinel Pattern
+
+```python
+class ReadUntil:
+    """Read until sentinel value"""
+
+    def __init__(self, iterable, sentinel):
+        self.iterator = iter(iterable)
+        self.sentinel = sentinel
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        value = next(self.iterator)
+        if value == self.sentinel:
+            raise StopIteration
+        return value
+
+# Using it
+data = [1, 2, 3, None, 4, 5]
+for num in ReadUntil(data, None):
+    print(num)  # 1, 2, 3 (stops at None)
+```
+
+### Filtering Iterator
+
+```python
+class FilterIterator:
+    """Filter values using predicate"""
+
+    def __init__(self, iterable, predicate):
+        self.iterator = iter(iterable)
+        self.predicate = predicate
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            value = next(self.iterator)
+            if self.predicate(value):
+                return value
+
+# Using it
+numbers = range(10)
+evens = FilterIterator(numbers, lambda x: x % 2 == 0)
+print(list(evens))  # [0, 2, 4, 6, 8]
+```
+
+## Summary
+
+In this chapter, we've explored:
+
+- **Iterables** have `__iter__()`, **iterators** have `__iter__()` and `__next__()`
+- **Iterator protocol** enables `for` loops and iteration
+- **Custom iterators** give fine-grained control over iteration
+- **Separating iterable from iterator** allows multiple iterations
+- **Generators** are usually simpler than iterators
+
+Understanding iterators deepens your knowledge of Python's internals and enables you to create custom iteration behavior!
+
+::: {.callout-tip}
+## Key Takeaways
+
+- All iterators are iterables, but not all iterables are iterators
+- Use `__iter__()` and `__next__()` to create iterators
+- Separate iterable and iterator classes for reusability
+- Prefer generators over iterators for simplicity
+- Use `iter()` and `next()` for manual iteration
+:::
+
+## Practice Exercises
+
+### Exercise 1: Alphabet Iterator
+Create an iterator that yields letters of the alphabet:
+
+```python
+for letter in Alphabet():
+    print(letter, end=" ")
+# Output: A B C ... Z
+```
+
+### Exercise 2: Skip Iterator
+Create an iterator that skips every nth item:
+
+```python
+skipper = Skip(range(10), 2)
+print(list(skipper))  # [0, 2, 4, 6, 8]
+```
+
+### Exercise 3: Repeat Each
+Create an iterator that repeats each item n times:
+
+```python
+repeater = RepeatEach([1, 2, 3], 3)
+print(list(repeater))  # [1, 1, 1, 2, 2, 2, 3, 3, 3]
+```
+
+### Exercise 4: Take While
+Create an iterator that yields items while a condition is true:
+
+```python
+taker = TakeWhile(range(10), lambda x: x < 5)
+print(list(taker))  # [0, 1, 2, 3, 4]
+```
+
+### Exercise 5: Pairwise Iterator
+Create an iterator that yields consecutive pairs:
+
+```python
+pairs = Pairwise([1, 2, 3, 4, 5])
+print(list(pairs))  # [(1,2), (2,3), (3,4), (4,5)]
+```
+
+## Next Steps
+
+In the next chapter, we'll explore **comprehensions**, Python's elegant syntax for creating lists, dictionaries, and sets. Get ready for some syntactic sugar!
