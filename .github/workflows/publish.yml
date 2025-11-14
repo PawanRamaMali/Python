@@ -1,3 +1,4 @@
+# GitHub Actions workflow to build and deploy Python Quarto ebook
 name: Publish Python Ebook
 
 on:
