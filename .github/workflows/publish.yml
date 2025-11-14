@@ -38,14 +38,12 @@ jobs:
           version: pre-release
 
       - name: Render Quarto Project
-        run: |
-          quarto render
-        working-directory: python-ebook
+        run: quarto render
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: python-ebook/_book
+          path: _book
 
       - name: Deploy to GitHub Pages
         id: deployment
