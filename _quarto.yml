@@ -116,8 +116,7 @@ format:
     code-block-border-left: "#31BAE9"
 
 execute:
-  enabled: true
-  freeze: false
+  enabled: false
   echo: true
   warning: false
   error: false
